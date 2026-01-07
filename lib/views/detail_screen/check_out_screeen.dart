@@ -1,0 +1,579 @@
+import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
+import 'package:ecommerceapp/resources/components/coupon_field.dart';
+import 'package:ecommerceapp/services/stripe_service/stripe_service.dart';
+import 'package:ecommerceapp/view_model/address_view_model.dart';
+import 'package:ecommerceapp/view_model/coupon_view_model.dart';
+import 'package:ecommerceapp/views/profile_screen/address_screen/address_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+class CheckOutScreen extends StatelessWidget {
+  final List<CartModel> cartItems;
+
+  CheckOutScreen({
+    Key? key,
+    List<CartModel>? cartItems,
+    CartModel? singleItem,
+  })  : cartItems = singleItem != null ? [singleItem] : (cartItems ?? []),
+        super(key: key);
+
+  int get subtotal {
+    int sub = 0;
+    for (var item in cartItems) {
+      sub += item.productPrice * item.quantity;
+    }
+    return sub;
+  }
+
+  String get productNames {
+    return cartItems.map((e) => e.productName).join(', ');
+  }
+
+  final TextEditingController _couponController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "Checkout",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Consumer<CouponViewModel>(
+        builder: (context, couponVM, _) {
+          final totalAfterDiscount = (subtotal + 15 + 24) - couponVM.discount;
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// SHIPPING ADDRESS SECTION
+                      _SectionHeader(
+                        title: "Shipping Address",
+                        icon: Icons.local_shipping_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      Consumer<AddressViewModel>(
+                        builder: (context, viewModel, _) {
+                          if (viewModel.isLoading) {
+                            return _LoadingCard();
+                          }
+                          final address = viewModel.checkoutAddress;
+                          return _AddressCard(address: address);
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      /// PAYMENT METHOD SECTION
+                      _SectionHeader(
+                        title: "Payment Method",
+                        icon: Icons.payment_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      _PaymentMethodCard(),
+                      const SizedBox(height: 24),
+
+                      couponField(
+                        controller: _couponController,
+                        onApply: () {
+                          couponVM.applyCoupon(_couponController.text.trim(), context);
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      _SectionHeader(
+                        title: "Order Summary",
+                        icon: Icons.receipt_long_outlined,
+                      ),
+                      const SizedBox(height: 12),
+                      OrderSummaryCard(
+                        subtotal: subtotal,
+                        shipping: 15,
+                        tax: 24,
+                        discount: couponVM.discount,
+                        totalAmount: totalAfterDiscount,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// BOTTOM BAR WITH TOTAL AND CHECKOUT BUTTON
+              _CheckoutBottomBar(totalAmount: totalAfterDiscount, productName: productNames),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const _SectionHeader({
+    required this.title,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey[700]),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey[900],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LoadingCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddressCard extends StatelessWidget {
+  final dynamic address;
+
+  const _AddressCard({this.address});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: address == null
+            ? _EmptyAddressState()
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.pink,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              address.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "Primary Address",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (_) => AddressScreen()));
+                        },
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          color: Colors.grey[700],
+                          size: 20,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.grey[100],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(color: Colors.grey[200]),
+                  const SizedBox(height: 12),
+                  Text(
+                    '${address.street}',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${address.city}, ${address.state} ${address.zip}',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    address.country,
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+class _EmptyAddressState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(
+          Icons.location_off_outlined,
+          size: 48,
+          color: Colors.grey[400],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          "No shipping address added",
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () {
+             Navigator.push(context, MaterialPageRoute(builder: (_) => AddressScreen()));
+          },
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text("Add Address"),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.pink,
+            side: const BorderSide(color: Colors.pink),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PaymentMethodCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: SvgPicture.asset(
+                "assets/stripe.svg",
+                height: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Stripe Payment",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Secure payment processing",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OrderSummaryCard extends StatelessWidget {
+  final int subtotal;
+  final int shipping;
+  final int tax;
+  final int discount;
+  final int totalAmount;
+
+  OrderSummaryCard({
+    required this.subtotal,
+    required this.shipping,
+    required this.tax,
+    required this.discount,
+    required this.totalAmount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          _SummaryRow(label: "Subtotal", value: "\$$subtotal"),
+          _SummaryRow(label: "Shipping", value: "\$$shipping"),
+          _SummaryRow(label: "Tax", value: "\$$tax"),
+          if (discount > 0)
+            _SummaryRow(
+              label: "Coupon Discount",
+              value: "-\$$discount",
+              color: Colors.green,
+            ),
+          const Divider(),
+          _SummaryRow(
+            label: "Total",
+            value: "\$$totalAmount",
+            isTotal: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isTotal;
+  final Color? color;
+
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    this.isTotal = false,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
+              color: isTotal ? Colors.black : Colors.grey[700],
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 15,
+              fontWeight: isTotal ? FontWeight.w700 : FontWeight.w600,
+              color: color ?? (isTotal ? Colors.pink : Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _CheckoutBottomBar extends StatelessWidget {
+
+   final int totalAmount;
+   final String productName; 
+
+  const _CheckoutBottomBar({required this.totalAmount,required this.productName});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Total Amount",
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                     Text(
+                      "\$$totalAmount",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () async{
+                      await StripeServices.instance.makePayment(
+                          amount: (totalAmount),
+                          currency: 'usd',
+                          productName: productName,
+                        
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Row(
+                    children: [
+                      Text(
+                        "Place Order",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, size: 20),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
