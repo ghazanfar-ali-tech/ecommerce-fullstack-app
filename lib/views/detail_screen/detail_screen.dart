@@ -1,18 +1,15 @@
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
-import 'package:ecommerceapp/models/product_review_model.dart';
-import 'package:ecommerceapp/services/deep_link_services.dart';
-import 'package:ecommerceapp/services/stripe_service/stripe_service.dart';
+
 import 'package:ecommerceapp/view_model/auth_view_model.dart';
-import 'package:ecommerceapp/view_model/detail_view_model.dart';
+
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
-import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/check_out_screeen.dart';
 import 'package:ecommerceapp/views/detail_screen/detailed_review_screen.dart';
 import 'package:ecommerceapp/views/detail_screen/product_reviews.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
+
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -121,7 +118,6 @@ Container(
 
 const SizedBox(height: 16),
 
-/// Thumbnails
 SizedBox(
   height: 70,
   child: ListView.separated(
@@ -587,7 +583,7 @@ Consumer<ProductReviewViewModel>(
     MaterialPageRoute(
       builder: (_) => CheckOutScreen(
         singleItem: singleItem,
-      //  productPrice: price,
+        // productPrice: price,
       ),
     ),
   );

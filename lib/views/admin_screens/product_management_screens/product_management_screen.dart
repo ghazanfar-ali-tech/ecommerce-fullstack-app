@@ -16,21 +16,7 @@ class ProductManagementScreen extends StatelessWidget {
   final TextEditingController productPriceController = TextEditingController();
   final TextEditingController productDiscountController = TextEditingController();
 
-  final ImagePicker _imagePicker = ImagePicker();
 
-  Future<void> _pickImage(BuildContext context) async {
-    final XFile? image = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1024,
-      maxHeight: 1024,
-      imageQuality: 85,
-    );
-
-    if (image != null) {
-      Provider.of<AdminViewModel>(context, listen: false)
-          .setSelectedImage(File(image.path));
-    }
-  }
   Future<void> _pickMultipleImages(BuildContext context) async {
   final ImagePicker picker = ImagePicker();
   final List<XFile> images = await picker.pickMultiImage(
@@ -53,7 +39,10 @@ class ProductManagementScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Management'),
+        title: GestureDetector(
+          child: const Text('Product Management'),
+          
+          ),
         centerTitle: true,
         elevation: 2,
       ),
@@ -191,20 +180,20 @@ class ProductManagementScreen extends StatelessWidget {
                       },
 
                       buttonStyleData: const ButtonStyleData(
-                        height: 50,
+                        height: 50.0,
                         padding: EdgeInsets.symmetric(horizontal: 12),
                         width: double.infinity,
                       ),
 
                       dropdownStyleData: const DropdownStyleData(
-                        maxHeight: 300,
+                        maxHeight: 300.0,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                           color: Colors.white,
                         ),
                       ),
 
-                      menuItemStyleData: const MenuItemStyleData(height: 50),
+                      menuItemStyleData: const MenuItemStyleData(height: 50.0),
 
                       dropdownSearchData: DropdownSearchData(
                         searchController: searchController,

@@ -549,6 +549,7 @@ Widget _buildProductGrid(HomeViewModel viewModel) {
       final productPrice = (productData['productPrice'] ?? 0).toString();
       final productDescription = productData['productDescription'] ?? '';
       final productDiscount = productData['productDiscount'] ?? 0;
+      final categoryName = productData['categoryName'] ?? 'Uncategorized';
       
       // Extract image URLs array
       final productImageUrls = (productData['productImageUrls'] as List<dynamic>?)
@@ -568,7 +569,8 @@ Widget _buildProductGrid(HomeViewModel viewModel) {
         productPrice,
         productDiscount,
         productImage,
-        productImageUrls, // Pass the full array
+        productImageUrls, 
+        categoryName
       );
     },
   );
@@ -610,9 +612,10 @@ Widget _buildProductGrid(HomeViewModel viewModel) {
   String productName,
   String productPrice,
   int productDiscount,
-
   String productImage,
   List<String> productImageUrls,
+  String categoryName,
+
   ) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -624,9 +627,9 @@ Widget _buildProductGrid(HomeViewModel viewModel) {
           productName: productName,
             price: int.parse(productPrice),
             discount:productDiscount,
-            productImageUrls: productImageUrls, // Pass the array
+            productImageUrls: productImageUrls, 
             description: productDescription,
-            categoryName: "working",
+            categoryName: categoryName,
         )));
       },
       child: Container(

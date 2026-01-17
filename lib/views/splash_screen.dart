@@ -1,4 +1,3 @@
-import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
 import 'package:ecommerceapp/models/hive_models/shipping_address/address.dart' as hive_address;
 import 'package:ecommerceapp/services/deep_link_services.dart';
 import 'package:ecommerceapp/services/fire_base_services.dart';
@@ -25,7 +24,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _handleStartupLogic() async {
-    // Small splash delay
     await Future.delayed(const Duration(seconds: 2));
 
     final Uri? uri = await deepLinkService.getInitialDeepLink();

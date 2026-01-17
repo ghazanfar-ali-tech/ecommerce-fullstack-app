@@ -50,30 +50,26 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Products data
+
   List<Map<String, dynamic>> allProducts = [];
   List<Map<String, dynamic>> filteredProducts = [];
 
   bool _loading = false;
   bool get loading => _loading;
 
-  // Subscriptions
   StreamSubscription<QuerySnapshot>? _productsSubscription;
   StreamSubscription<User?>? _authSubscription;
 
-  // Constructor - Initialize auth listener
   HomeViewModel() {
     _initializeAuthListener();
   }
 
-  // Initialize auth listener to manage Firestore subscriptions
   void _initializeAuthListener() {
     _authSubscription = _auth.authStateChanges().listen((user) {
       if (user != null) {
-        // User is logged in, start listening to products
+    
         _listenToProducts();
       } else {
-        // User is logged out, cancel products listener and clear data
         _cancelProductsListener();
         allProducts = [];
         filteredProducts = [];
@@ -86,7 +82,7 @@ class HomeViewModel extends ChangeNotifier {
     await _fetchUsername();
     await _initializeVideo();
     _startAutoScroll();
-    // Products listener is handled by auth state listener
+   
   }
 
   Future<void> _fetchUsername() async {
@@ -196,9 +192,7 @@ class HomeViewModel extends ChangeNotifier {
     debugPrint('Add to cart: $productId');
   }
 
-  // Single method to listen to products with auth state management
   void _listenToProducts() {
-    // Cancel any existing subscription first
     _productsSubscription?.cancel();
     
     _loading = true;
@@ -216,7 +210,6 @@ class HomeViewModel extends ChangeNotifier {
               return data;
             }).toList();
 
-            // Initially, filteredProducts = all products
             filteredProducts = List.from(allProducts);
             _loading = false;
             notifyListeners();
@@ -225,7 +218,6 @@ class HomeViewModel extends ChangeNotifier {
             debugPrint('Products stream error: $error');
             if (error is FirebaseException && 
                 error.code == 'permission-denied') {
-              // Permission denied, likely logged out
               _cancelProductsListener();
               allProducts = [];
               filteredProducts = [];
@@ -241,7 +233,6 @@ class HomeViewModel extends ChangeNotifier {
     _productsSubscription = null;
   }
 
-  // Filter products based on search query
   void onSearch(String query) {
     if (query.isEmpty) {
       filteredProducts = List.from(allProducts);
@@ -254,7 +245,8 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Call this when you want to manually refresh
+  
+
   void refresh() {
     if (_auth.currentUser != null) {
       _listenToProducts();

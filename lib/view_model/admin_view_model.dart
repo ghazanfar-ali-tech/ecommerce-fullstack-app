@@ -5,6 +5,7 @@ import 'package:ecommerceapp/services/category_services.dart';
 import 'package:ecommerceapp/services/cloudinary_services.dart';
 import 'package:ecommerceapp/services/product_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 class AdminViewModel extends ChangeNotifier {
   int _selectIndex = 0;
@@ -19,6 +20,7 @@ class AdminViewModel extends ChangeNotifier {
 
   final List<File> _productImages = [];
   List<File> get productImages => _productImages;
+  final ZoomDrawerController drawerController = ZoomDrawerController();
 
   void addProductImage(File image) {
     _productImages.add(image);
@@ -49,6 +51,17 @@ class AdminViewModel extends ChangeNotifier {
   void updateScreen(BuildContext context, int index) {
     _selectIndex = index;
     notifyListeners();
+  }
+   void toggleDrawer() {
+    drawerController.toggle?.call();
+  }
+
+  void closeDrawer() {
+    drawerController.close?.call();
+  }
+
+  void openDrawer() {
+    drawerController.open?.call();
   }
 
   final ProductServices _productServices = ProductServices();
@@ -308,4 +321,7 @@ class AdminViewModel extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+
+  
 }

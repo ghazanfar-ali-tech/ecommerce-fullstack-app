@@ -77,6 +77,7 @@ class UserManagementScreen extends StatelessWidget {
                       final username = userData['username'] ?? 'Unknown';
                       final email = userData['email'] ?? 'No email';
                       final role = userData['role'] ?? 'user';
+                      final userImage = userData['profilePhotoUrl'] ?? 'https://t3.ftcdn.net/jpg/16/27/33/06/360_F_1627330643_pLZLDh7zIgLLsuBMhNgiWxoP4BjzRIfx.jpg';
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -85,10 +86,10 @@ class UserManagementScreen extends StatelessWidget {
                             backgroundColor: role == 'admin'
                                 ? Colors.red
                                 : Colors.blue,
-                            child: Icon(
-                              role == 'admin' ? Icons.admin_panel_settings : Icons.person,
-                              color: Colors.white,
-                            ),
+                            
+                            backgroundImage:role == 'admin' ? NetworkImage(  "https://thumbs.dreamstime.com/b/portrait-handsome-smiling-young-man-folded-arms-smiling-joyful-cheerful-men-crossed-hands-isolated-studio-shot-172869765.jpg"
+                            ):NetworkImage(userImage),
+                            
                           ),
                           title: Text(username),
                           subtitle: Text(email),

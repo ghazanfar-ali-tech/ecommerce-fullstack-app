@@ -1,12 +1,16 @@
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
+import 'package:ecommerceapp/models/cart_item_model.dart';
 import 'package:ecommerceapp/resources/components/coupon_field.dart';
 import 'package:ecommerceapp/services/stripe_service/stripe_service.dart';
 import 'package:ecommerceapp/view_model/address_view_model.dart';
 import 'package:ecommerceapp/view_model/coupon_view_model.dart';
+import 'package:ecommerceapp/view_model/stats_view_model.dart';
+import 'package:ecommerceapp/views/detail_screen/safepay_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/address_screen/address_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
 class CheckOutScreen extends StatelessWidget {
   final List<CartModel> cartItems;
 
@@ -25,8 +29,15 @@ class CheckOutScreen extends StatelessWidget {
     return sub;
   }
 
-  String get productNames {
-    return cartItems.map((e) => e.productName).join(', ');
+  // ✅ Convert CartModel list to CartItemModel list (CRITICAL FOR CORRECT STATS)
+  List<CartItemModel> get cartItemModels {
+    return cartItems.map((cartModel) => CartItemModel(
+      productName: cartModel.productName,
+      productPic: cartModel.productImage,
+      price: cartModel.productPrice,
+      quantity: cartModel.quantity,  // ✅ Individual quantity per product
+      categoryName: cartModel.productCategory,
+    )).toList();
   }
 
   final TextEditingController _couponController = TextEditingController();
@@ -64,7 +75,6 @@ class CheckOutScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// SHIPPING ADDRESS SECTION
                       _SectionHeader(
                         title: "Shipping Address",
                         icon: Icons.local_shipping_outlined,
@@ -81,7 +91,15 @@ class CheckOutScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
 
-                      /// PAYMENT METHOD SECTION
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => SafepayScreen()));
+                        },
+                        child: Text("Safe pay"),
+                      ),
                       _SectionHeader(
                         title: "Payment Method",
                         icon: Icons.payment_outlined,
@@ -93,7 +111,8 @@ class CheckOutScreen extends StatelessWidget {
                       couponField(
                         controller: _couponController,
                         onApply: () {
-                          couponVM.applyCoupon(_couponController.text.trim(), context);
+                          couponVM.applyCoupon(
+                              _couponController.text.trim(), context);
                         },
                       ),
                       const SizedBox(height: 24),
@@ -114,8 +133,10 @@ class CheckOutScreen extends StatelessWidget {
                 ),
               ),
 
-              /// BOTTOM BAR WITH TOTAL AND CHECKOUT BUTTON
-              _CheckoutBottomBar(totalAmount: totalAfterDiscount, productName: productNames),
+              _CheckoutBottomBar(
+                totalAmount: totalAfterDiscount,
+                cartItemModels: cartItemModels, // ✅ Pass the list of items
+              ),
             ],
           );
         },
@@ -243,7 +264,8 @@ class _AddressCard extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: () {
-                         Navigator.push(context, MaterialPageRoute(builder: (_) => AddressScreen()));
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => AddressScreen()));
                         },
                         icon: Icon(
                           Icons.edit_outlined,
@@ -316,7 +338,8 @@ class _EmptyAddressState extends StatelessWidget {
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () {
-             Navigator.push(context, MaterialPageRoute(builder: (_) => AddressScreen()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => AddressScreen()));
           },
           icon: const Icon(Icons.add, size: 18),
           label: const Text("Add Address"),
@@ -485,12 +508,16 @@ class _SummaryRow extends StatelessWidget {
     );
   }
 }
+
 class _CheckoutBottomBar extends StatelessWidget {
+  final int totalAmount;
+  final List<CartItemModel> cartItemModels; // ✅ Changed from strings to list
 
-   final int totalAmount;
-   final String productName; 
+  const _CheckoutBottomBar({
+    required this.totalAmount,
+    required this.cartItemModels,
+  });
 
-  const _CheckoutBottomBar({required this.totalAmount,required this.productName});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -524,7 +551,7 @@ class _CheckoutBottomBar extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                     Text(
+                    Text(
                       "\$$totalAmount",
                       style: TextStyle(
                         fontSize: 24,
@@ -535,21 +562,34 @@ class _CheckoutBottomBar extends StatelessWidget {
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () async{
-                      await StripeServices.instance.makePayment(
-                          amount: (totalAmount),
-                          currency: 'usd',
-                          productName: productName,
-                        
-                        );
+                  onPressed: () async {
+                    final statsVM = context.read<StatsViewModel>();
+
+                    // ✅ CRITICAL: Pass cartItems list, NOT individual string fields
+                    bool success = await StripeServices.instance.makePayment(
+                      amount: totalAmount,
+                      currency: 'usd',
+                      userName: "John Doe",
+                      statsViewModel: statsVM,
+                      cartItems: cartItemModels, // ✅ This will create separate Firestore docs
+                    );
+
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Purchase successful!')),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Payment failed!')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 16,
-                    ),
+                        horizontal: 40, vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -560,9 +600,7 @@ class _CheckoutBottomBar extends StatelessWidget {
                       Text(
                         "Place Order",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                            fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(width: 8),
                       Icon(Icons.arrow_forward, size: 20),

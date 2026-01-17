@@ -31,7 +31,7 @@ class Category {
       categoryName: data['categoryName'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      totalItems: data['totalItems'] ?? 0,
+      totalItems: (data['totalItems'] ?? 0).toInt(),
     );
   }
 

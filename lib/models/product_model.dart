@@ -44,8 +44,8 @@ class ProductModel {
       productImageUrls: List<String>.from(data["productImageUrls"] ?? []), 
       productName: data["productName"] ?? "",
       productDescription: data["productDescription"] ?? "",
-      productPrice: data["productPrice"] ?? 0,
-      productDiscount: data["productDiscount"] ?? 0,
+       productPrice: (data["productPrice"] ?? 0).toInt(),
+    productDiscount: (data["productDiscount"] ?? 0).toInt(), 
       createdAt: (data["createdAt"] as Timestamp).toDate(),
 
       // 👇 Category fields

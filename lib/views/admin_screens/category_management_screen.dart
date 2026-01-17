@@ -17,6 +17,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final TextEditingController _categoryNameController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   File? _selectedImage;
+  final TextEditingController _searchController = TextEditingController();
+
 
   final List<String> sortItems = [
     'A → Z',
@@ -37,6 +39,7 @@ String? selectedValue;
   @override
   void dispose() {
     _categoryNameController.dispose();
+      _searchController.dispose();
     super.dispose();
   }
 
@@ -72,6 +75,7 @@ String? selectedValue;
                 children: [
                   TextFormField(
                     controller: _categoryNameController,
+                  
                     decoration: const InputDecoration(
                       labelText: "Category Name",
                       border: OutlineInputBorder(),
@@ -364,6 +368,10 @@ String? selectedValue;
               children: [
                Expanded(
       child: TextFormField(
+        controller: _searchController,
+        onChanged: (value) {
+                setState(() {});
+              },
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.search),
           hintText: "Search category",
@@ -496,10 +504,19 @@ String? selectedValue;
                     );
                   }
 
+                  final query = _searchController.text.toLowerCase();
+
+final filteredCategories = viewModel.categories.where((category) {
+  return query.isEmpty ||
+      category.categoryName.toLowerCase().contains(query);
+}).toList();
+      
                   return ListView.builder(
-                    itemCount: viewModel.categories.length,
+                    itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
-                      final category = viewModel.categories[index];
+                      final category = filteredCategories[index];
+ 
+
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(

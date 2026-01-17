@@ -156,7 +156,7 @@ class CartScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Rs ${item.productPrice}',
+                                    '\$ ${item.productPrice}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -346,7 +346,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Rs $totalPrice',
+                              '\$ $totalPrice',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -377,7 +377,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Rs $totalPrice',
+                              '\$ $totalPrice',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,

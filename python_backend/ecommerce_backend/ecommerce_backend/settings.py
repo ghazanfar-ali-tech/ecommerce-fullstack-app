@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'payments',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -99,6 +101,9 @@ DATABASES = {
 }
 SAFEPAY_PUBLIC = os.getenv("SAFEPAY_PUBLIC")
 SAFEPAY_SECRET = os.getenv("SAFEPAY_SECRET")
+print("SAFEPAY_PUBLIC =", SAFEPAY_PUBLIC)
+print("SAFEPAY_SECRET =", SAFEPAY_SECRET)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -135,3 +140,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CORS_ALLOW_ALL_ORIGINS = True

@@ -68,6 +68,13 @@ dependencies:
   hive_flutter: ^1.1.0
   hive_generator: ^2.0.1
   badges: ^3.1.2
+  webview_flutter: ^4.13.1
+  http: ^1.6.0
+  safepay_checkout: ^1.0.6
+  fl_chart: ^1.1.1
+  animate_do: ^4.2.0
+  intl: ^0.20.2
+  flutter_zoom_drawer: ^3.2.0
  
 
 dev_dependencies:
