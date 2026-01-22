@@ -1,4 +1,4 @@
-import 'package:ecommerceapp/views/home_screen/home_screen.dart';
+import 'package:ecommerceapp/view_model/notification_view_model.dart';
 import 'package:ecommerceapp/views/auth_screens/forgot_password_screen.dart';
 import 'package:ecommerceapp/views/bottom_navigation/bottom_navigation.dart';
 import 'package:flutter/material.dart';
@@ -159,7 +159,6 @@ class AuthScreen extends StatelessWidget {
 
                             SizedBox(height: 20),
 
-                            // Animated form fields
                             Consumer<AuthViewModel>(
                               builder: (context, model, child) {
                                 return Form(
@@ -265,10 +264,10 @@ class AuthScreen extends StatelessWidget {
                                   onTap: () {
                                     if (model.isLoginSelected) {
                                       print("Login clicked");
-                                      model.login(context);
+                                      model.login(context,context.read<NotificationViewModel>());
                                     } else {
                                       print("Sign Up clicked");
-                                      model.signUp(context);
+                                      model.signUp(context,context.read<NotificationViewModel>());
                                     }
                                   },
                                   child: AnimatedContainer(
@@ -375,7 +374,7 @@ class AuthScreen extends StatelessWidget {
                                     onPressed: () async {
                                    final user = await context.read<AuthViewModel>().loginWithGoogle();
                                    if (user != null) {
-                                     // success -> navigate to home or update UI
+                                  
                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNavigation()));
                                    } else {
                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AuthScreen()));

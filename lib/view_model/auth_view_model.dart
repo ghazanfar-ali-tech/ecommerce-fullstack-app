@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
+import 'package:ecommerceapp/services/notification_services.dart/notification_services.dart';
 import 'package:ecommerceapp/utils/utils.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
+import 'package:ecommerceapp/view_model/notification_view_model.dart';
 import 'package:ecommerceapp/views/admin_screens/admin_panel_screen.dart';
 import 'package:ecommerceapp/views/auth_screens/auth_screen.dart';
 import 'package:ecommerceapp/views/bottom_navigation/bottom_navigation.dart';
@@ -54,7 +56,7 @@ class AuthViewModel extends ChangeNotifier {
 
   bool get isAdmin => _userRole?.toLowerCase() == 'admin';
 
-  Future<void> signUp(BuildContext context) async {
+  Future<void> signUp(BuildContext context,NotificationViewModel notificationVM,) async {
     _setLoading(true);
 
     try {
@@ -72,6 +74,10 @@ class AuthViewModel extends ChangeNotifier {
       });
 
       Utils.toastMessage('Account created successfully!');
+      notificationVM.showNotification(
+         'SignUP Successful',
+    'Account created successfully!',
+        );
       _usernameController.clear();
       _emailController.clear();
       _passwordController.clear();
@@ -165,7 +171,8 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> login(BuildContext context) async {
+  Future<void> login(BuildContext context, NotificationViewModel notificationVM,) async {
+   
     _setLoading(true);
 
     try {
@@ -191,6 +198,11 @@ class AuthViewModel extends ChangeNotifier {
       await openUserCart(_userId!);
 
       Utils.toastMessage('Welcome, ${_userRole == 'admin' ? 'Admin' : 'User'}!');
+  notificationVM.showNotification(
+    'Login Successful',
+    'Welcome back!',
+  );
+
       
       _emailController.clear();
       _passwordController.clear();

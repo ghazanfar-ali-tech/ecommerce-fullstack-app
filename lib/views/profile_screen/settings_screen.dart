@@ -1,4 +1,6 @@
+import 'package:ecommerceapp/view_model/app_version_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -79,10 +81,12 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('App Version'),
-            subtitle: const Text('1.0.0'),
-            onTap: () {
-              // Optionally show more app info
-            },
+            subtitle: Consumer<AppVersionInfoViewModel>(
+              builder: (context, appVersionModel, child){
+                return Text('${appVersionModel.packageInfo.version}+${appVersionModel.packageInfo.buildNumber}');
+              }
+              )
+           
           ),
         ],
       ),
