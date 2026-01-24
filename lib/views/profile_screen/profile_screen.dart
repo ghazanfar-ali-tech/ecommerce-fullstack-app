@@ -2,7 +2,7 @@ import 'package:ecommerceapp/view_model/profile_view_model.dart';
 import 'package:ecommerceapp/view_model/setting_view_model.dart';
 import 'package:ecommerceapp/views/profile_screen/address_screen/address_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/edit_profile_screen.dart';
-import 'package:ecommerceapp/views/profile_screen/settings_screen.dart';
+import 'package:ecommerceapp/views/profile_screen/settings_screen/settings_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

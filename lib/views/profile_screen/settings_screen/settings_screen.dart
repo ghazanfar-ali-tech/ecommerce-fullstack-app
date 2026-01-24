@@ -1,4 +1,7 @@
 import 'package:ecommerceapp/view_model/app_version_info.dart';
+import 'package:ecommerceapp/view_model/notification_view_model.dart';
+import 'package:ecommerceapp/views/profile_screen/settings_screen/privacy_and_policy_screen.dart';
+import 'package:ecommerceapp/views/profile_screen/settings_screen/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,12 +38,13 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           SwitchListTile(
-            title: const Text('Push Notifications'),
-            value: true,
-            onChanged: (value) {
-              // Implement push notification toggle
-            },
-          ),
+  title: const Text('Push Notifications'),
+  value: context.watch<NotificationViewModel>().isEnabled,
+  onChanged: (value) {
+    context.read<NotificationViewModel>().togglePush(value);
+  },
+),
+
           SwitchListTile(
             title: const Text('Email Notifications'),
             value: false,
@@ -60,7 +64,12 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Privacy Policy'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // Navigate to Privacy Policy screen
+                        Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const PrivacyPolicyScreen(),
+    ),
+  );
             },
           ),
           ListTile(
@@ -68,7 +77,12 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Terms of Service'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // Navigate to Terms of Service screen
+                          Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const TermsOfServiceScreen(),
+    ),
+  );
             },
           ),
           const Padding(
