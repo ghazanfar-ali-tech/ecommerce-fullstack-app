@@ -6,6 +6,7 @@ import 'package:ecommerceapp/views/onboarding_screens/onboarding_screens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,6 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _handleStartupLogic() async {
     await Future.delayed(const Duration(seconds: 2));
+    await Hive.initFlutter();
 
     await Hive.openBox('app');
   await Hive.openBox<hive_address.Address>('addresses');

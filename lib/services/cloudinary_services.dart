@@ -1,15 +1,17 @@
 import 'dart:io';
-import 'package:ecommerceapp/constants.dart';
+import 'package:ecommerceapp/core/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class CloudinaryService {
+  static String get uploadPreset => AppConstants.uploadPreset;
+
     
   
   static Future<String?> uploadImage(File imageFile) async {
     try {
       final url = Uri.parse(
-        'https://api.cloudinary.com/v1_1/$cloudName/image/upload'
+        'https://api.cloudinary.com/v1_1/${AppConstants.cloudName}/image/upload'
       );
 
       final request = http.MultipartRequest('POST', url);
@@ -40,14 +42,14 @@ class CloudinaryService {
   static Future<bool> deleteImage(String publicId) async {
     try {
       final url = Uri.parse(
-        'https://api.cloudinary.com/v1_1/$cloudName/image/destroy'
+        'https://api.cloudinary.com/v1_1/${AppConstants.cloudName}/image/destroy'
       );
 
       final response = await http.post(
         url,
         body: {
           'public_id': publicId,
-          'api_key': apiKey,
+          'api_key': AppConstants.cloudinaryApiKey,
         },
       );
 

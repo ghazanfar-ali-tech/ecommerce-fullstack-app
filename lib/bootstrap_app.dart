@@ -1,4 +1,4 @@
-import 'package:ecommerceapp/constants.dart';
+import 'package:ecommerceapp/core/constants.dart';
 import 'package:ecommerceapp/main.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
 import 'package:ecommerceapp/models/hive_models/shipping_address/address.dart' as hive_address;
@@ -48,14 +48,14 @@ class _BootstrapAppState extends State<BootstrapApp> {
   }
 
   Future<void> _initServices() async {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: firebaseApiKey,
-        appId: firebaseAppId,
-        messagingSenderId: firebaseMessagingSenderId,
-        projectId: firebaseProjectId,
-      ),
-    );
+ await Firebase.initializeApp(
+  options: FirebaseOptions(
+    apiKey: AppConstants.firebaseApiKey,
+    appId: AppConstants.firebaseAppId,
+    messagingSenderId: AppConstants.firebaseMessagingSenderId,
+    projectId: AppConstants.firebaseProjectId,
+  ),
+);
 
     await NotificationService().init();
 
