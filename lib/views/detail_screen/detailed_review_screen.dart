@@ -405,7 +405,9 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
                                             radius: 20,
                                             backgroundColor: Colors.blue.shade100,
                                             child: Text(
-                                              review.userName[0].toUpperCase(),
+                                              review.userName.isNotEmpty
+    ? review.userName[0].toUpperCase()
+    : "?",
                                               style: TextStyle(
                                                 color: Colors.blue.shade900,
                                                 fontWeight: FontWeight.bold,

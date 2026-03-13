@@ -372,7 +372,7 @@ class AuthScreen extends StatelessWidget {
                               children: [
                                 IconButton(
                                     onPressed: () async {
-                                   final user = await context.read<AuthViewModel>().loginWithGoogle();
+                                   final user = await context.read<AuthViewModel>().loginWithGoogle(context);
                                    if (user != null) {
                                   
                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNavigation()));

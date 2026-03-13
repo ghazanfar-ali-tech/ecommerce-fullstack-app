@@ -4,12 +4,14 @@ import 'package:ecommerceapp/services/notification_services.dart/notification_se
 import 'package:ecommerceapp/utils/utils.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
+import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/admin_screens/admin_panel_screen.dart';
 import 'package:ecommerceapp/views/auth_screens/auth_screen.dart';
 import 'package:ecommerceapp/views/bottom_navigation/bottom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -114,7 +116,7 @@ class AuthViewModel extends ChangeNotifier {
     print('Saved to prefs - Role: $role, UserId: $userId, Email: $email');
   }
 
-  Future<void> loadUserFromPrefs() async {
+  Future<void> loadUserFromPrefs(StoreViewModel storeVM) async {
     final prefs = await SharedPreferences.getInstance();
     _userRole = prefs.getString('userRole');
     _userId = prefs.getString('userId');
@@ -122,6 +124,7 @@ class AuthViewModel extends ChangeNotifier {
     
     if (_userId != null) {
       await openUserCart(_userId!);
+      await storeVM.initForUser(_userId!); 
     }
     
     notifyListeners();
@@ -137,6 +140,8 @@ class AuthViewModel extends ChangeNotifier {
 
     try {
 
+final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+storeVM.clearFavorites();
       await _auth.signOut();
 
       // 2. Clear SharedPreferences
@@ -197,6 +202,9 @@ class AuthViewModel extends ChangeNotifier {
 
       await openUserCart(_userId!);
 
+      final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+await storeVM.initForUser(_userId!);
+
       Utils.toastMessage('Welcome, ${_userRole == 'admin' ? 'Admin' : 'User'}!');
   notificationVM.showNotification(
     'Login Successful',
@@ -245,7 +253,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<User?> loginWithGoogle() async {
+  Future<User?> loginWithGoogle(BuildContext context) async {
     try {
       _setLoading(true);
 
@@ -275,6 +283,8 @@ class AuthViewModel extends ChangeNotifier {
         await _saveToPrefs(_userRole!, _userId!, _email!);
 
         await openUserCart(_userId!);
+        final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+await storeVM.initForUser(_userId!);
       }
 
       _setLoading(false);

@@ -625,7 +625,7 @@ Widget _buildProductGrid(HomeViewModel viewModel) {
         Navigator.push(context, MaterialPageRoute(builder: (_)=> DetailScreen(
           productId: productId,
           productName: productName,
-            price: int.parse(productPrice),
+           price: double.parse(productPrice).toInt(),
             discount:productDiscount,
             productImageUrls: productImageUrls, 
             description: productDescription,

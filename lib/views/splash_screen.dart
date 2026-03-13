@@ -2,6 +2,7 @@ import 'package:ecommerceapp/models/hive_models/shipping_address/address.dart' a
 import 'package:ecommerceapp/services/deep_link_services.dart';
 import 'package:ecommerceapp/services/fire_base_services.dart';
 import 'package:ecommerceapp/view_model/auth_view_model.dart';
+import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/onboarding_screens/onboarding_screens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,8 @@ class _SplashScreenState extends State<SplashScreen> {
   
   if (user != null) {
     await authVM.openUserCart(user.uid);
+     final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+  await authVM.loadUserFromPrefs(storeVM);
   }
     if (uri != null && uri.pathSegments.isNotEmpty) {
  
@@ -74,6 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),

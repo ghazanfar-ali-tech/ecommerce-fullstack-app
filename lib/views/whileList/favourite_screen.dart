@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/view_model/auth_view_model.dart';
 import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/home_screen/widgets/add_to_cart_button.dart';
 import 'package:flutter/material.dart';
@@ -46,25 +47,36 @@ class FavouriteScreen extends StatelessWidget {
                         const SizedBox(height: 15),
                       ],
                     ),
-                    addToCartButton(
-                      "Add all to Cart",
-                      Icons.shopping_cart_checkout_sharp,
-                      Colors.orange,
-                      () {
-                        if (favCount > 0) {
-                          viewModel.addAllToCart();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Added $favCount items to cart'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      },
-                      Colors.white,
-                      16.0,
-                      18,
-                    ),
+                addToCartButton(
+  "Add all to Cart",
+  Icons.shopping_cart_checkout_sharp,
+  Colors.orange,
+  () async {
+    if (favCount > 0) {
+      final authVM = Provider.of<AuthViewModel>(context, listen: false);
+      final cartBox = authVM.getCartBox();
+      
+      final countBefore = cartBox.length;
+      await viewModel.addAllToCart(cartBox);
+      final countAfter = cartBox.length;
+      final addedCount = countAfter - countBefore;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            addedCount == 0
+                ? 'All items already in cart'
+                : 'Added $addedCount item${addedCount == 1 ? '' : 's'} to cart',
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  },
+  Colors.white,
+  16.0,
+  18,
+),
                   ],
                 ),
               ),
@@ -206,22 +218,35 @@ class FavouriteScreen extends StatelessWidget {
                                               ),
                                               Row(
                                                 children: [
-                                                  // Add to Cart Button
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text('Added $productName to cart'),
-                                                          duration: const Duration(seconds: 1),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.shopping_cart_outlined,
-                                                      size: 22,
-                                                      color: Colors.orange,
-                                                    ),
-                                                  ),
+                                                GestureDetector(
+  onTap: () async {
+    final authVM = Provider.of<AuthViewModel>(context, listen: false);
+    final cartBox = authVM.getCartBox();
+    final exists = cartBox.values.any((item) => item.productName == productName);
+    
+    if (exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$productName already in cart'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } else {
+      await viewModel.addSingleToCart(product, cartBox);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Added $productName to cart'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+  },
+  child: const Icon(
+    Icons.shopping_cart_outlined,
+    size: 22,
+    color: Colors.orange,
+  ),
+),
                                                   const SizedBox(width: 20),
                                                   
                                                   // Remove from Favorites Button
