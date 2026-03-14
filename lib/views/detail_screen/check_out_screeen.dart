@@ -29,13 +29,12 @@ class CheckOutScreen extends StatelessWidget {
     return sub;
   }
 
-  // ✅ Convert CartModel list to CartItemModel list (CRITICAL FOR CORRECT STATS)
   List<CartItemModel> get cartItemModels {
     return cartItems.map((cartModel) => CartItemModel(
       productName: cartModel.productName,
       productPic: cartModel.productImage,
       price: cartModel.productPrice,
-      quantity: cartModel.quantity,  // ✅ Individual quantity per product
+      quantity: cartModel.quantity,  
       categoryName: cartModel.productCategory,
     )).toList();
   }
@@ -135,7 +134,7 @@ class CheckOutScreen extends StatelessWidget {
 
               _CheckoutBottomBar(
                 totalAmount: totalAfterDiscount,
-                cartItemModels: cartItemModels, // ✅ Pass the list of items
+                cartItemModels: cartItemModels, 
               ),
             ],
           );
@@ -511,7 +510,7 @@ class _SummaryRow extends StatelessWidget {
 
 class _CheckoutBottomBar extends StatelessWidget {
   final int totalAmount;
-  final List<CartItemModel> cartItemModels; // ✅ Changed from strings to list
+  final List<CartItemModel> cartItemModels; 
 
   const _CheckoutBottomBar({
     required this.totalAmount,
@@ -565,13 +564,12 @@ class _CheckoutBottomBar extends StatelessWidget {
                   onPressed: () async {
                     final statsVM = context.read<StatsViewModel>();
 
-                    // ✅ CRITICAL: Pass cartItems list, NOT individual string fields
                     bool success = await StripeServices.instance.makePayment(
                       amount: totalAmount,
                       currency: 'usd',
                       userName: "John Doe",
                       statsViewModel: statsVM,
-                      cartItems: cartItemModels, // ✅ This will create separate Firestore docs
+                      cartItems: cartItemModels, 
                     );
 
                     if (success) {
