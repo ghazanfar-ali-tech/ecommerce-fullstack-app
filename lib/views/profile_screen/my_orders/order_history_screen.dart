@@ -1,6 +1,7 @@
 import 'package:ecommerceapp/enums/order_status.dart';
 import 'package:ecommerceapp/models/order_model.dart';
 import 'package:ecommerceapp/view_model/order_view_model.dart';
+import 'package:ecommerceapp/views/profile_screen/my_orders/order_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
  
@@ -490,15 +491,13 @@ final OrderModel order;
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Viewing details for ${order.orderId}'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            margin: const EdgeInsets.all(12),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+     
+        Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => OrderDetailScreen(order: order),
+  ),
+);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
