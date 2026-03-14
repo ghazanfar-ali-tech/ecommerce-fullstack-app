@@ -4,6 +4,7 @@ import 'package:ecommerceapp/resources/components/coupon_field.dart';
 import 'package:ecommerceapp/services/stripe_service/stripe_service.dart';
 import 'package:ecommerceapp/view_model/address_view_model.dart';
 import 'package:ecommerceapp/view_model/coupon_view_model.dart';
+import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:ecommerceapp/view_model/stats_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/safepay_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/address_screen/address_screen.dart';
@@ -135,6 +136,7 @@ class CheckOutScreen extends StatelessWidget {
               _CheckoutBottomBar(
                 totalAmount: totalAfterDiscount,
                 cartItemModels: cartItemModels, 
+                  subtotal: subtotal,  
               ),
             ],
           );
@@ -511,9 +513,12 @@ class _SummaryRow extends StatelessWidget {
 class _CheckoutBottomBar extends StatelessWidget {
   final int totalAmount;
   final List<CartItemModel> cartItemModels; 
+  
+ final int subtotal;  
 
   const _CheckoutBottomBar({
     required this.totalAmount,
+     required this.subtotal, 
     required this.cartItemModels,
   });
 
@@ -563,6 +568,9 @@ class _CheckoutBottomBar extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     final statsVM = context.read<StatsViewModel>();
+                      final orderVM = context.read<OrderViewModel>();        
+    final couponVM = context.read<CouponViewModel>();       
+    final addressVM = context.read<AddressViewModel>(); 
 
                     bool success = await StripeServices.instance.makePayment(
                       amount: totalAmount,
@@ -573,6 +581,22 @@ class _CheckoutBottomBar extends StatelessWidget {
                     );
 
                     if (success) {
+                        await orderVM.placeOrder(
+        items: cartItemModels,
+        subtotal: subtotal,
+        shipping: 15,
+        tax: 24,
+        discount: couponVM.discount,
+        totalAmount: totalAmount,
+        shippingAddress: addressVM.checkoutAddress != null
+    ? '${addressVM.checkoutAddress!.name}, '
+      '${addressVM.checkoutAddress!.street}, '
+      '${addressVM.checkoutAddress!.city}, '
+      '${addressVM.checkoutAddress!.state} '
+      '${addressVM.checkoutAddress!.zip}, '
+      '${addressVM.checkoutAddress!.country}'
+    : '',
+      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Purchase successful!')),
                       );

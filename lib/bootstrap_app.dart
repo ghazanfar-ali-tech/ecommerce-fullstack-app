@@ -14,6 +14,7 @@ import 'package:ecommerceapp/view_model/detail_view_model.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
 import 'package:ecommerceapp/view_model/home_view_mode.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
+import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:ecommerceapp/view_model/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +92,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
         ChangeNotifierProvider(create: (_) => StatsViewModel()),
         ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()..init()),
+        ChangeNotifierProvider(create: (_) => OrderViewModel()), 
         ChangeNotifierProvider(
           create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
         ),

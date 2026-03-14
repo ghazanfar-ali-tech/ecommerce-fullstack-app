@@ -1,92 +1,79 @@
 import 'package:ecommerceapp/enums/order_status.dart';
-import 'package:ecommerceapp/views/profile_screen/my_orders/order_class.dart';
+import 'package:ecommerceapp/models/order_model.dart';
+import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
  
 
  
-final List<OrderItem> sampleOrders = [
-  OrderItem(
-    orderId: 'ORD-100421',
-    productName: 'Nike Air Max 270',
-    productImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
-    quantity: 2,
-    totalPrice: 299.98,
-    status: OrderStatus.active,
-    orderDate: DateTime.now().subtract(const Duration(days: 1)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100398',
-    productName: 'Sony WH-1000XM5',
-    productImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
-    quantity: 1,
-    totalPrice: 349.99,
-    status: OrderStatus.active,
-    orderDate: DateTime.now().subtract(const Duration(days: 3)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100374',
-    productName: 'Apple Watch Series 9',
-    productImage: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400',
-    quantity: 1,
-    totalPrice: 399.00,
-    status: OrderStatus.completed,
-    orderDate: DateTime.now().subtract(const Duration(days: 12)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100360',
-    productName: 'Leather Crossbody Bag',
-    productImage: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400',
-    quantity: 1,
-    totalPrice: 89.95,
-    status: OrderStatus.completed,
-    orderDate: DateTime.now().subtract(const Duration(days: 20)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100341',
-    productName: 'Mechanical Keyboard',
-    productImage: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400',
-    quantity: 1,
-    totalPrice: 159.00,
-    status: OrderStatus.completed,
-    orderDate: DateTime.now().subtract(const Duration(days: 30)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100319',
-    productName: 'Adidas Running Shorts',
-    productImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=400',
-    quantity: 3,
-    totalPrice: 89.97,
-    status: OrderStatus.cancelled,
-    orderDate: DateTime.now().subtract(const Duration(days: 8)),
-  ),
-  OrderItem(
-    orderId: 'ORD-100305',
-    productName: 'Wireless Earbuds Pro',
-    productImage: 'https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?w=400',
-    quantity: 1,
-    totalPrice: 129.99,
-    status: OrderStatus.cancelled,
-    orderDate: DateTime.now().subtract(const Duration(days: 15)),
-  ),
-];
+
  
  
 class OrderHistoryScreen extends StatelessWidget {
   const OrderHistoryScreen({super.key});
  
-  @override
+ @override
   Widget build(BuildContext context) {
+     Future.microtask(() =>
+        context.read<OrderViewModel>().fetchOrders());
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F6FA),
         appBar: _buildAppBar(context),
-        body: TabBarView(
-          children: [
-            _OrderList(status: OrderStatus.active),
-            _OrderList(status: OrderStatus.completed),
-            _OrderList(status: OrderStatus.cancelled),
-          ],
+        body: Consumer<OrderViewModel>(
+          builder: (context, orderVM, _) {
+
+            if (orderVM.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF4F46E5),
+                ),
+              );
+            }
+
+            if (orderVM.error != null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 48, color: Color(0xFFEF4444)),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Something went wrong',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1A2E),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      orderVM.error!,
+                      style: const TextStyle(
+                          fontSize: 13, color: Color(0xFF9CA3AF)),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => orderVM.fetchOrders(),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return TabBarView(
+  children: [
+    _OrderList(orders: orderVM.activeOrders,    status: OrderStatus.active),
+    _OrderList(orders: orderVM.completedOrders, status: OrderStatus.completed),
+    _OrderList(orders: orderVM.cancelledOrders, status: OrderStatus.cancelled),
+  ],
+);
+          },
         ),
       ),
     );
@@ -110,7 +97,6 @@ class OrderHistoryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Row
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 16, 0),
                 child: Row(
@@ -145,7 +131,6 @@ class OrderHistoryScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              // Tab Bar
               const TabBar(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 labelColor: Color(0xFF4F46E5),
@@ -183,25 +168,24 @@ class OrderHistoryScreen extends StatelessWidget {
  
  
 class _OrderList extends StatelessWidget {
-  final OrderStatus status;
+  final List<OrderModel> orders; 
+  final OrderStatus status; 
  
-  const _OrderList({required this.status});
+  const _OrderList({required this.orders, required this.status,  });
  
-  @override
+   @override
   Widget build(BuildContext context) {
-    final orders = sampleOrders.where((o) => o.status == status).toList();
- 
     if (orders.isEmpty) {
       return _buildEmptyState(status);
     }
- 
+
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       itemCount: orders.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: _OrderCard(order: orders[index]),
+          child: _OrderCard(order: orders[index]),   
         );
       },
     );
@@ -273,55 +257,42 @@ class _OrderList extends StatelessWidget {
  
  
 class _OrderCard extends StatelessWidget {
-  final OrderItem order;
- 
+    final OrderModel order;               
+
   const _OrderCard({required this.order});
- 
+
   @override
   Widget build(BuildContext context) {
+    final firstItem = order.items.isNotEmpty ? order.items.first : null;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Color(0x08000000), blurRadius: 10, offset: Offset(0, 2)),
         ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            // ── Top row: image + info + status badge
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Image
+            
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    order.productImage,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 80,
-                      height: 80,
-                      color: const Color(0xFFF5F6FA),
-                      child: const Icon(
-                        Icons.image_outlined,
-                        color: Color(0xFFD1D5DB),
-                        size: 30,
-                      ),
-                    ),
-                  ),
+                  child: firstItem != null
+                      ? Image.network(
+                          firstItem.productPic,
+                          width: 80, height: 80, fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _imageFallback(),
+                        )
+                      : _imageFallback(),
                 ),
                 const SizedBox(width: 12),
- 
-                // Product Info
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +302,10 @@ class _OrderCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              order.productName,
+                            
+                              order.items.length > 1
+                                  ? '${firstItem?.productName ?? ''} +${order.items.length - 1} more'
+                                  : firstItem?.productName ?? '',
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
@@ -343,55 +317,48 @@ class _OrderCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _StatusBadge(status: order.status),
+                          _StatusBadge(status: _parseStatus(order.status)),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      // Order ID
                       Row(
                         children: [
-                          const Icon(
-                            Icons.receipt_long_outlined,
-                            size: 13,
-                            color: Color(0xFF9CA3AF),
-                          ),
+                          const Icon(Icons.receipt_long_outlined,
+                              size: 13, color: Color(0xFF9CA3AF)),
                           const SizedBox(width: 4),
-                          Text(
-                            order.orderId,
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: Color(0xFF9CA3AF),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          Text(order.orderId,
+                              style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: Color(0xFF9CA3AF),
+                                  fontWeight: FontWeight.w500)),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      // Qty + Price
                       Row(
                         children: [
-                          const Icon(
-                            Icons.shopping_bag_outlined,
-                            size: 13,
-                            color: Color(0xFF9CA3AF),
-                          ),
+                          const Icon(Icons.shopping_bag_outlined,
+                              size: 13, color: Color(0xFF9CA3AF)),
                           const SizedBox(width: 4),
-                          Text(
-                            '${order.quantity} ${order.quantity == 1 ? 'item' : 'items'}',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: Color(0xFF6B7280),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                       Text(
+  () {
+    final totalQty = order.items.fold<int>(
+      0, (sum, item) => sum + item.quantity,
+    );
+    return '$totalQty ${totalQty == 1 ? 'item' : 'items'}';
+  }(),
+  style: const TextStyle(
+    fontSize: 12.5,
+    color: Color(0xFF6B7280),
+    fontWeight: FontWeight.w500,
+  ),
+),
                           const SizedBox(width: 10),
                           Text(
-                            '\$${order.totalPrice.toStringAsFixed(2)}',
+                            '\$${order.totalAmount}',
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF4F46E5),
-                            ),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF4F46E5)),
                           ),
                         ],
                       ),
@@ -400,27 +367,22 @@ class _OrderCard extends StatelessWidget {
                 ),
               ],
             ),
- 
+
             const SizedBox(height: 12),
             const Divider(height: 1, color: Color(0xFFF3F4F6)),
             const SizedBox(height: 12),
- 
-            // ── Bottom row: date + View Details button
+
             Row(
               children: [
-                const Icon(
-                  Icons.calendar_today_outlined,
-                  size: 13,
-                  color: Color(0xFF9CA3AF),
-                ),
+                const Icon(Icons.calendar_today_outlined,
+                    size: 13, color: Color(0xFF9CA3AF)),
                 const SizedBox(width: 5),
                 Text(
-                  _formatDate(order.orderDate),
+                  _formatDate(order.createdAt),
                   style: const TextStyle(
-                    fontSize: 12.5,
-                    color: Color(0xFF9CA3AF),
-                    fontWeight: FontWeight.w500,
-                  ),
+                      fontSize: 12.5,
+                      color: Color(0xFF9CA3AF),
+                      fontWeight: FontWeight.w500),
                 ),
                 const Spacer(),
                 _ViewDetailsButton(order: order),
@@ -438,6 +400,19 @@ class _OrderCard extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+   Widget _imageFallback() => Container(
+        width: 80, height: 80,
+        color: const Color(0xFFF5F6FA),
+        child: const Icon(Icons.image_outlined,
+            color: Color(0xFFD1D5DB), size: 30),
+      );
+        OrderStatus _parseStatus(String status) {
+    switch (status) {
+      case 'completed': return OrderStatus.completed;
+      case 'cancelled': return OrderStatus.cancelled;
+      default:          return OrderStatus.active;
+    }
   }
 }
  
@@ -507,7 +482,7 @@ class _StatusBadge extends StatelessWidget {
  
  
 class _ViewDetailsButton extends StatelessWidget {
-  final OrderItem order;
+final OrderModel order; 
  
   const _ViewDetailsButton({required this.order});
  
@@ -515,7 +490,6 @@ class _ViewDetailsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to order detail screen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Viewing details for ${order.orderId}'),
