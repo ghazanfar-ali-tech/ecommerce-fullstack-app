@@ -108,7 +108,7 @@ class StoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
+
     Widget buildProductCard(Map<String, dynamic> product) {
       final imageUrl = (product['productImageUrls'] as List).isNotEmpty
           ? product['productImageUrls'][0]
@@ -289,7 +289,7 @@ class StoreScreen extends StatelessWidget {
       return SizedBox(
         height: gridHeight,
         child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(), 
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -307,14 +307,12 @@ class StoreScreen extends StatelessWidget {
     Widget buildTabContent(String categoryName, String categoryId) {
       return Consumer2<AdminViewModel, StoreViewModel>(
         builder: (context, adminVM, storeVM, child) {
-       
           if (!adminVM.brandsByCategory.containsKey(categoryId)) {
             adminVM.loadBrandsForCategory(categoryId);
           }
 
           final brands = adminVM.brandsByCategory[categoryId] ?? [];
 
-        
           Widget brandsSection() {
             if (brands.isEmpty) return const SizedBox.shrink();
             return Padding(
@@ -343,13 +341,17 @@ class StoreScreen extends StatelessWidget {
           final cached = storeVM.getCachedProducts(categoryName);
 
           if (cached != null) {
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  brandsSection(),
-                  buildProductGrid(cached, categoryName),
-                ],
+            return ColoredBox(
+              color: Colors.grey.shade50,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    brandsSection(),
+                    buildProductGrid(cached, categoryName),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             );
           }
@@ -358,24 +360,34 @@ class StoreScreen extends StatelessWidget {
             future: storeVM.fetchProductsByCategory(categoryName),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return buildProductGridShimmer();
+                return ColoredBox(
+                  color: Colors.grey.shade50,
+                  child: buildProductGridShimmer(),
+                );
               }
               if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    "Error: ${snapshot.error}",
-                    style: const TextStyle(color: Colors.red),
+                return ColoredBox(
+                  color: Colors.grey.shade50,
+                  child: Center(
+                    child: Text(
+                      "Error: ${snapshot.error}",
+                      style: const TextStyle(color: Colors.red),
+                    ),
                   ),
                 );
               }
               final products = snapshot.data ?? [];
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    brandsSection(),
-                    buildProductGrid(products, categoryName),
-                  ],
+              return ColoredBox(
+                color: Colors.grey.shade50,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      brandsSection(),
+                      buildProductGrid(products, categoryName),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               );
             },
@@ -397,6 +409,7 @@ class StoreScreen extends StatelessWidget {
         ),
         body: Stack(
           children: [
+         
             Positioned(
               top: 0,
               left: 0,
@@ -466,16 +479,20 @@ class StoreScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+          
             Consumer<StoreViewModel>(
               builder: (context, viewModel, child) {
+           
                 if (viewModel.categories.isEmpty) {
                   if (viewModel.isLoadingFromPrefs) {
                     return Positioned(
                       top: viewModel.tabTop,
                       left: 0,
                       right: 0,
-                      child: Material(
-                        elevation: 2,
+                      bottom: 0,
+                      child: Container(
+                       
                         color: Colors.white,
                         child: buildShimmerTab(),
                       ),
@@ -488,8 +505,8 @@ class StoreScreen extends StatelessWidget {
                     top: viewModel.tabTop,
                     left: 0,
                     right: 0,
-                    child: Material(
-                      elevation: 2,
+                    bottom: 0,
+                    child: Container(
                       color: Colors.white,
                       child: buildShimmerTab(),
                     ),
@@ -497,13 +514,14 @@ class StoreScreen extends StatelessWidget {
                 }
 
                 final tabs = viewModel.categories
-                    .map((cat) => Tab(text: cat['categoryName'], height: 50))
+                    .map((cat) =>
+                        Tab(text: cat['categoryName'], height: 50))
                     .toList();
 
                 final tabViews = viewModel.categories
                     .map((cat) => buildTabContent(
                           cat['categoryName'],
-                          cat['id'],      
+                          cat['id'],
                         ))
                     .toList();
 
@@ -515,34 +533,50 @@ class StoreScreen extends StatelessWidget {
                   child: GestureDetector(
                     onVerticalDragUpdate: viewModel.verticalDragUpdate,
                     onVerticalDragEnd: (_) => viewModel.verticalDragEnd(),
-                    child: DefaultTabController(
-                      length: tabs.length,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Material(
-                            elevation: 2,
-                            color: Colors.white,
-                            child: TabBar(
-                              tabs: tabs,
-                              labelColor: Colors.blue,
-                              unselectedLabelColor: Colors.grey,
-                              indicatorColor: Colors.blue,
-                              indicatorWeight: 3,
-                              labelStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              unselectedLabelStyle: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: TabBarView(children: tabViews),
+                    child: Container(
+                    
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, -3),
                           ),
                         ],
+                      ),
+                      child: DefaultTabController(
+                        length: tabs.length,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Material(
+                              elevation: 0,
+                              color: Colors.white,
+                              child: TabBar(
+                                tabs: tabs,
+                                labelColor: Colors.blue,
+                                unselectedLabelColor: Colors.grey,
+                                indicatorColor: Colors.blue,
+                                indicatorWeight: 3,
+                                labelStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                unselectedLabelStyle: const TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: ColoredBox(
+                                color: Colors.grey.shade50,
+                                child: TabBarView(children: tabViews),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

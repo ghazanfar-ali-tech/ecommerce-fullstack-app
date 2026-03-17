@@ -98,7 +98,7 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
 
      categories = snapshot.docs.map((doc) {
   final data = doc.data();
-  data['id'] = doc.id; 
+  data['id'] = doc.id; // ← inject the document id
   return data;
 }).toList();
       await _saveCategoriesToPrefs(categories);
