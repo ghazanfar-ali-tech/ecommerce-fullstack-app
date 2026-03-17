@@ -21,7 +21,7 @@ class _SearchScreenState extends State<SearchScreen>
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late String _uid;
- String get _prefsKey => 'recent_searches_${_uid}';
+ String get _prefsKey => 'recent_searches_$_uid';
 
   List<String> _recentSearches = [];
   late final AnimationController _animCtrl;

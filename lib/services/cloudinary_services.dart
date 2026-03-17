@@ -29,7 +29,10 @@ class CloudinaryService {
         final jsonMap = jsonDecode(responseString);
         return jsonMap['secure_url'];
       } else {
-        print('Upload failed with status: ${response.statusCode}');
+         final responseData = await response.stream.toBytes();
+  final responseString = String.fromCharCodes(responseData);
+  print('Upload failed with status: ${response.statusCode}');
+  print('Cloudinary error: $responseString');
         return null;
       }
     } catch (e) {

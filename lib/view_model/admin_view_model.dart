@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:ecommerceapp/models/brand_model.dart';
 import 'package:ecommerceapp/models/category_model.dart';
 import 'package:ecommerceapp/models/product_model.dart';
+import 'package:ecommerceapp/services/brand_services/brand_services.dart';
 import 'package:ecommerceapp/services/category_services.dart';
 import 'package:ecommerceapp/services/cloudinary_services.dart';
 import 'package:ecommerceapp/services/product_services.dart';
@@ -21,6 +23,16 @@ class AdminViewModel extends ChangeNotifier {
   final List<File> _productImages = [];
   List<File> get productImages => _productImages;
   final ZoomDrawerController drawerController = ZoomDrawerController();
+
+
+  /// => brands instances
+  final BrandService _brandService = BrandService();
+
+  final Map<String, List<BrandModel>> _brandsByCategory = {};
+  Map<String, List<BrandModel>> get brandsByCategory => _brandsByCategory;
+
+  final List<File> _brandIntroImages = [];
+  List<File> get brandIntroImages => _brandIntroImages;
 
   void addProductImage(File image) {
     _productImages.add(image);
@@ -323,5 +335,112 @@ class AdminViewModel extends ChangeNotifier {
   }
 
 
+//=> brand methods
+
+void addBrandIntroImage(File image) {
+    if (_brandIntroImages.length < 3) {
+      _brandIntroImages.add(image);
+      notifyListeners();
+    }
+  }
+
+  void removeBrandIntroImage(int index) {
+    _brandIntroImages.removeAt(index);
+    notifyListeners();
+  }
+
+  void clearBrandIntroImages() {
+    _brandIntroImages.clear();
+    notifyListeners();
+  }
+
+  void loadBrandsForCategory(String categoryId) {
+    _brandService.getBrands(categoryId).listen(
+      (brands) {
+        _brandsByCategory[categoryId] = brands;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Error loading brands: $error';
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<bool> addBrand(
+    String name,
+    File? imageFile,
+    String categoryId,
+    List<File> introImages,
+  ) async {
+    if (name.isEmpty) {
+      _errorMessage = 'Brand name cannot be empty';
+      notifyListeners();
+      return false;
+    }
+    if (imageFile == null) {
+      _errorMessage = 'Please select a brand logo';
+      notifyListeners();
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final String? logoUrl = await CloudinaryService.uploadImage(imageFile);
+      if (logoUrl == null) {
+        _errorMessage = 'Failed to upload brand logo';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+    
+      final List<String> introUrls = [];
+      for (final img in introImages.take(3)) {
+        final url = await CloudinaryService.uploadImage(img);
+        if (url != null) introUrls.add(url);
+      }
+
+      final brand = BrandModel(
+        id: '',
+        name: name,
+        imageUrl: logoUrl,
+        categoryId: categoryId,
+        productCount: introUrls.length,
+        introProductImages: introUrls,
+        createdAt: DateTime.now(),
+      );
+
+      final success = await _brandService.addBrand(brand);
+
+      if (success) {
+        _brandIntroImages.clear();
+        _errorMessage = null;
+      } else {
+        _errorMessage = 'Failed to save brand';
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _errorMessage = 'Error: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deleteBrand(String categoryId, String brandId) async {
+    _isLoading = true;
+    notifyListeners();
+    final success = await _brandService.deleteBrand(categoryId, brandId);
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
   
 }

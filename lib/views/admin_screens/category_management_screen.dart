@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ecommerceapp/models/category_model.dart';
 import 'package:ecommerceapp/view_model/admin_view_model.dart';
+import 'package:ecommerceapp/views/admin_screens/brand_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -529,19 +530,32 @@ final filteredCategories = viewModel.categories.where((category) {
                           ),
                           title: Text(category.categoryName),
                           subtitle: Text("Total items: ${category.totalItems}"),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () => _showEditCategoryDialog(category),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _showDeleteConfirmation(category),
-                              ),
-                            ],
-                          ),
+                       trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    IconButton(
+      icon: const Icon(Icons.branding_watermark, color: Colors.orange),
+      tooltip: 'Manage Brands',
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                BrandManagementScreen(category: category),
+          ),
+        );
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.edit, color: Colors.blue),
+      onPressed: () => _showEditCategoryDialog(category),
+    ),
+    IconButton(
+      icon: const Icon(Icons.delete, color: Colors.red),
+      onPressed: () => _showDeleteConfirmation(category),
+    ),
+  ],
+),
                         ),
                       );
                     },

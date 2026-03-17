@@ -96,7 +96,11 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
           .limit(4)
           .get();
 
-      categories = snapshot.docs.map((doc) => doc.data()).toList();
+     categories = snapshot.docs.map((doc) {
+  final data = doc.data();
+  data['id'] = doc.id; 
+  return data;
+}).toList();
       await _saveCategoriesToPrefs(categories);
     } catch (e) {
       debugPrint('Error fetching categories: $e');
