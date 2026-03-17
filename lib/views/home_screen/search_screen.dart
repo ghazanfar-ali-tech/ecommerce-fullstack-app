@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,8 @@ class _SearchScreenState extends State<SearchScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final String _prefsKey = 'recent_searches';
+  late String _uid;
+ String get _prefsKey => 'recent_searches_${_uid}';
 
   List<String> _recentSearches = [];
   late final AnimationController _animCtrl;
@@ -28,6 +30,8 @@ class _SearchScreenState extends State<SearchScreen>
   @override
   void initState() {
     super.initState();
+      _uid = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+
     _animCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 280),
