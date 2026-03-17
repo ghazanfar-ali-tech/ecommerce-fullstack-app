@@ -6,6 +6,7 @@ import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 import 'package:ecommerceapp/views/home_screen/cart_screen/cart_screen.dart';
 import 'package:ecommerceapp/views/home_screen/curve_clipper.dart';
+import 'package:ecommerceapp/views/home_screen/search_screen.dart';
 import 'package:ecommerceapp/views/home_screen/widgets/category_items_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as badges;
@@ -53,34 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Consumer<HomeViewModel>(
         builder: (context, viewModel, child) {
           return GestureDetector(
-            // Dismiss keyboard when tapping outside search
             onTap: () => FocusScope.of(context).unfocus(),
             child: CustomScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               slivers: [
-                // ── Header ─────────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _buildHeaderSection(context, viewModel),
                 ),
-                // ── Search Bar (sticky below header) ───────────────────
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _SearchBarDelegate(
-                    controller: _searchController,
-                    focusNode: _searchFocusNode,
-                    isFocused: _isSearchFocused,
-                     onChanged: (value) {
-      viewModel.onSearch(value);
-      setState(() => _isSearching = value.trim().isNotEmpty);  // ← add
-    },
-                     onClear: () {
-      _searchController.clear();
-      viewModel.onSearch('');
-      setState(() => _isSearching = false);                    // ← add
-    },
-                  ),
-                ),
-                // ── Body content ────────────────────────────────────────
+               SliverPersistentHeader(
+    pinned: true,
+    delegate: _SearchPillDelegate(),
+  ),
                 SliverToBoxAdapter(
                   child: _buildProductSection(context, viewModel),
                 ),
@@ -92,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Header ────────────────────────────────────────────────────────────────
 
   Widget _buildHeaderSection(BuildContext context, HomeViewModel viewModel) {
     return SizedBox(
@@ -362,7 +345,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Product Section ───────────────────────────────────────────────────────
 
   Widget _buildProductSection(BuildContext context, HomeViewModel viewModel) {
     return Padding(
@@ -569,118 +551,68 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ─── Sticky Search Bar Delegate ────────────────────────────────────────────────
 
-class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool isFocused;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
 
-  const _SearchBarDelegate({
-    required this.controller,
-    required this.focusNode,
-    required this.isFocused,
-    required this.onChanged,
-    required this.onClear,
-  });
-
+class _SearchPillDelegate extends SliverPersistentHeaderDelegate {
   @override
   double get minExtent => 68;
   @override
   double get maxExtent => 68;
-
+ 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       color: AppColors.background(context),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 52,
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground(context),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isFocused
-                ? AppColors.primary.withOpacity(0.5)
-                : AppColors.border(context),
-            width: isFocused ? 1.5 : 1,
-          ),
-          boxShadow: isFocused
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 14),
-            Icon(
-              Icons.search_rounded,
-              color: isFocused ? AppColors.primary : AppColors.info,
-              size: 20,
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const SearchScreen(),
+            transitionsBuilder: (_, anim, __, child) => FadeTransition(
+              opacity: anim,
+              child: child,
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                onChanged: onChanged,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary(context),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search products...',
-                  hintStyle: TextStyle(
+            transitionDuration: const Duration(milliseconds: 220),
+          ),
+        ),
+        child: Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground(context),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border(context)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 14),
+              Icon(Icons.search_rounded,
+                  color: AppColors.info, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Search products...',
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.textSecondary(context),
                   ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
                 ),
               ),
-            ),
-            // Clear button when typing
-            if (controller.text.isNotEmpty)
-              GestureDetector(
-                onTap: onClear,
-                child: Container(
-                  margin: const EdgeInsets.only(right: 6),
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.close_rounded,
-                      size: 14, color: AppColors.info),
-                ),
+              Container(
+                width: 1,
+                height: 20,
+                color: AppColors.border(context),
               ),
-            // Filter button
-            Container(
-              width: 1,
-              height: 20,
-              color: AppColors.border(context),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Container(
+              Container(
                 width: 50,
                 height: 52,
                 decoration: BoxDecoration(
@@ -697,20 +629,16 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
                 child: const Icon(Icons.tune_rounded,
                     color: Colors.white, size: 19),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-
+ 
   @override
-  bool shouldRebuild(_SearchBarDelegate old) =>
-      isFocused != old.isFocused ||
-      controller.text != old.controller.text;
+  bool shouldRebuild(_SearchPillDelegate old) => false;
 }
-
-// ─── Product Card ──────────────────────────────────────────────────────────────
 
 class _ProductCard extends StatelessWidget {
   final String productId;
@@ -758,12 +686,10 @@ class _ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Image Section ──────────────────────────────────────────
             Expanded(
               flex: 6,
               child: Stack(
                 children: [
-                  // Image fills entire top portion
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(16),
@@ -780,7 +706,6 @@ class _ProductCard extends StatelessWidget {
                         : _imageFallback(context),
                   ),
 
-                  // Discount badge — top left
                   if (productDiscount > 0)
                     Positioned(
                       top: 8,
@@ -803,7 +728,6 @@ class _ProductCard extends StatelessWidget {
                       ),
                     ),
 
-                  // Favorite — top right
                   Positioned(
                     top: 8,
                     right: 8,
@@ -835,7 +759,6 @@ class _ProductCard extends StatelessWidget {
               ),
             ),
 
-            // ── Info Section ───────────────────────────────────────────
             Expanded(
               flex: 4,
               child: Padding(
@@ -845,7 +768,6 @@ class _ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Product name
                     Text(
                       productName,
                       maxLines: 2,
@@ -858,7 +780,6 @@ class _ProductCard extends StatelessWidget {
                       ),
                     ),
 
-                    // Price + Add to Cart
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -920,3 +841,7 @@ class _ProductCard extends StatelessWidget {
     );
   }
 }
+
+
+
+

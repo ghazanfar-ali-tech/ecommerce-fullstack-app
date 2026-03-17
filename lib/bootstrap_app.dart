@@ -21,8 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
-import 'package:ecommerceapp/view_model/notification_view_model.dart';
+
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
