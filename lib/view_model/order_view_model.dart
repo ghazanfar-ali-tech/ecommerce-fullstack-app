@@ -1,5 +1,5 @@
 import 'package:ecommerceapp/repository/order_repositories.dart';
-import 'package:ecommerceapp/services/notification_services.dart/push_notification_services.dart';
+import 'package:ecommerceapp/view_model/notification_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/order_model.dart';
@@ -8,6 +8,9 @@ import '../models/cart_item_model.dart';
 class OrderViewModel extends ChangeNotifier {
   final OrderRepository _repository = OrderRepository();
 
+  final NotificationViewModel _notifVM;
+  OrderViewModel(this._notifVM);
+
   List<OrderModel> _orders = [];
   bool _isLoading = false;
   String? _error;
@@ -15,7 +18,6 @@ class OrderViewModel extends ChangeNotifier {
   List<OrderModel> get orders => _orders;
   bool get isLoading => _isLoading;
   String? get error => _error;
-
 
   List<OrderModel> get activeOrders =>
       _orders.where((o) => o.status == 'active').toList();
@@ -26,55 +28,52 @@ class OrderViewModel extends ChangeNotifier {
   List<OrderModel> get cancelledOrders =>
       _orders.where((o) => o.status == 'cancelled').toList();
 
-
  Future<bool> placeOrder({
-  required List<CartItemModel> items,
-  required int subtotal,
-  required int shipping,
-  required int tax,
-  required int discount,
-  required int totalAmount,
-  required String shippingAddress,
-}) async {
-  _isLoading = true;
-  _error = null;
-  notifyListeners();
-
-  try {
-    final orderId = 'ORD-${const Uuid().v4().substring(0, 8).toUpperCase()}';
-
-    final order = OrderModel(
-      orderId: orderId,
-      items: items,
-      subtotal: subtotal,
-      shipping: shipping,
-      tax: tax,
-      discount: discount,
-      totalAmount: totalAmount,
-      status: 'active',
-      createdAt: DateTime.now(),
-      shippingAddress: shippingAddress,
-    );
-
-    await _repository.placeOrder(order);
-
-    await PushNotificationService.instance.showOrderNotification(
-      title: ' Order Placed Successfully!',
-      body: 'Your order $orderId (${items.length} item${items.length > 1 ? 's' : ''}) worth \$$totalAmount is confirmed.',
-    );
-
-    _orders.insert(0, order);
-    return true;
-  } catch (e) {
-    _error = e.toString();
-    return false;
-  } finally {
-    _isLoading = false;
+    required List<CartItemModel> items,
+    required int subtotal,
+    required int shipping,
+    required int tax,
+    required int discount,
+    required int totalAmount,
+    required String shippingAddress,
+  }) async {
+    _isLoading = true;
+    _error = null;
     notifyListeners();
+
+    try {
+      final orderId = 'ORD-${const Uuid().v4().substring(0, 8).toUpperCase()}';
+
+      final order = OrderModel(
+        orderId: orderId,
+        items: items,
+        subtotal: subtotal,
+        shipping: shipping,
+        tax: tax,
+        discount: discount,
+        totalAmount: totalAmount,
+        status: 'active',
+        createdAt: DateTime.now(),
+        shippingAddress: shippingAddress,
+      );
+
+      await _repository.placeOrder(order);
+
+      await _notifVM.showOrderNotification(
+        title: '🛍️ Order Placed Successfully!',
+        body: 'Your order $orderId (${items.length} item${items.length > 1 ? 's' : ''}) worth \$$totalAmount is confirmed.',
+      );
+
+      _orders.insert(0, order);
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
-}
-
-
 
   Future<void> fetchOrders() async {
     _isLoading = true;
@@ -91,47 +90,45 @@ class OrderViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateOrderStatus(String orderId, String status) async {
+    try {
+      await _repository.updateOrderStatus(orderId, status);
 
- 
-Future<void> updateOrderStatus(String orderId, String status) async {
-  try {
-    await _repository.updateOrderStatus(orderId, status);
+      final Map<String, Map<String, String>> messages = {
+        'shipped':   {'title': 'Order Shipped!',  'body': 'Your order $orderId is on its way.'},
+        'delivered': {'title': 'Order Delivered!', 'body': 'Your order $orderId has been delivered.'},
+        'completed': {'title': 'Order Completed!', 'body': 'Thanks for shopping! Order $orderId is complete.'},
+        'cancelled': {'title': 'Order Cancelled',  'body': 'Your order $orderId has been cancelled.'},
+      };
 
-  
-    final Map<String, Map<String, String>> messages = {
-      'shipped':   {'title': 'Order Shipped!',  'body': 'Your order $orderId is on its way.'},
-      'delivered': {'title': 'Order Delivered!', 'body': 'Your order $orderId has been delivered.'},
-      'completed': {'title': 'Order Completed!', 'body': 'Thanks for shopping! Order $orderId is complete.'},
-      'cancelled': {'title': 'Order Cancelled',  'body': 'Your order $orderId has been cancelled.'},
-    };
+      final notif = messages[status];
+      if (notif != null) {
+      
+        await _notifVM.showOrderNotification(
+          title: notif['title']!,
+          body: notif['body']!,
+        );
+      }
 
-    final notif = messages[status];
-    if (notif != null) {
-      await PushNotificationService.instance.showOrderNotification(
-        title: notif['title']!,
-        body: notif['body']!,
-      );
-    }
-
-    final index = _orders.indexWhere((o) => o.orderId == orderId);
-    if (index != -1) {
-      _orders[index] = OrderModel(
-        orderId: _orders[index].orderId,
-        items: _orders[index].items,
-        subtotal: _orders[index].subtotal,
-        shipping: _orders[index].shipping,
-        tax: _orders[index].tax,
-        discount: _orders[index].discount,
-        totalAmount: _orders[index].totalAmount,
-        status: status,
-        createdAt: _orders[index].createdAt,
-        shippingAddress: _orders[index].shippingAddress,
-      );
+      final index = _orders.indexWhere((o) => o.orderId == orderId);
+      if (index != -1) {
+        _orders[index] = OrderModel(
+          orderId: _orders[index].orderId,
+          items: _orders[index].items,
+          subtotal: _orders[index].subtotal,
+          shipping: _orders[index].shipping,
+          tax: _orders[index].tax,
+          discount: _orders[index].discount,
+          totalAmount: _orders[index].totalAmount,
+          status: status,
+          createdAt: _orders[index].createdAt,
+          shippingAddress: _orders[index].shippingAddress,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
       notifyListeners();
     }
-  } catch (e) {
-    _error = e.toString();
-    notifyListeners();
   }
-}
 }

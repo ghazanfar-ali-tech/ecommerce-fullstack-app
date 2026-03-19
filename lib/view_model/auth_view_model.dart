@@ -10,6 +10,7 @@ import 'package:ecommerceapp/views/admin_screens/admin_panel_screen.dart';
 import 'package:ecommerceapp/views/auth_screens/auth_screen.dart';
 import 'package:ecommerceapp/views/bottom_navigation/bottom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
@@ -165,6 +166,8 @@ storeVM.clearFavorites();
 
       notifyListeners();
 
+await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
+
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => AuthScreen()),
         (route) => false,
@@ -211,6 +214,8 @@ await storeVM.initForUser(_userId!);
     'Login Successful',
     'Welcome back!',
   );
+
+  await context.read<NotificationViewModel>().init();
 
       
       _emailController.clear();

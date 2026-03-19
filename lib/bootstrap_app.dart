@@ -37,26 +37,30 @@ class BootstrapApp extends StatefulWidget {
 }
 
 class _BootstrapAppState extends State<BootstrapApp> {
+  late Future<NotificationViewModel> _initFuture;
+
   @override
   void initState() {
     super.initState();
-
-    /// Delay native-heavy work until AFTER first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initServices();
-    });
+    _initFuture = _initServices(); 
   }
 
-  Future<void> _initServices() async {
- await Firebase.initializeApp(
-  options: FirebaseOptions(
-    apiKey: AppConstants.firebaseApiKey,
-    appId: AppConstants.firebaseAppId,
-    messagingSenderId: AppConstants.firebaseMessagingSenderId,
-    projectId: AppConstants.firebaseProjectId,
-  ),
-);
+  Future<NotificationViewModel> _initServices() async {
+   
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: AppConstants.firebaseApiKey,
+        appId: AppConstants.firebaseAppId,
+        messagingSenderId: AppConstants.firebaseMessagingSenderId,
+        projectId: AppConstants.firebaseProjectId,
+      ),
+    );
 
+    
+    final notifVM = NotificationViewModel();
+    await notifVM.init();
+
+   
     await NotificationService().init();
 
     Stripe.publishableKey = stripePubishableKey;
@@ -71,32 +75,58 @@ class _BootstrapAppState extends State<BootstrapApp> {
     if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(CartModelAdapter());
     }
+
+    return notifVM;
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => AdminViewModel()),
-        ChangeNotifierProvider(create: (_) => HomeViewModel()),
-        ChangeNotifierProvider(create: (_) => DetailViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider(create: (_) => StoreViewModel()),
-        ChangeNotifierProvider(create: (_) => SettingViewModel()),
-        ChangeNotifierProvider(create: (_) => AddressViewModel()),
-        ChangeNotifierProvider(create: (_) => CouponViewModel()),
-        ChangeNotifierProvider(create: (_) => ProductReviewViewModel()),
-        ChangeNotifierProvider(create: (_) => StatsViewModel()),
-        ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
-        ChangeNotifierProvider(create: (_) => NotificationViewModel()..init()),
-        ChangeNotifierProvider(create: (_) => OrderViewModel()), 
-        ChangeNotifierProvider(
-          create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
-        ),
-      ],
-      child: const MyApp(),
+    return FutureBuilder<NotificationViewModel>(
+      future: _initFuture,
+      builder: (context, snapshot) {
+      
+        if (!snapshot.hasData) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(child: Text('Init error: ${snapshot.error}')),
+            ),
+          );
+        }
+
+        final notifVM = snapshot.data!; 
+
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => AuthViewModel()),
+            ChangeNotifierProvider(create: (_) => AdminViewModel()),
+            ChangeNotifierProvider(create: (_) => HomeViewModel()),
+            ChangeNotifierProvider(create: (_) => DetailViewModel()),
+            ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+            ChangeNotifierProvider(create: (_) => StoreViewModel()),
+            ChangeNotifierProvider(create: (_) => SettingViewModel()),
+            ChangeNotifierProvider(create: (_) => AddressViewModel()),
+            ChangeNotifierProvider(create: (_) => CouponViewModel()),
+            ChangeNotifierProvider(create: (_) => ProductReviewViewModel()),
+            ChangeNotifierProvider(create: (_) => StatsViewModel()),
+            ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
+            ChangeNotifierProvider.value(value: notifVM), 
+            ChangeNotifierProvider(create: (_) => OrderViewModel(notifVM)),
+            ChangeNotifierProvider(
+              create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
+            ),
+          ],
+          child: const MyApp(),
+        );
+      },
     );
   }
 }

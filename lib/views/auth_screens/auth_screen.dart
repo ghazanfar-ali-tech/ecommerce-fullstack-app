@@ -166,7 +166,7 @@ class AuthScreen extends StatelessWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      // Name field with animation
+                                 
                                       AnimatedSize(
                                         duration: Duration(milliseconds: 400),
                                         curve: Curves.easeInOut,
@@ -212,7 +212,7 @@ class AuthScreen extends StatelessWidget {
                                         ),
                                       ),
                                   
-                                      // Email field with smooth transition
+                                   
                                       AnimatedSlide(
                                         duration: Duration(milliseconds: 400),
                                         curve: Curves.easeInOut,

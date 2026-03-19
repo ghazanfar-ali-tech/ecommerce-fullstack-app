@@ -602,7 +602,7 @@ class _CheckoutBottomBar extends StatelessWidget {
     const SnackBar(content: Text('Purchase successful!')),
   );
 
-  await Future.delayed(const Duration(seconds: 2)); // ← add this
+  await Future.delayed(const Duration(seconds: 2)); 
   Navigator.pop(context);
 }else {
                       ScaffoldMessenger.of(context).showSnackBar(
