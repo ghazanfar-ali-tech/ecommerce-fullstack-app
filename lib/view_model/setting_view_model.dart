@@ -5,6 +5,9 @@ import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingViewModel extends ChangeNotifier {
+
+  bool _isFetched = false;
+
   final FirebaseFirestore _firebaseStore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CloudinaryPublic _cloudinary = CloudinaryPublic(
@@ -40,7 +43,7 @@ class SettingViewModel extends ChangeNotifier {
 
   Future<void> fetchUserProfile() async {
     if (_auth.currentUser == null) return;
-
+    if (_isFetched) return; 
     try {
       _error = null;
       _isLoading = true;
@@ -57,7 +60,7 @@ class SettingViewModel extends ChangeNotifier {
         _userEmail = data['email'];
         _profilePhotoUrl = data['profilePhotoUrl'];
       }
-
+_isFetched = true;
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -192,8 +195,15 @@ class SettingViewModel extends ChangeNotifier {
     }
   }
 
-  void clearError() {
-    _error = null;
-    notifyListeners();
-  }
+ 
+
+  void clearProfile() {
+  _isFetched = false;
+  _username = null;
+  _userEmail = null;
+  _profilePhotoUrl = null;
+  _selectedImage = null;
+  _error = null;
+  notifyListeners();
+}
 }
