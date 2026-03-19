@@ -47,3 +47,4 @@ lib/constants.dart
 .env
 
 /lib/core/constants.dart
+assets/service_account.json

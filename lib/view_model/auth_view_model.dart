@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
 import 'package:ecommerceapp/services/notification_services.dart/notification_services.dart';
+import 'package:ecommerceapp/services/notification_services.dart/push_notification_services.dart';
 import 'package:ecommerceapp/utils/utils.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
@@ -144,7 +145,7 @@ final storeVM = Provider.of<StoreViewModel>(context, listen: false);
 storeVM.clearFavorites();
       await _auth.signOut();
 
-      // 2. Clear SharedPreferences
+    
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('userRole');
       await prefs.remove('userId');
@@ -185,7 +186,7 @@ storeVM.clearFavorites();
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      
+      await PushNotificationService.instance.saveTokenToFirestore();
       final user = userCredential.user!;
       _userId = user.uid;
       _email = user.email;
@@ -263,11 +264,11 @@ await storeVM.initForUser(_userId!);
         final user = result!.user!;
         _userId = user.uid;
         _email = user.email;
-
+ await PushNotificationService.instance.saveTokenToFirestore();
         final userDoc = await _firestore.collection('users').doc(user.uid).get();
 
         if (!userDoc.exists) {
-          // Create new user document with default role
+         
           await _firestore.collection('users').doc(user.uid).set({
             'username': user.displayName ?? 'User',
             'email': user.email,

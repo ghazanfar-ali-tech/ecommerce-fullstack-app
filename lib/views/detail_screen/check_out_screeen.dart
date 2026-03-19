@@ -581,27 +581,30 @@ class _CheckoutBottomBar extends StatelessWidget {
                     );
 
                     if (success) {
-                        await orderVM.placeOrder(
-        items: cartItemModels,
-        subtotal: subtotal,
-        shipping: 15,
-        tax: 24,
-        discount: couponVM.discount,
-        totalAmount: totalAmount,
-        shippingAddress: addressVM.checkoutAddress != null
-    ? '${addressVM.checkoutAddress!.name}, '
-      '${addressVM.checkoutAddress!.street}, '
-      '${addressVM.checkoutAddress!.city}, '
-      '${addressVM.checkoutAddress!.state} '
-      '${addressVM.checkoutAddress!.zip}, '
-      '${addressVM.checkoutAddress!.country}'
-    : '',
-      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Purchase successful!')),
-                      );
-                      Navigator.pop(context);
-                    } else {
+  await orderVM.placeOrder(
+    items: cartItemModels,
+    subtotal: subtotal,
+    shipping: 15,
+    tax: 24,
+    discount: couponVM.discount,
+    totalAmount: totalAmount,
+    shippingAddress: addressVM.checkoutAddress != null
+        ? '${addressVM.checkoutAddress!.name}, '
+          '${addressVM.checkoutAddress!.street}, '
+          '${addressVM.checkoutAddress!.city}, '
+          '${addressVM.checkoutAddress!.state} '
+          '${addressVM.checkoutAddress!.zip}, '
+          '${addressVM.checkoutAddress!.country}'
+        : '',
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Purchase successful!')),
+  );
+
+  await Future.delayed(const Duration(seconds: 2)); // ← add this
+  Navigator.pop(context);
+}else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Payment failed!')),
                       );
