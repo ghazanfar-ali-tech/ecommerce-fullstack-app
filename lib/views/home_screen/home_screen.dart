@@ -200,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           width: 14,
                                           height: 14,
                                           decoration: BoxDecoration(
-                                            color: AppColors.primaryButton,
+                                            color: AppColors.accent,
                                             shape: BoxShape.circle,
                                           ),
                                           child: Center(
@@ -802,7 +802,7 @@ class _ProductCard extends StatelessWidget {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryButton,
+                              color: AppColors.accent,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(

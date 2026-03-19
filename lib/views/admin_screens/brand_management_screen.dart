@@ -52,7 +52,7 @@ class _BrandManagementScreenState extends State<BrandManagementScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (ctx, setDialogState) {
-          final viewModel = context.read<AdminViewModel>();
+      
 
           return AlertDialog(
             title: const Text('Add Brand'),

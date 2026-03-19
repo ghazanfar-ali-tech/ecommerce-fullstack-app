@@ -722,7 +722,7 @@ class _SearchProductCard extends StatelessWidget {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryButton,
+                           color: AppColors.accent,
                               borderRadius:
                                   BorderRadius.circular(10),
                             ),

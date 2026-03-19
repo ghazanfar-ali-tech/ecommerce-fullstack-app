@@ -37,7 +37,7 @@ class BootstrapApp extends StatefulWidget {
 }
 
 class _BootstrapAppState extends State<BootstrapApp> {
-  // ← change Future type to hold both
+
   late Future<(NotificationViewModel, ThemeProvider)> _initFuture;
 
   @override
@@ -46,7 +46,6 @@ class _BootstrapAppState extends State<BootstrapApp> {
     _initFuture = _initServices();
   }
 
-  // ← return a Record with both
   Future<(NotificationViewModel, ThemeProvider)> _initServices() async {
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -61,7 +60,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
     await notifVM.init();
 
     final themeProvider = ThemeProvider();
-    await themeProvider.loadTheme(); // ← loads saved dark/light preference
+    await themeProvider.loadTheme();
 
     await NotificationService().init();
 
@@ -78,7 +77,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
       Hive.registerAdapter(CartModelAdapter());
     }
 
-    return (notifVM, themeProvider); // ← return both
+    return (notifVM, themeProvider);
   }
 
   @override
@@ -101,13 +100,11 @@ class _BootstrapAppState extends State<BootstrapApp> {
             ),
           );
         }
-
-        // ← destructure both from the record
         final (notifVM, themeProvider) = snapshot.data!;
 
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider.value(value: themeProvider), // ← pre-loaded
+            ChangeNotifierProvider.value(value: themeProvider),
             ChangeNotifierProvider.value(value: notifVM),
             ChangeNotifierProvider(create: (_) => AuthViewModel()),
             ChangeNotifierProvider(create: (_) => AdminViewModel()),

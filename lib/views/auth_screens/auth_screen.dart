@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
 import 'package:ecommerceapp/views/auth_screens/forgot_password_screen.dart';
 import 'package:ecommerceapp/views/bottom_navigation/bottom_navigation.dart';
@@ -15,6 +16,7 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -29,14 +31,7 @@ class AuthScreen extends StatelessWidget {
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20),
                       ),
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF6DD5FA),
-                          Color.fromARGB(255, 15, 68, 104),
-                        ],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
+                     gradient: AppColors.heroGradient, 
                     ),
                     child: Center(
                       child: SizedBox(
@@ -56,7 +51,7 @@ class AuthScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.cardBackground(context),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(23),
                           topRight: Radius.circular(23),
@@ -77,7 +72,11 @@ class AuthScreen extends StatelessWidget {
                               width: 300,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
-                                border: Border.all(color: Colors.blue),
+                                border: Border.all(
+                                  color: AppColors.primary, 
+                                  width: 0.5,
+                                ),
+                                color: AppColors.surfaceVariant(context),
                               ),
                               child: Consumer<AuthViewModel>(
                                 builder: (context, model, child) {
@@ -93,14 +92,7 @@ class AuthScreen extends StatelessWidget {
                                           width: 150,
                                           height: 50,
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.blue,
-                                                Colors.black,
-                                              ],
-                                              begin: Alignment.topRight,
-                                              end: Alignment.bottomLeft,
-                                            ),
+                                             gradient: AppColors.primaryGradient,
                                             borderRadius: BorderRadius.circular(
                                               50,
                                             ),
@@ -125,8 +117,8 @@ class AuthScreen extends StatelessWidget {
                                                     fontSize: 15.3,
                                                     fontWeight: FontWeight.bold,
                                                     color: model.isLoginSelected
-                                                        ? Colors.white
-                                                        : Colors.blue,
+                                                       ? Colors.white          
+                                                        : AppColors.primaryText(context),
                                                   ),
                                                 ),
                                               ),
@@ -142,7 +134,7 @@ class AuthScreen extends StatelessWidget {
                                                     fontSize: 15.3,
                                                     fontWeight: FontWeight.bold,
                                                     color: model.isLoginSelected
-                                                        ? Colors.blue
+                                                       ? AppColors.primaryText(context) // idle
                                                         : Colors.white,
                                                   ),
                                                 ),
@@ -195,6 +187,7 @@ class AuthScreen extends StatelessWidget {
                                               : Column(
                                                   children: [
                                                     customField(
+                                                      context: context,
                                                       controller: context.read<AuthViewModel>().usernameController,
                                                       hintName: "Name",
                                                       icon: Icons.person,
@@ -222,6 +215,7 @@ class AuthScreen extends StatelessWidget {
                                         child: Column(
                                           children: [
                                             customField(
+                                              context: context,
                                               controller: context.read<AuthViewModel>().emailController,
                                               hintName: "Email",
                                               icon: Icons.email_outlined,
@@ -235,6 +229,7 @@ class AuthScreen extends StatelessWidget {
                                             ),
                                             SizedBox(height: 10),
                                              customField(
+                                              context: context,
                                           controller: context.read<AuthViewModel>().passwordController,
                                           hintName: "Password",
                                           labelText: "Password",
@@ -278,11 +273,7 @@ class AuthScreen extends StatelessWidget {
                                     height: 50,
                                     decoration: BoxDecoration(
                                       boxShadow: [BoxShadow()],
-                                      gradient: LinearGradient(
-                                        colors: [Colors.blue, Colors.black],
-                                        begin: Alignment.topRight,
-                                        end: Alignment.bottomLeft,
-                                      ),
+                                      gradient:AppColors.primaryGradient,
                                       borderRadius: BorderRadius.circular(30),
                                     ),
                                     child: Center(

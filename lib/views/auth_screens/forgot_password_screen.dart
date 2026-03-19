@@ -82,7 +82,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Enter your email',
-                      prefixIcon: const Icon(Icons.email_outlined,color: AppColors.iconPrimary,),
+                      prefixIcon: const Icon(Icons.email_outlined,color: AppColors.primary,),
                       filled: true,
                       fillColor: AppColors.cardBackground(context),
                       border: OutlineInputBorder(
