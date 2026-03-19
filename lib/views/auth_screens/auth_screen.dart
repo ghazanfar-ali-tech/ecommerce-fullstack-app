@@ -134,7 +134,7 @@ class AuthScreen extends StatelessWidget {
                                                     fontSize: 15.3,
                                                     fontWeight: FontWeight.bold,
                                                     color: model.isLoginSelected
-                                                       ? AppColors.primaryText(context) // idle
+                                                       ? AppColors.primaryText(context) 
                                                         : Colors.white,
                                                   ),
                                                 ),
