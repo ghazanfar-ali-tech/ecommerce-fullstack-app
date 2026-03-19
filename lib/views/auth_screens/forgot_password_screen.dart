@@ -35,7 +35,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         height: double.infinity,
         decoration:  BoxDecoration(
           gradient: LinearGradient(
-            colors: themeProvider.isDarkMode ?  [Color.fromARGB(255, 32, 32, 32), Color.fromARGB(255, 48, 48, 48)] : [Color(0xFF6DD5FA), Color(0xFF2980B9)],
+            colors: themeProvider.isDark ?  [Color.fromARGB(255, 32, 32, 32), Color.fromARGB(255, 48, 48, 48)] : [Color(0xFF6DD5FA), Color(0xFF2980B9)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -50,7 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                   color: themeProvider.isDarkMode ? const Color.fromARGB(135, 102, 101, 101) : (Colors.grey[300] ?? Colors.grey),
+                   color: themeProvider.isDark ? const Color.fromARGB(135, 102, 101, 101) : (Colors.grey[300] ?? Colors.grey),
                     blurRadius: 10,
                     offset: Offset(0, 4),
                   )
@@ -64,7 +64,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                     color:  themeProvider.isDarkMode ? AppColors.primaryLight : Color(0xFF2C3E50),
+                     color:  themeProvider.isDark ? AppColors.primaryLight : Color(0xFF2C3E50),
               
                     ),
                   ),
@@ -73,7 +73,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     'Enter your email and we will send you a password reset link.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: themeProvider.isDarkMode ? AppColors.primaryLight : Colors.grey,
+                      color: themeProvider.isDark ? AppColors.primaryLight : Colors.grey,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   RoundButton(
                     title: 'Send Reset Link',
                       gradient:  LinearGradient(
-              colors: themeProvider.isDarkMode ? [const Color.fromARGB(255, 32, 32, 32), const Color.fromARGB(255, 48, 48, 48)]: [Colors.blueAccent, Colors.black],
+              colors: themeProvider.isDark ? [const Color.fromARGB(255, 32, 32, 32), const Color.fromARGB(255, 48, 48, 48)]: [Colors.blueAccent, Colors.black],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
           ),

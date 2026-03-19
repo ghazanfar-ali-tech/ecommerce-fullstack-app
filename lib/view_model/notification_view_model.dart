@@ -10,6 +10,9 @@ class NotificationViewModel extends ChangeNotifier {
   bool _isEnabled = false;
   bool get isEnabled => _isEnabled;
 
+  bool _isEmailNotification = false;
+  bool get isEmailNotification => _isEmailNotification;
+
   final NotificationService _notificationService = NotificationService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -98,5 +101,8 @@ Future<void> showOrderNotification({
     body: body,
   );
 }
-  
+  void setEmailNotification(bool value){
+    _isEmailNotification = value;
+    notifyListeners();
+  }
 }

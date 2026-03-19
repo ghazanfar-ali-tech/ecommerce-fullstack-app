@@ -37,16 +37,17 @@ class BootstrapApp extends StatefulWidget {
 }
 
 class _BootstrapAppState extends State<BootstrapApp> {
-  late Future<NotificationViewModel> _initFuture;
+  // ← change Future type to hold both
+  late Future<(NotificationViewModel, ThemeProvider)> _initFuture;
 
   @override
   void initState() {
     super.initState();
-    _initFuture = _initServices(); 
+    _initFuture = _initServices();
   }
 
-  Future<NotificationViewModel> _initServices() async {
-   
+  // ← return a Record with both
+  Future<(NotificationViewModel, ThemeProvider)> _initServices() async {
     await Firebase.initializeApp(
       options: FirebaseOptions(
         apiKey: AppConstants.firebaseApiKey,
@@ -56,11 +57,12 @@ class _BootstrapAppState extends State<BootstrapApp> {
       ),
     );
 
-    
     final notifVM = NotificationViewModel();
     await notifVM.init();
 
-   
+    final themeProvider = ThemeProvider();
+    await themeProvider.loadTheme(); // ← loads saved dark/light preference
+
     await NotificationService().init();
 
     Stripe.publishableKey = stripePubishableKey;
@@ -76,15 +78,14 @@ class _BootstrapAppState extends State<BootstrapApp> {
       Hive.registerAdapter(CartModelAdapter());
     }
 
-    return notifVM;
+    return (notifVM, themeProvider); // ← return both
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<NotificationViewModel>(
+    return FutureBuilder<(NotificationViewModel, ThemeProvider)>(
       future: _initFuture,
       builder: (context, snapshot) {
-      
         if (!snapshot.hasData) {
           return const MaterialApp(
             home: Scaffold(
@@ -101,11 +102,13 @@ class _BootstrapAppState extends State<BootstrapApp> {
           );
         }
 
-        final notifVM = snapshot.data!; 
+        // ← destructure both from the record
+        final (notifVM, themeProvider) = snapshot.data!;
 
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider.value(value: themeProvider), // ← pre-loaded
+            ChangeNotifierProvider.value(value: notifVM),
             ChangeNotifierProvider(create: (_) => AuthViewModel()),
             ChangeNotifierProvider(create: (_) => AdminViewModel()),
             ChangeNotifierProvider(create: (_) => HomeViewModel()),
@@ -118,7 +121,6 @@ class _BootstrapAppState extends State<BootstrapApp> {
             ChangeNotifierProvider(create: (_) => ProductReviewViewModel()),
             ChangeNotifierProvider(create: (_) => StatsViewModel()),
             ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
-            ChangeNotifierProvider.value(value: notifVM), 
             ChangeNotifierProvider(create: (_) => OrderViewModel(notifVM)),
             ChangeNotifierProvider(
               create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),

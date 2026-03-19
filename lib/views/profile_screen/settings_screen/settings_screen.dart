@@ -1,5 +1,6 @@
 import 'package:ecommerceapp/view_model/app_version_info.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
+import 'package:ecommerceapp/view_model/theme_provider.dart';
 import 'package:ecommerceapp/views/profile_screen/settings_screen/privacy_and_policy_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/settings_screen/terms_of_service.dart';
 import 'package:flutter/material.dart';
@@ -23,13 +24,13 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            value: false, // Replace with actual dark mode state
-            onChanged: (value) {
-              // Implement toggle dark mode functionality
-            },
-          ),
+         SwitchListTile(
+  title: const Text('Dark Mode'),
+  value: context.watch<ThemeProvider>().isDark,
+  onChanged: (value) {
+    context.read<ThemeProvider>().toggleTheme(value);
+  },
+),
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -47,9 +48,9 @@ class SettingsScreen extends StatelessWidget {
 
           SwitchListTile(
             title: const Text('Email Notifications'),
-            value: false,
+             value: context.watch<NotificationViewModel>().isEmailNotification,
             onChanged: (value) {
-              // Implement email notification toggle
+              context.read<NotificationViewModel>().setEmailNotification(value);
             },
           ),
           const Padding(

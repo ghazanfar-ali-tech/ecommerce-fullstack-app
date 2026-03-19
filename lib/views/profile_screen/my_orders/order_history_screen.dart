@@ -4,19 +4,13 @@ import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:ecommerceapp/views/profile_screen/my_orders/order_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
- 
 
- 
-
- 
- 
 class OrderHistoryScreen extends StatelessWidget {
   const OrderHistoryScreen({super.key});
- 
- @override
+
+  @override
   Widget build(BuildContext context) {
-     Future.microtask(() =>
-        context.read<OrderViewModel>().fetchOrders());
+    Future.microtask(() => context.read<OrderViewModel>().fetchOrders());
 
     return DefaultTabController(
       length: 3,
@@ -25,12 +19,9 @@ class OrderHistoryScreen extends StatelessWidget {
         appBar: _buildAppBar(context),
         body: Consumer<OrderViewModel>(
           builder: (context, orderVM, _) {
-
             if (orderVM.isLoading) {
               return const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF4F46E5),
-                ),
+                child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
               );
             }
 
@@ -39,8 +30,11 @@ class OrderHistoryScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 48, color: Color(0xFFEF4444)),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Color(0xFFEF4444),
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       'Something went wrong',
@@ -54,7 +48,9 @@ class OrderHistoryScreen extends StatelessWidget {
                     Text(
                       orderVM.error!,
                       style: const TextStyle(
-                          fontSize: 13, color: Color(0xFF9CA3AF)),
+                        fontSize: 13,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -68,18 +64,27 @@ class OrderHistoryScreen extends StatelessWidget {
             }
 
             return TabBarView(
-  children: [
-    _OrderList(orders: orderVM.activeOrders,    status: OrderStatus.active),
-    _OrderList(orders: orderVM.completedOrders, status: OrderStatus.completed),
-    _OrderList(orders: orderVM.cancelledOrders, status: OrderStatus.cancelled),
-  ],
-);
+              children: [
+                _OrderList(
+                  orders: orderVM.activeOrders,
+                  status: OrderStatus.active,
+                ),
+                _OrderList(
+                  orders: orderVM.completedOrders,
+                  status: OrderStatus.completed,
+                ),
+                _OrderList(
+                  orders: orderVM.cancelledOrders,
+                  status: OrderStatus.cancelled,
+                ),
+              ],
+            );
           },
         ),
       ),
     );
   }
- 
+
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(110),
@@ -146,10 +151,7 @@ class OrderHistoryScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
                 indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    color: Color(0xFF4F46E5),
-                    width: 2.5,
-                  ),
+                  borderSide: BorderSide(color: Color(0xFF4F46E5), width: 2.5),
                   borderRadius: BorderRadius.all(Radius.circular(4)),
                 ),
                 indicatorSize: TabBarIndicatorSize.label,
@@ -166,15 +168,14 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 }
- 
- 
+
 class _OrderList extends StatelessWidget {
-  final List<OrderModel> orders; 
-  final OrderStatus status; 
- 
-  const _OrderList({required this.orders, required this.status,  });
- 
-   @override
+  final List<OrderModel> orders;
+  final OrderStatus status;
+
+  const _OrderList({required this.orders, required this.status});
+
+  @override
   Widget build(BuildContext context) {
     if (orders.isEmpty) {
       return _buildEmptyState(status);
@@ -186,12 +187,12 @@ class _OrderList extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: _OrderCard(order: orders[index]),   
+          child: _OrderCard(order: orders[index]),
         );
       },
     );
   }
- 
+
   Widget _buildEmptyState(OrderStatus status) {
     final Map<OrderStatus, Map<String, dynamic>> config = {
       OrderStatus.active: {
@@ -213,9 +214,9 @@ class _OrderList extends StatelessWidget {
         'color': const Color(0xFFEF4444),
       },
     };
- 
+
     final cfg = config[status]!;
- 
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -245,20 +246,16 @@ class _OrderList extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             cfg['subtitle'] as String,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF9CA3AF),
-            ),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF9CA3AF)),
           ),
         ],
       ),
     );
   }
 }
- 
- 
+
 class _OrderCard extends StatelessWidget {
-    final OrderModel order;               
+  final OrderModel order;
 
   const _OrderCard({required this.order});
 
@@ -271,7 +268,11 @@ class _OrderCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Color(0x08000000), blurRadius: 10, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Padding(
@@ -281,13 +282,14 @@ class _OrderCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: firstItem != null
                       ? Image.network(
                           firstItem.productPic,
-                          width: 80, height: 80, fit: BoxFit.cover,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => _imageFallback(),
                         )
                       : _imageFallback(),
@@ -303,7 +305,6 @@ class _OrderCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                            
                               order.items.length > 1
                                   ? '${firstItem?.productName ?? ''} +${order.items.length - 1} more'
                                   : firstItem?.productName ?? '',
@@ -324,42 +325,53 @@ class _OrderCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.receipt_long_outlined,
-                              size: 13, color: Color(0xFF9CA3AF)),
+                          const Icon(
+                            Icons.receipt_long_outlined,
+                            size: 13,
+                            color: Color(0xFF9CA3AF),
+                          ),
                           const SizedBox(width: 4),
-                          Text(order.orderId,
-                              style: const TextStyle(
-                                  fontSize: 12.5,
-                                  color: Color(0xFF9CA3AF),
-                                  fontWeight: FontWeight.w500)),
+                          Text(
+                            order.orderId,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              color: Color(0xFF9CA3AF),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.shopping_bag_outlined,
-                              size: 13, color: Color(0xFF9CA3AF)),
+                          const Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 13,
+                            color: Color(0xFF9CA3AF),
+                          ),
                           const SizedBox(width: 4),
-                       Text(
-  () {
-    final totalQty = order.items.fold<int>(
-      0, (sum, item) => sum + item.quantity,
-    );
-    return '$totalQty ${totalQty == 1 ? 'item' : 'items'}';
-  }(),
-  style: const TextStyle(
-    fontSize: 12.5,
-    color: Color(0xFF6B7280),
-    fontWeight: FontWeight.w500,
-  ),
-),
+                          Text(
+                            () {
+                              final totalQty = order.items.fold<int>(
+                                0,
+                                (sum, item) => sum + item.quantity,
+                              );
+                              return '$totalQty ${totalQty == 1 ? 'item' : 'items'}';
+                            }(),
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             '\$${order.totalAmount}',
                             style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF4F46E5)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF4F46E5),
+                            ),
                           ),
                         ],
                       ),
@@ -375,15 +387,19 @@ class _OrderCard extends StatelessWidget {
 
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined,
-                    size: 13, color: Color(0xFF9CA3AF)),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 13,
+                  color: Color(0xFF9CA3AF),
+                ),
                 const SizedBox(width: 5),
                 Text(
                   _formatDate(order.createdAt),
                   style: const TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFF9CA3AF),
-                      fontWeight: FontWeight.w500),
+                    fontSize: 12.5,
+                    color: Color(0xFF9CA3AF),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const Spacer(),
                 _ViewDetailsButton(order: order),
@@ -394,35 +410,48 @@ class _OrderCard extends StatelessWidget {
       ),
     );
   }
- 
+
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
-   Widget _imageFallback() => Container(
-        width: 80, height: 80,
-        color: const Color(0xFFF5F6FA),
-        child: const Icon(Icons.image_outlined,
-            color: Color(0xFFD1D5DB), size: 30),
-      );
-        OrderStatus _parseStatus(String status) {
+
+  Widget _imageFallback() => Container(
+    width: 80,
+    height: 80,
+    color: const Color(0xFFF5F6FA),
+    child: const Icon(Icons.image_outlined, color: Color(0xFFD1D5DB), size: 30),
+  );
+  OrderStatus _parseStatus(String status) {
     switch (status) {
-      case 'completed': return OrderStatus.completed;
-      case 'cancelled': return OrderStatus.cancelled;
-      default:          return OrderStatus.active;
+      case 'completed':
+        return OrderStatus.completed;
+      case 'cancelled':
+        return OrderStatus.cancelled;
+      default:
+        return OrderStatus.active;
     }
   }
 }
- 
- 
+
 class _StatusBadge extends StatelessWidget {
   final OrderStatus status;
- 
+
   const _StatusBadge({required this.status});
- 
+
   @override
   Widget build(BuildContext context) {
     final Map<OrderStatus, Map<String, dynamic>> config = {
@@ -445,9 +474,9 @@ class _StatusBadge extends StatelessWidget {
         'dot': const Color(0xFFEF4444),
       },
     };
- 
+
     final cfg = config[status]!;
- 
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -480,24 +509,20 @@ class _StatusBadge extends StatelessWidget {
     );
   }
 }
- 
- 
+
 class _ViewDetailsButton extends StatelessWidget {
-final OrderModel order; 
- 
+  final OrderModel order;
+
   const _ViewDetailsButton({required this.order});
- 
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-     
         Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => OrderDetailScreen(order: order),
-  ),
-);
+          context,
+          MaterialPageRoute(builder: (_) => OrderDetailScreen(order: order)),
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -518,11 +543,7 @@ final OrderModel order;
               ),
             ),
             SizedBox(width: 4),
-            Icon(
-              Icons.arrow_forward_rounded,
-              size: 13,
-              color: Colors.white,
-            ),
+            Icon(Icons.arrow_forward_rounded, size: 13, color: Colors.white),
           ],
         ),
       ),

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/bootstrap_app.dart';
+import 'package:ecommerceapp/view_model/theme_provider.dart';
 import 'package:ecommerceapp/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:provider/provider.dart';
 
 /// https://ecommercestore-ea75d.firebaseapp.com/__/auth/handler
 void main() {
@@ -18,13 +20,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-   return GetMaterialApp(
-  debugShowCheckedModeBanner: false,
-  title: 'Flutter Demo',
-  theme: ThemeData(
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-  ),
-  home: const SplashScreen(),
+   return Consumer<ThemeProvider>(
+  builder: (context, themeProvider, _) {
+    return MaterialApp(
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: const SplashScreen(),
+    );
+  },
 );
   }
 }
