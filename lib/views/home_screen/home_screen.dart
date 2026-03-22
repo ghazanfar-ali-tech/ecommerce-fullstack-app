@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/auth_view_model.dart';
@@ -51,40 +53,111 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: Consumer<HomeViewModel>(
-        builder: (context, viewModel, child) {
-          return GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: CustomScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _buildHeaderSection(context, viewModel),
+   body: Consumer<HomeViewModel>(
+  builder: (context, viewModel, child) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Stack(
+        children: [
+      
+          CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              SliverToBoxAdapter(
+                child: _buildHeaderSection(context, viewModel),
+              ),
+              SliverToBoxAdapter(
+                child: _buildProductSection(context, viewModel),
+              ),
+            ],
+          ),
+
+          Positioned(
+            top: 195,
+            left: 16,
+            right: 16,
+            child: SafeArea(
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-               SliverPersistentHeader(
-    pinned: true,
-    delegate: _SearchPillDelegate(),
-  ),
-                SliverToBoxAdapter(
-                  child: _buildProductSection(context, viewModel),
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => const SearchScreen(),
+                      transitionsBuilder: (_, anim, __, child) => FadeTransition(
+                        opacity: anim,
+                        child: child,
+                      ),
+                      transitionDuration: const Duration(milliseconds: 220),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 14),
+                      const Icon(Icons.search_rounded,  size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Search products...',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                           
+                          ),
+                        ),
+                      ),
+                      Container(width: 1, height: 20, color: Colors.white24),
+                      Container(
+                        width: 50,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary, AppColors.primaryDark],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(14),
+                            bottomRight: Radius.circular(14),
+                          ),
+                        ),
+                        child: const Icon(Icons.tune_rounded, color: Colors.white, size: 19),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          );
-        },
+          ),
+        ],
       ),
+    );
+  },
+),
     );
   }
 
 
   Widget _buildHeaderSection(BuildContext context, HomeViewModel viewModel) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.32,
+      height: MediaQuery.of(context).size.height * 0.33,
       width: MediaQuery.of(context).size.width,
       child: ClipPath(
         clipper: CurveClipper(),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.32,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.30,
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -115,134 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoriesView(BuildContext context, HomeViewModel viewModel) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(color: AppColors.primaryDark),
-        Positioned(
-          top: -80, right: -60,
-          child: Container(
-            width: 220, height: 220,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: -100, right: -40,
-          child: Container(
-            width: 260, height: 260,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
-        Positioned(
-          top: 40, left: 0, right: 0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Good Morning",
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                           viewModel.isUsernameLoaded
-      ? (viewModel.username ?? "")
-      : "Loading...",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        Consumer<AuthViewModel>(
-                          builder: (context, authViewModel, child) {
-                            final cartItemCount =
-                                authViewModel.getCartItemCount();
-                            return GestureDetector(
-                              onTap: () => Navigator.push(context,
-                                  MaterialPageRoute(
-                                      builder: (_) => CartScreen())),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    const Icon(Icons.shopping_bag_outlined,
-                                        color: Colors.white, size: 22),
-                                    if (cartItemCount > 0)
-                                      Positioned(
-                                        top: 6,
-                                        right: 6,
-                                        child: Container(
-                                          width: 14,
-                                          height: 14,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.accent,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '$cartItemCount',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Shop by Category',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ),
-              _buildCategoriesList(viewModel),
-            ],
-          ),
-        ),
-      ],
-    );
+    return _AnimatedCategoryHeader(
+    viewModel: viewModel,
+    categoriesList: _buildCategoriesList(viewModel), 
+  );
   }
 
   Widget _buildCategoriesList(HomeViewModel viewModel) {
@@ -265,8 +214,10 @@ class _HomeScreenState extends State<HomeScreen> {
               final item =
                   categories[index].data() as Map<String, dynamic>;
               return buildCategoryItemFromFirestore(
+                context,  
                 item['imageUrl'] ?? '',
                 item['categoryName'] ?? 'Unknown',
+                
               );
             },
           );
@@ -361,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
     
           _buildSectionHeader(context),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _buildProductGrid(context, viewModel),
           const SizedBox(height: 24),
         ],
@@ -845,3 +796,558 @@ class _ProductCard extends StatelessWidget {
 
 
 
+
+
+
+
+class _AnimatedCategoryHeader extends StatefulWidget {
+  final HomeViewModel viewModel;
+  final Widget categoriesList;
+  const _AnimatedCategoryHeader({required this.viewModel,required this.categoriesList,});
+
+  @override
+  State<_AnimatedCategoryHeader> createState() =>
+      _AnimatedCategoryHeaderState();
+}
+
+class _AnimatedCategoryHeaderState extends State<_AnimatedCategoryHeader>
+    with TickerProviderStateMixin {
+
+  late AnimationController _starCtrl;   
+  late AnimationController _floatCtrl; 
+  late AnimationController _cloudCtrl;  
+  late AnimationController _rayCtrl;    
+  late AnimationController _shootCtrl;  
+
+  final _rand = math.Random(42);
+
+
+  late final List<_Star> _stars = List.generate(28, (i) => _Star(
+    x: _rand.nextDouble(),
+    y: _rand.nextDouble() * 0.85,
+    r: 0.8 + _rand.nextDouble() * 1.8,
+    phase: _rand.nextDouble(),
+    speed: 0.4 + _rand.nextDouble() * 0.6,
+  ));
+
+  late final List<_Cloud> _clouds = List.generate(3, (i) => _Cloud(
+    y: 0.12 + i * 0.14,
+    speed: 0.012 + i * 0.006,
+    scale: 0.6 + i * 0.2,
+    opacity: 0.12 + i * 0.06,
+  ));
+
+  @override
+  void initState() {
+    super.initState();
+    _starCtrl  = AnimationController(vsync: this,
+        duration: const Duration(seconds: 3))..repeat(reverse: true);
+    _floatCtrl = AnimationController(vsync: this,
+        duration: const Duration(seconds: 5))..repeat(reverse: true);
+    _cloudCtrl = AnimationController(vsync: this,
+        duration: const Duration(seconds: 40))..repeat();
+    _rayCtrl   = AnimationController(vsync: this,
+        duration: const Duration(seconds: 8))..repeat();
+    _shootCtrl = AnimationController(vsync: this,
+        duration: const Duration(seconds: 6))..repeat(
+            period: const Duration(seconds: 12));
+  }
+
+  @override
+  void dispose() {
+    _starCtrl.dispose();
+    _floatCtrl.dispose();
+    _cloudCtrl.dispose();
+    _rayCtrl.dispose();
+    _shootCtrl.dispose();
+    super.dispose();
+  }
+
+
+  _TimeOfDay get _timeOfDay {
+    final h = DateTime.now().hour;
+    if (h >= 5  && h < 8)  return _TimeOfDay.dawn;
+    if (h >= 8  && h < 18) return _TimeOfDay.day;
+    if (h >= 18 && h < 21) return _TimeOfDay.dusk;
+    return _TimeOfDay.night;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tod    = _timeOfDay;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+
+      
+        _buildBackground(isDark, tod),
+
+        
+        if (isDark || tod == _TimeOfDay.night || tod == _TimeOfDay.dawn)
+          ..._buildStars(context),
+
+        if (isDark || tod == _TimeOfDay.night)
+          _buildShootingStar(context),
+
+  
+        if (isDark || tod == _TimeOfDay.night || tod == _TimeOfDay.dawn)
+          _buildMoon(context, tod)
+        else
+          _buildSun(context, tod),
+
+        
+
+        Positioned(
+          top: -80, right: -60,
+          child: Container(
+            width: 220, height: 220,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(isDark ? 0.03 : 0.06),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -100, right: -40,
+          child: Container(
+            width: 260, height: 260,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(isDark ? 0.02 : 0.05),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+
+        Positioned(
+          top: 40, left: 0, right: 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    Row(
+                      children: [
+                        Text(
+                          _greeting(tod),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        _timeChip(tod),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.viewModel.isUsernameLoaded
+                              ? (widget.viewModel.username ?? '')
+                              : 'Loading...',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        Consumer<AuthViewModel>(
+                          builder: (context, authViewModel, child) {
+                            final cartItemCount =
+                                authViewModel.getCartItemCount();
+                            return GestureDetector(
+                              onTap: () => Navigator.push(context,
+                                  MaterialPageRoute(
+                                      builder: (_) => CartScreen())),
+                              child: Container(
+                                width: 40, height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: Colors.white.withOpacity(0.2),
+                                      width: 0.5),
+                                ),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    const Icon(Icons.shopping_bag_outlined,
+                                        color: Colors.white, size: 22),
+                                    if (cartItemCount > 0)
+                                      Positioned(
+                                        top: 6, right: 6,
+                                        child: Container(
+                                          width: 14, height: 14,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.accent,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Text('$cartItemCount',
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8,
+                                                    fontWeight:
+                                                        FontWeight.w700)),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                   
+
+                    Text('Shop by Category',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        )),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+              widget.categoriesList,
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackground(bool isDark, _TimeOfDay tod) {
+    final colors = _bgColors(isDark, tod);
+    return AnimatedContainer(
+      duration: const Duration(seconds: 2),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: colors,
+        ),
+      ),
+    );
+  }
+
+  List<Color> _bgColors(bool isDark, _TimeOfDay tod) {
+    if (isDark) {
+      return [const Color(0xFF010B1A), const Color(0xFF020D28)];
+    }
+    switch (tod) {
+      case _TimeOfDay.dawn:
+        return [const Color(0xFF1A237E), const Color(0xFFFF7043)];
+      case _TimeOfDay.day:
+        return [const Color(0xFF1565C0), const Color(0xFF003DB5)];
+      case _TimeOfDay.dusk:
+        return [const Color(0xFF4A148C), const Color(0xFFE65100)];
+      case _TimeOfDay.night:
+        return [const Color(0xFF010B1A), const Color(0xFF020D28)];
+    }
+  }
+
+  List<Widget> _buildStars(BuildContext context) {
+    return _stars.map((s) {
+      return Positioned(
+        left:  s.x * MediaQuery.sizeOf(context).width,
+        top:   s.y * 200,
+        child: AnimatedBuilder(
+          animation: _starCtrl,
+          builder: (_, __) {
+            final flicker = (0.3 +
+    0.7 * math.sin(
+        (_starCtrl.value + s.phase) * math.pi * s.speed * 2))
+    .clamp(0.0, 1.0);
+            return Opacity(
+              opacity:flicker,
+              child: Container(
+                width: s.r * 2,
+                height: s.r * 2,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.6 * flicker),
+                      blurRadius: s.r * 3,
+                      spreadRadius: s.r * 0.5,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _buildShootingStar(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    return AnimatedBuilder(
+      animation: _shootCtrl,
+      builder: (_, __) {
+        final t = _shootCtrl.value;
+        if (t < 0.0 || t > 0.25) return const SizedBox.shrink();
+        final progress = t / 0.25;
+        final x = w * 0.2 + w * 0.6 * progress;
+        final y = 20.0 + 60.0 * progress;
+        return Positioned(
+          left: x, top: y,
+          child: Opacity(
+            opacity: (1 - progress) * 0.9,
+            child: Transform.rotate(
+              angle: math.pi / 4,
+              child: Container(
+                width: 60, height: 1.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.white.withOpacity(0),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMoon(BuildContext context, _TimeOfDay tod) {
+    return Positioned(
+      top: 20, right: 24,
+      child: AnimatedBuilder(
+        animation: _floatCtrl,
+        builder: (_, __) {
+          final float = -4 * math.sin(_floatCtrl.value * math.pi);
+          return Transform.translate(
+            offset: Offset(0, float),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+              
+                Container(
+                  width: 52, height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.12),
+                        blurRadius: 20,
+                        spreadRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+            
+                Container(
+                  width: 38, height: 38,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8EAF6),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+            
+                Positioned(
+                  top: 4, right: 4,
+                  child: Container(
+                    width: 28, height: 28,
+                    decoration: BoxDecoration(
+                      color: tod == _TimeOfDay.night
+                          ? const Color(0xFF010B1A)
+                          : const Color(0xFF1A237E),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                
+                Positioned(
+                  left: 10, top: 14,
+                  child: Container(
+                    width: 5, height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 7, top: 22,
+                  child: Container(
+                    width: 3, height: 3,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+
+  Widget _buildSun(BuildContext context, _TimeOfDay tod) {
+    final sunColor = tod == _TimeOfDay.dawn
+        ? const Color(0xFFFFB74D)
+        : tod == _TimeOfDay.dusk
+            ? const Color(0xFFFF7043)
+            : const Color(0xFFFFD600);
+
+    return Positioned(
+      top: 16, right: 20,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_floatCtrl, _rayCtrl]),
+        builder: (_, __) {
+          final float = -3 * math.sin(_floatCtrl.value * math.pi);
+          return Transform.translate(
+            offset: Offset(0, float),
+            child: SizedBox(
+              width: 60, height: 60,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+
+           
+                  Transform.rotate(
+                    angle: _rayCtrl.value * 2 * math.pi,
+                    child: CustomPaint(
+                      painter: _SunRayPainter(color: sunColor),
+                      size: const Size(60, 60),
+                    ),
+                  ),
+
+               
+                  Container(
+                    width: 44, height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: sunColor.withOpacity(0.5),
+                          blurRadius: 18,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                  ),
+
+               
+                  Container(
+                    width: 32, height: 32,
+                    decoration: BoxDecoration(
+                      color: sunColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+
+
+
+  String _greeting(_TimeOfDay tod) {
+    switch (tod) {
+      case _TimeOfDay.dawn:  return 'Good Morning ✨';
+      case _TimeOfDay.day:   return 'Good Day ☀️';
+      case _TimeOfDay.dusk:  return 'Good Evening 🌅';
+      case _TimeOfDay.night: return 'Good Night 🌙';
+    }
+  }
+
+  Widget _timeChip(_TimeOfDay tod) {
+    final now = DateTime.now();
+    final h   = now.hour.toString().padLeft(2, '0');
+    final m   = now.minute.toString().padLeft(2, '0');
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+            color: Colors.white.withOpacity(0.2), width: 0.5),
+      ),
+      child: Text('$h:$m',
+          style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+enum _TimeOfDay { dawn, day, dusk, night }
+
+class _Star {
+  final double x, y, r, phase, speed;
+  const _Star({required this.x, required this.y, required this.r,
+      required this.phase, required this.speed});
+}
+
+class _Cloud {
+  final double y, speed, scale, opacity;
+  const _Cloud({required this.y, required this.speed,
+      required this.scale, required this.opacity});
+}
+
+class _SunRayPainter extends CustomPainter {
+  final Color color;
+  _SunRayPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withOpacity(0.5)
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    final center = Offset(size.width / 2, size.height / 2);
+    const rays   = 8;
+    const inner  = 20.0;
+    const outer  = 28.0;
+
+    for (int i = 0; i < rays; i++) {
+      final angle = (i / rays) * 2 * math.pi;
+      canvas.drawLine(
+        Offset(center.dx + inner * math.cos(angle),
+               center.dy + inner * math.sin(angle)),
+        Offset(center.dx + outer * math.cos(angle),
+               center.dy + outer * math.sin(angle)),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SunRayPainter old) => old.color != color;
+}

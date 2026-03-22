@@ -14,116 +14,54 @@ class FavouriteScreen extends StatefulWidget {
 }
 
 class _FavouriteScreenState extends State<FavouriteScreen>
-    with SingleTickerProviderStateMixin {
-  final GlobalKey<CartIconKey> _cartKey = GlobalKey<CartIconKey>();
-  late Function(GlobalKey) _runAnimation;
-  int _cartCount = 0;
+    with TickerProviderStateMixin {
+
+  final GlobalKey<CartIconKey> _cartKey   = GlobalKey<CartIconKey>();
+  late Function(GlobalKey)     _runAnim;
+  int                          _cartCount = 0;
+
+
   final List<GlobalKey> _imageKeys = [];
 
-  bool _isCancelled = false;
+ 
+  bool _cancelled = false;
 
-  late AnimationController _cartBounceCtrl;
-  late Animation<double> _cartBounce;
+
+  late AnimationController _bounceCtrl;
+  late Animation<double>   _bounce;
+
+  late AnimationController _auroraCtrl;
+
+  late AnimationController _floatCtrl;
 
   @override
   void initState() {
     super.initState();
-    _cartBounceCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _cartBounce = TweenSequence([
+
+    _bounceCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
+    _bounce = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 40),
       TweenSequenceItem(tween: Tween(begin: 1.3, end: 0.9), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 30),
-    ]).animate(CurvedAnimation(parent: _cartBounceCtrl, curve: Curves.easeOut));
+    ]).animate(CurvedAnimation(parent: _bounceCtrl, curve: Curves.easeOut));
+
+    _auroraCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1800))
+      ..forward();
+
+    _floatCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 3200))
+      ..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _isCancelled = true; 
-    _cartBounceCtrl.dispose();
+    _cancelled = true;
+    _bounceCtrl.dispose();
+    _auroraCtrl.dispose();
+    _floatCtrl.dispose();
     super.dispose();
-  }
-
-// In _FavouriteScreenState
-
-Future<void> _handleAddToCart(
-    GlobalKey imageKey, String name, StoreViewModel viewModel) async {
-  if (!mounted || _isCancelled) return;
-
-  final authVM  = Provider.of<AuthViewModel>(context, listen: false);
-  final cartBox = authVM.getCartBox();
-  final exists  = cartBox.values.any((i) => i.productName == name);
-
-  if (exists) {
-    if (mounted) _showSnack('$name already in cart', AppColors.warning);
-    return;
-  }
-
-  if (!mounted || _isCancelled) return;
-
-  // ← wrap package animation in try-catch
-  // the package internally calls setState which crashes if disposed
-  try {
-    await _runAnimation(imageKey);
-  } catch (_) {
-    return; // ← silently exit if widget disposed during animation
-  }
-
-  if (!mounted || _isCancelled) return;
-
-  try {
-    await _cartKey.currentState?.runCartAnimation((++_cartCount).toString());
-  } catch (_) {
-    return;
-  }
-
-  if (!mounted || _isCancelled) return;
-  _cartBounceCtrl.forward(from: 0);
-
-  final product = viewModel.favList.firstWhere(
-    (p) => p['productName'] == name,
-    orElse: () => {},
-  );
-  if (product.isNotEmpty) {
-    await viewModel.addSingleToCart(
-        Map<String, dynamic>.from(product), cartBox);
-  }
-
-  if (mounted && !_isCancelled) {
-    _showSnack('Added $name to cart', AppColors.success);
-  }
-}
-
-// Updated _handleAddAll
-Future<void> _handleAddAll(StoreViewModel viewModel) async {
-  final favList = List.from(viewModel.favList);
-
-  for (int i = 0; i < favList.length; i++) {
-    if (!mounted || _isCancelled) return;
-    if (i >= _imageKeys.length) break;
-
-    final name = favList[i]['productName'] ?? '';
-    final key  = _imageKeys[i];
-
-    if (key.currentContext == null) continue;
-
-    await _handleAddToCart(key, name, viewModel);
-
-    if (!mounted || _isCancelled) return;
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted || _isCancelled) return;
-  }
-}
-  void _showSnack(String msg, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: color,
-        duration: const Duration(seconds: 1),
-      ),
-    );
   }
 
   void _syncKeys(int count) {
@@ -131,11 +69,87 @@ Future<void> _handleAddAll(StoreViewModel viewModel) async {
     while (_imageKeys.length > count) _imageKeys.removeLast();
   }
 
+  Future<void> _addToCart(
+      GlobalKey imageKey, String name, StoreViewModel vm) async {
+    if (!mounted || _cancelled) return;
+
+    final authVM  = Provider.of<AuthViewModel>(context, listen: false);
+    final cartBox = authVM.getCartBox();
+    final exists  = cartBox.values.any((i) => i.productName == name);
+
+    if (exists) {
+      if (mounted) _snack('$name already in cart', AppColors.warning);
+      return;
+    }
+
+    if (!mounted || _cancelled) return;
+
+    
+    try {
+      await _runAnim(imageKey);
+    } catch (_) {
+      return;
+    }
+
+    if (!mounted || _cancelled) return;
+
+    try {
+      await _cartKey.currentState
+          ?.runCartAnimation((++_cartCount).toString());
+    } catch (_) {
+      return;
+    }
+
+    if (!mounted || _cancelled) return;
+    _bounceCtrl.forward(from: 0);
+
+    final product = vm.favList.firstWhere(
+      (p) => p['productName'] == name,
+      orElse: () => {},
+    );
+    if (product.isNotEmpty) {
+      await vm.addSingleToCart(Map<String, dynamic>.from(product), cartBox);
+    }
+
+    if (mounted && !_cancelled) {
+      _snack('Added $name to cart', AppColors.success);
+    }
+  }
+
+  Future<void> _addAll(StoreViewModel vm) async {
+    final snapshot = List.from(vm.favList);
+
+    for (int i = 0; i < snapshot.length; i++) {
+      if (!mounted || _cancelled) return;
+      if (i >= _imageKeys.length) break;
+
+      final name = snapshot[i]['productName'] ?? '';
+      final key  = _imageKeys[i];
+
+      if (key.currentContext == null) continue;
+
+      await _addToCart(key, name, vm);
+
+      if (!mounted || _cancelled) return;
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted || _cancelled) return;
+    }
+  }
+
+  void _snack(String msg, Color color) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      backgroundColor: color,
+      duration: const Duration(seconds: 1),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StoreViewModel>(
-      builder: (context, viewModel, _) {
-        final favList = viewModel.favList;
+      builder: (context, vm, _) {
+        final favList  = vm.favList;
         final favCount = favList.length;
         _syncKeys(favCount);
 
@@ -154,23 +168,70 @@ Future<void> _handleAddAll(StoreViewModel viewModel) async {
             curve: Curves.easeInOut,
             duration: Duration(milliseconds: 180),
           ),
-          createAddToCartAnimation: (fn) => _runAnimation = fn,
+          createAddToCartAnimation: (fn) => _runAnim = fn,
           child: Scaffold(
             backgroundColor: AppColors.background(context),
             body: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                SliverPersistentHeader(
+
+                SliverAppBar(
                   pinned: true,
-                  delegate: _HeaderDelegate(
-                    cartKey: _cartKey,
-                    cartBounce: _cartBounce,
-                    favCount: favCount,
-                    viewModel: viewModel,
-                    onAddAll: () => _handleAddAll(viewModel),
-                  ),
+                  expandedHeight: 0,
+                  backgroundColor: AppColors.background(context),
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  automaticallyImplyLeading: false,
+                  title: Text('My Wishlist',
+                      style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700)),
+                  actions: [
+            
+                    AnimatedBuilder(
+                      animation: _bounce,
+                      builder: (_, child) => Transform.scale(
+                        scale: _bounce.value,
+                        child: child,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Container(
+                          padding:const EdgeInsets.only(right: 10) ,
+                          width: 60, height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackground(context),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: AppColors.border(context), width: 0.5),
+                          ),
+                          child: AddToCartIcon(
+                            key: _cartKey,
+                            icon: Icon(Icons.shopping_cart_rounded,
+                                color: AppColors.textPrimary(context),
+                                size: 18),
+                            badgeOptions: BadgeOptions(
+                              active: true,
+                              backgroundColor: AppColors.accent,
+                              foregroundColor: Colors.white,
+                              width: 18,
+                              height: 18,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
+              
+                SliverToBoxAdapter(
+                  child: _buildHeroCard(context, vm, favCount),
+                ),
+
+             
                 if (favCount == 0)
                   SliverFillRemaining(child: _buildEmpty(context))
                 else
@@ -179,12 +240,13 @@ Future<void> _handleAddAll(StoreViewModel viewModel) async {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) => _WishlistCard(
-                          product: Map<String, dynamic>.from(favList[index]),
-                          index: index,
-                          viewModel: viewModel,
-                          imageKey: _imageKeys[index],
+                          product:
+                              Map<String, dynamic>.from(favList[index]),
+                          index:    index,
+                          viewModel: vm,
+                          imageKey:  _imageKeys[index],
                           onAddToCart: (key, name) =>
-                              _handleAddToCart(key, name, viewModel),
+                              _addToCart(key, name, vm),
                         ),
                         childCount: favCount,
                       ),
@@ -198,384 +260,145 @@ Future<void> _handleAddAll(StoreViewModel viewModel) async {
     );
   }
 
+  Widget _buildHeroCard(
+      BuildContext context, StoreViewModel vm, int favCount) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: AppColors.heroGradient,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: AppColors.primaryShadow,
+        ),
+        child: Stack(
+          children: [
+
+            Positioned(
+              right: -8, top: -8,
+              child: AnimatedBuilder(
+                animation: _floatCtrl,
+                builder: (_, __) => CustomPaint(
+                  painter: _BlobPainter(progress: _floatCtrl.value),
+                  size: const Size(100, 100),
+                ),
+              ),
+            ),
+
+       
+            Positioned(
+              left: 0, bottom: 0,
+              child: AnimatedBuilder(
+                animation: _floatCtrl,
+                builder: (_, __) => Opacity(
+                  opacity: 0.1 + _floatCtrl.value * 0.08,
+                  child: CustomPaint(
+                    painter: _DotsPainter(),
+                    size: const Size(80, 50),
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: AnimatedBuilder(
+                  animation: _auroraCtrl,
+                  builder: (_, __) => CustomPaint(
+                    painter: _AuroraPainter(progress: _auroraCtrl.value),
+                  ),
+                ),
+              ),
+            ),
+
+            Row(
+              children: [
+
+                Container(
+                  width: 56, height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.4), width: 1.5),
+                  ),
+                  child: const Icon(Icons.favorite_rounded,
+                      color: Colors.white, size: 28),
+                ),
+
+                const SizedBox(width: 16),
+
+         
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+
+                      const Text('My Wishlist',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2)),
+
+                      const SizedBox(height: 3),
+
+                      Text(
+                        '$favCount ${favCount == 1 ? 'item' : 'items'} saved',
+                        style: TextStyle(
+                            color: Colors.white.withOpacity(0.65),
+                            fontSize: 12),
+                      ),
+
+                      if (favCount > 0) ...[
+                        const SizedBox(height: 10),
+                        _AddAllBtn(onTap: () => _addAll(vm)),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmpty(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 88,
-            height: 88,
+            width: 88, height: 88,
             decoration: BoxDecoration(
               color: AppColors.primaryContainer(context),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.favorite_border_rounded,
-              size: 42,
-              color: AppColors.primaryText(context),
-            ),
+            child: Icon(Icons.favorite_border_rounded,
+                size: 42, color: AppColors.primaryText(context)),
           ),
           const SizedBox(height: 20),
-          Text(
-            'Your wishlist is empty',
-            style: TextStyle(
-              color: AppColors.textPrimary(context),
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text('Your wishlist is empty',
+              style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text(
-            'Save items you love and find them here',
-            style: TextStyle(
-              color: AppColors.textSecondary(context),
-              fontSize: 14,
-            ),
-          ),
+          Text('Save items you love and find them here',
+              style: TextStyle(
+                  color: AppColors.textSecondary(context), fontSize: 14)),
         ],
       ),
     );
   }
-}
-
-class _HeaderDelegate extends SliverPersistentHeaderDelegate {
-  final GlobalKey<CartIconKey> cartKey;
-  final Animation<double> cartBounce;
-  final int favCount;
-  final StoreViewModel viewModel;
-  final VoidCallback onAddAll;
-
-  _HeaderDelegate({
-    required this.cartKey,
-    required this.cartBounce,
-    required this.favCount,
-    required this.viewModel,
-    required this.onAddAll,
-  });
-
-  @override
-  double get minExtent => 72;
-  @override
-  double get maxExtent => favCount > 0 ? 200 : 160;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final t = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
-    final top = MediaQuery.of(context).padding.top;
-
-    return _HeaderWidget(
-      shrinkT: t,
-      top: top,
-      cartKey: cartKey,
-      cartBounce: cartBounce,
-      favCount: favCount,
-      viewModel: viewModel,
-      onAddAll: onAddAll,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_HeaderDelegate old) => old.favCount != favCount;
-}
-
-class _HeaderWidget extends StatefulWidget {
-  final double shrinkT;
-  final double top;
-  final GlobalKey<CartIconKey> cartKey;
-  final Animation<double> cartBounce;
-  final int favCount;
-  final StoreViewModel viewModel;
-  final VoidCallback onAddAll;
-
-  const _HeaderWidget({
-    required this.shrinkT,
-    required this.top,
-    required this.cartKey,
-    required this.cartBounce,
-    required this.favCount,
-    required this.viewModel,
-    required this.onAddAll,
-  });
-
-  @override
-  State<_HeaderWidget> createState() => _HeaderWidgetState();
-}
-
-class _HeaderWidgetState extends State<_HeaderWidget>
-    with TickerProviderStateMixin {
-  late AnimationController _entryCtrl;
-  late AnimationController _floatCtrl;
-  late AnimationController _auroraCtrl;
-  late Animation<double> _fade1;
-  late Animation<Offset> _slide1;
-  late Animation<double> _fade2;
-  late Animation<Offset> _slide2;
-
-  @override
-  void initState() {
-    super.initState();
-    _entryCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..forward();
-    _floatCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 4000),
-    )..repeat(reverse: true);
-    _auroraCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    )..forward();
-
-    _fade1 = CurvedAnimation(
-      parent: _entryCtrl,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    );
-    _slide1 = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _entryCtrl,
-            curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
-          ),
-        );
-    _fade2 = CurvedAnimation(
-      parent: _entryCtrl,
-      curve: const Interval(0.2, 0.8, curve: Curves.easeOut),
-    );
-    _slide2 = Tween<Offset>(begin: const Offset(0, 0.6), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _entryCtrl,
-            curve: const Interval(0.2, 0.9, curve: Curves.easeOutCubic),
-          ),
-        );
-  }
-
-  @override
-  void dispose() {
-    _entryCtrl.dispose();
-    _floatCtrl.dispose();
-    _auroraCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final collapsed = widget.shrinkT > 0.85;
-
-    return Container(
-      margin: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        gradient: AppColors.heroGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(collapsed ? 0 : 28),
-          bottomRight: Radius.circular(collapsed ? 0 : 28),
-          topLeft: Radius.circular(collapsed ? 0 : 28),
-          topRight: Radius.circular(collapsed ? 0 : 28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12 + widget.shrinkT * 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          if (!collapsed) ..._rings(),
-
-          if (!collapsed)
-            Positioned(
-              top: 30,
-              left: 60,
-              child: AnimatedBuilder(
-                animation: _floatCtrl,
-                builder: (_, __) => Opacity(
-                  opacity: 0.15 + 0.1 * math.sin(_floatCtrl.value * math.pi),
-                  child: CustomPaint(
-                    painter: _DotsPainter(),
-                    size: const Size(60, 40),
-                  ),
-                ),
-              ),
-            ),
-
-          if (widget.shrinkT < 0.5)
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _auroraCtrl,
-                builder: (_, __) => CustomPaint(
-                  painter: _AuroraPainter(progress: _auroraCtrl.value),
-                ),
-              ),
-            ),
-
-          Positioned(
-            top: widget.top + 8,
-            left: 16,
-            right: 16,
-            bottom: 12,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FadeTransition(
-                        opacity: _fade1,
-                        child: SlideTransition(
-                          position: _slide1,
-                          child: AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 200),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: collapsed ? 16 : 22,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
-                            ),
-                            child: const Text('My Wishlist'),
-                          ),
-                        ),
-                      ),
-
-                      if (!collapsed) ...[
-                        const SizedBox(height: 4),
-
-                        FadeTransition(
-                          opacity: _fade2,
-                          child: SlideTransition(
-                            position: _slide2,
-                            child: Text(
-                              '${widget.favCount} ${widget.favCount == 1 ? 'item' : 'items'} saved',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.72),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        if (widget.favCount > 0) ...[
-                          const SizedBox(height: 10),
-
-                          FadeTransition(
-                            opacity: _fade1,
-                            child: _AddAllBtn(onTap: widget.onAddAll),
-                          ),
-                        ],
-                      ],
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                AnimatedBuilder(
-                  animation: widget.cartBounce,
-                  builder: (_, child) => Transform.scale(
-                    scale: widget.cartBounce.value,
-                    child: child,
-                  ),
-                  child: AddToCartIcon(
-                    key: widget.cartKey,
-                    icon: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.18),
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.shopping_cart_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                    badgeOptions: BadgeOptions(
-                      active: true,
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: Colors.white,
-                      width: 20,
-                      height: 20,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _rings() => [
-    Positioned(
-      top: -20,
-      right: -20,
-      child: AnimatedBuilder(
-        animation: _floatCtrl,
-        builder: (_, __) => Transform.translate(
-          offset: Offset(
-            4 * math.sin(_floatCtrl.value * math.pi),
-            -3 * math.cos(_floatCtrl.value * math.pi),
-          ),
-          child: Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(0.08),
-                width: 1,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-    Positioned(
-      bottom: -30,
-      left: -30,
-      child: AnimatedBuilder(
-        animation: _floatCtrl,
-        builder: (_, __) => Transform.translate(
-          offset: Offset(
-            -3 * math.cos(_floatCtrl.value * math.pi),
-            4 * math.sin(_floatCtrl.value * math.pi + 1),
-          ),
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(0.06),
-                width: 1,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  ];
 }
 
 class _AddAllBtn extends StatefulWidget {
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
   const _AddAllBtn({required this.onTap});
 
   @override
@@ -607,57 +430,49 @@ class _AddAllBtnState extends State<_AddAllBtn>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) {
-        if (!_running && mounted) _ctrl.forward();
-      },
+      onTapDown: (_) { if (!_running && mounted) _ctrl.forward(); },
       onTapUp: (_) async {
         if (!mounted) return;
         _ctrl.reverse();
         if (_running) return;
-
         if (mounted) setState(() => _running = true);
-
-        // ← await the actual callback so we know when it finishes
         try {
-          await Future.microtask(() => widget.onTap());
+          await widget.onTap();
         } catch (_) {}
-
         if (mounted) setState(() => _running = false);
       },
-      onTapCancel: () {
-        if (mounted) _ctrl.reverse();
-      },
+      onTapCancel: () { if (mounted) _ctrl.reverse(); },
       child: ScaleTransition(
         scale: _scale,
         child: AnimatedOpacity(
           opacity: _running ? 0.65 : 1.0,
           duration: const Duration(milliseconds: 200),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
-              gradient: AppColors.accentGradient,
-              borderRadius: BorderRadius.circular(11),
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                  color: Colors.white.withOpacity(0.25), width: 0.8),
-              boxShadow: AppColors.accentShadow,
+                  color: Colors.white.withOpacity(0.3), width: 0.8),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _running
                     ? const SizedBox(
-                        width: 14, height: 14,
+                        width: 12, height: 12,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
                     : const Icon(Icons.shopping_cart_checkout_rounded,
-                        color: Colors.white, size: 15),
-                const SizedBox(width: 7),
+                        color: Colors.white, size: 14),
+                const SizedBox(width: 6),
                 Text(
                   _running ? 'Adding...' : 'Add all to Cart',
                   style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -669,10 +484,10 @@ class _AddAllBtnState extends State<_AddAllBtn>
 }
 
 class _WishlistCard extends StatefulWidget {
-  final Map<String, dynamic> product;
-  final int index;
-  final StoreViewModel viewModel;
-  final GlobalKey imageKey;
+  final Map<String, dynamic>               product;
+  final int                                index;
+  final StoreViewModel                     viewModel;
+  final GlobalKey                          imageKey;
   final Future<void> Function(GlobalKey, String) onAddToCart;
 
   const _WishlistCard({
@@ -689,13 +504,14 @@ class _WishlistCard extends StatefulWidget {
 
 class _WishlistCardState extends State<_WishlistCard>
     with TickerProviderStateMixin {
+
   late AnimationController _entryCtrl;
-  late Animation<double> _fade;
-  late Animation<Offset> _slide;
+  late Animation<double>   _fade;
+  late Animation<Offset>   _slide;
 
   late AnimationController _pressCtrl;
-  late Animation<double> _scale;
-  late Animation<double> _elevate;
+  late Animation<double>   _pressScale;
+  late Animation<double>   _elevate;
 
   bool _adding = false;
 
@@ -703,32 +519,25 @@ class _WishlistCardState extends State<_WishlistCard>
   void initState() {
     super.initState();
 
-    _entryCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _fade = CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOut);
+    _entryCtrl = AnimationController(vsync: this,
+        duration: const Duration(milliseconds: 500));
+    _fade  = CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOut);
     _slide = Tween<Offset>(
-      begin: const Offset(0, 0.25),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _entryCtrl, curve: Curves.easeOutCubic));
+            begin: const Offset(0, 0.25), end: Offset.zero)
+        .animate(CurvedAnimation(
+            parent: _entryCtrl, curve: Curves.easeOutCubic));
 
-    _pressCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 140),
-    );
-    _scale = Tween<double>(
-      begin: 1.0,
-      end: 1.03,
-    ).animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
-    _elevate = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
+    _pressCtrl = AnimationController(vsync: this,
+        duration: const Duration(milliseconds: 140));
+    _pressScale = Tween<double>(begin: 1.0, end: 1.03)
+        .animate(CurvedAnimation(
+            parent: _pressCtrl, curve: Curves.easeOut));
+    _elevate = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(
+            parent: _pressCtrl, curve: Curves.easeOut));
 
-    Future.delayed(Duration(milliseconds: widget.index * 80), () {
-      if (mounted) _entryCtrl.forward();
-    });
+    Future.delayed(Duration(milliseconds: widget.index * 80),
+        () { if (mounted) _entryCtrl.forward(); });
   }
 
   @override
@@ -740,11 +549,12 @@ class _WishlistCardState extends State<_WishlistCard>
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.product['productName'] ?? 'Unknown';
-    final price = (widget.product['productPrice'] ?? 0).toString();
-    final category = widget.product['categoryName'] ?? '';
-    final images = widget.product['productImageUrls'] as List?;
-    final imageUrl = (images != null && images.isNotEmpty) ? images[0] : null;
+    final name     = widget.product['productName']      ?? 'Unknown';
+    final price    = (widget.product['productPrice']    ?? 0).toString();
+    final category = widget.product['categoryName']     ?? '';
+    final images   = widget.product['productImageUrls'] as List?;
+    final imageUrl =
+        (images != null && images.isNotEmpty) ? images[0] : null;
 
     return FadeTransition(
       opacity: _fade,
@@ -752,21 +562,19 @@ class _WishlistCardState extends State<_WishlistCard>
         position: _slide,
         child: GestureDetector(
           onTapDown: (_) => _pressCtrl.forward(),
-          onTapUp: (_) => _pressCtrl.reverse(),
+          onTapUp:   (_) => _pressCtrl.reverse(),
           onTapCancel: () => _pressCtrl.reverse(),
           child: AnimatedBuilder(
             animation: _pressCtrl,
             builder: (_, child) => Transform.scale(
-              scale: _scale.value,
+              scale: _pressScale.value,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: AppColors.cardBackground(context),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.border(context),
-                    width: 0.5,
-                  ),
+                      color: AppColors.border(context), width: 0.5),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.shadow(context),
@@ -775,9 +583,8 @@ class _WishlistCardState extends State<_WishlistCard>
                     ),
                     if (_elevate.value > 0.5)
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(
-                          _elevate.value * 0.06,
-                        ),
+                        color: AppColors.primary
+                            .withOpacity(_elevate.value * 0.06),
                         blurRadius: 20,
                         offset: const Offset(0, 6),
                       ),
@@ -789,6 +596,7 @@ class _WishlistCardState extends State<_WishlistCard>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -798,24 +606,18 @@ class _WishlistCardState extends State<_WishlistCard>
                     tag: 'fav_img_${widget.index}',
                     child: Container(
                       key: widget.imageKey,
-                      width: 110,
-                      height: 120,
+                      width: 110, height: 120,
                       color: AppColors.surfaceVariant(context),
                       child: imageUrl != null
-                          ? Image.network(
-                              imageUrl,
+                          ? Image.network(imageUrl,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => Icon(
-                                Icons.image_outlined,
-                                size: 40,
-                                color: AppColors.textHint(context),
-                              ),
-                            )
-                          : Icon(
-                              Icons.image_outlined,
+                                  Icons.image_outlined,
+                                  size: 40,
+                                  color: AppColors.textHint(context)))
+                          : Icon(Icons.image_outlined,
                               size: 40,
-                              color: AppColors.textHint(context),
-                            ),
+                              color: AppColors.textHint(context)),
                     ),
                   ),
                 ),
@@ -826,36 +628,29 @@ class _WishlistCardState extends State<_WishlistCard>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            color: AppColors.textPrimary(context),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+
+                        Text(name,
+                            style: TextStyle(
+                                color: AppColors.textPrimary(context),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
 
                         const SizedBox(height: 5),
 
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: AppColors.primaryContainer(context),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              color: AppColors.primaryText(context),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          child: Text(category,
+                              style: TextStyle(
+                                  color: AppColors.primaryText(context),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500)),
                         ),
 
                         const SizedBox(height: 10),
@@ -863,21 +658,22 @@ class _WishlistCardState extends State<_WishlistCard>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+
+                     
                             ShaderMask(
                               shaderCallback: (b) =>
                                   AppColors.primaryGradient.createShader(b),
-                              child: Text(
-                                '\$$price',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                              child: Text('\$$price',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700)),
                             ),
 
                             Row(
                               children: [
+
+                               
                                 _Btn(
                                   icon: _adding
                                       ? Icons.hourglass_top_rounded
@@ -885,31 +681,35 @@ class _WishlistCardState extends State<_WishlistCard>
                                   gradient: AppColors.primaryGradient,
                                   shadow: AppColors.primary,
                                   disabled: _adding,
-                                onTap: () async {
-  if (_adding || !mounted) return;
-  setState(() => _adding = true);
-  await widget.onAddToCart(widget.imageKey, name);
-  if (mounted) setState(() => _adding = false); // ← was missing mounted check
-},
+                                  onTap: () async {
+                                    if (_adding || !mounted) return;
+                                    setState(() => _adding = true);
+                                    await widget.onAddToCart(
+                                        widget.imageKey, name);
+                                    if (mounted) {
+                                      setState(() => _adding = false);
+                                    }
+                                  },
                                 ),
 
                                 const SizedBox(width: 8),
 
+                       
                                 _Btn(
                                   icon: Icons.delete_outline_rounded,
                                   color: AppColors.error,
                                   shadow: AppColors.error,
                                   onTap: () {
-                                    widget.viewModel.removeFromFavorites(name);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Removed $name from wishlist',
-                                        ),
-                                        backgroundColor: AppColors.error,
-                                        duration: const Duration(seconds: 1),
-                                      ),
-                                    );
+                                    widget.viewModel
+                                        .removeFromFavorites(name);
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          'Removed $name from wishlist'),
+                                      backgroundColor: AppColors.error,
+                                      duration:
+                                          const Duration(seconds: 1),
+                                    ));
                                   },
                                 ),
                               ],
@@ -929,13 +729,14 @@ class _WishlistCardState extends State<_WishlistCard>
   }
 }
 
+
 class _Btn extends StatelessWidget {
-  final IconData icon;
+  final IconData        icon;
   final LinearGradient? gradient;
-  final Color? color;
-  final Color shadow;
-  final VoidCallback onTap;
-  final bool disabled;
+  final Color?          color;
+  final Color           shadow;
+  final VoidCallback    onTap;
+  final bool            disabled;
 
   const _Btn({
     required this.icon,
@@ -954,19 +755,15 @@ class _Btn extends StatelessWidget {
         opacity: disabled ? 0.5 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: Container(
-          width: 34,
-          height: 34,
+          width: 34, height: 34,
           decoration: BoxDecoration(
             gradient: gradient,
             color: color,
             borderRadius: BorderRadius.circular(9),
-            boxShadow: [
-              BoxShadow(
+            boxShadow: [BoxShadow(
                 color: shadow.withOpacity(0.28),
                 blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+                offset: const Offset(0, 3))],
           ),
           child: Icon(icon, color: Colors.white, size: 16),
         ),
@@ -982,14 +779,13 @@ class _AuroraPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (progress <= 0 || progress >= 1) return;
-    final x = size.width * 1.5 * progress - size.width * 0.25;
+    final x    = size.width * 1.5 * progress - size.width * 0.25;
     final peak = math.sin(progress * math.pi);
-
     canvas.drawPath(
       Path()
         ..moveTo(x - 100, 0)
-        ..lineTo(x + 60, 0)
-        ..lineTo(x + 30, size.height)
+        ..lineTo(x + 60,  0)
+        ..lineTo(x + 30,  size.height)
         ..lineTo(x - 130, size.height)
         ..close(),
       Paint()
@@ -1012,19 +808,47 @@ class _AuroraPainter extends CustomPainter {
   bool shouldRepaint(_AuroraPainter o) => o.progress != progress;
 }
 
+class _BlobPainter extends CustomPainter {
+  final double progress;
+  _BlobPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.07)
+      ..style = PaintingStyle.fill;
+    final path = Path();
+    const pts = 8;
+    for (int i = 0; i <= pts; i++) {
+      final a = (i / pts) * 2 * math.pi;
+      final r = 36 +
+          12 * math.sin(a * 3 + progress * math.pi * 2) +
+          7  * math.cos(a * 2 + progress * math.pi);
+      final x = cx + r * math.cos(a);
+      final y = cy + r * math.sin(a);
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_BlobPainter o) => o.progress != progress;
+}
+
 class _DotsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = Colors.white 
-      ..style = PaintingStyle.fill;
-    const cols = 4;
-    const rows = 3;
+    final p = Paint()..color = Colors.white..style = PaintingStyle.fill;
+    const cols = 4; const rows = 3;
     final gx = size.width / cols;
     final gy = size.height / rows;
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        canvas.drawCircle(Offset(gx * c + gx / 2, gy * r + gy / 2), 1.2, p);
+        canvas.drawCircle(
+            Offset(gx * c + gx / 2, gy * r + gy / 2), 1.2, p);
       }
     }
   }

@@ -156,7 +156,9 @@ _aurora = CurvedAnimation(parent: _auroraCtrl, curve: Curves.easeInOut);
                                    iconColor: const Color(0xFF0284C7),
                                   title: 'Help Center',
                                   subtitle: 'FAQs and support',
-                                  onTap: () {}),
+                                  onTap: () {
+
+                                  }),
                               _divider(context),
                               _tile(context, 3,
                                   icon: Icons.settings_outlined,
@@ -422,38 +424,18 @@ Widget _buildSection(BuildContext context, int index,
                     letterSpacing: 0.6)),
           ),
 
-        AnimatedBuilder(
-          animation: _aurora,
-          builder: (_, child) => ClipRRect(
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground(context),
             borderRadius: BorderRadius.circular(16),
-            child: Stack(
-              children: [
-                child!,
-             
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: AuroraPainter(
-                      progress: _aurora.value,
-                      sectionIndex: index,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            border: Border.all(
+                color: AppColors.border(context), width: 0.5),
+            boxShadow: [BoxShadow(
+                color: AppColors.shadow(context),
+                blurRadius: 10,
+                offset: const Offset(0, 2))],
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.cardBackground(context),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                  color: AppColors.border(context), width: 0.5),
-              boxShadow: [BoxShadow(
-                  color: AppColors.shadow(context),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2))],
-            ),
-            child: Column(children: items),
-          ),
+          child: Column(children: items),
         ),
       ],
     ),
