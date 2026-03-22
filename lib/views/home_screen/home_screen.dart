@@ -53,93 +53,93 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background(context),
-   body: Consumer<HomeViewModel>(
+ body: Consumer<HomeViewModel>(
   builder: (context, viewModel, child) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Stack(
-        children: [
-      
-          CustomScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            slivers: [
-              SliverToBoxAdapter(
-                child: _buildHeaderSection(context, viewModel),
-              ),
-              SliverToBoxAdapter(
-                child: _buildProductSection(context, viewModel),
-              ),
-            ],
-          ),
+      child: CustomScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        slivers: [
+         SliverToBoxAdapter(
+  child: Stack(
+    clipBehavior: Clip.none, 
+    children: [
+   
+      _buildHeaderSection(context, viewModel),
 
-          Positioned(
-            top: 195,
-            left: 16,
-            right: 16,
-            child: SafeArea(
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => const SearchScreen(),
-                      transitionsBuilder: (_, anim, __, child) => FadeTransition(
-                        opacity: anim,
-                        child: child,
-                      ),
-                      transitionDuration: const Duration(milliseconds: 220),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 14),
-                      const Icon(Icons.search_rounded,  size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Search products...',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                           
-                          ),
-                        ),
-                      ),
-                      Container(width: 1, height: 20, color: Colors.white24),
-                      Container(
-                        width: 50,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.primary, AppColors.primaryDark],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(14),
-                            bottomRight: Radius.circular(14),
-                          ),
-                        ),
-                        child: const Icon(Icons.tune_rounded, color: Colors.white, size: 19),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+     
+      Positioned(
+        bottom: -2, 
+        left: 16,
+        right: 16,
+        child: GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const SearchScreen(),
+              transitionsBuilder: (_, anim, __, child) =>
+                  FadeTransition(opacity: anim, child: child),
+              transitionDuration: const Duration(milliseconds: 220),
             ),
+          ),
+          child: Container(
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground(context),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border(context)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const SizedBox(width: 14),
+                Icon(Icons.search_rounded, color: AppColors.info, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Search products...',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondary(context),
+                    ),
+                  ),
+                ),
+                Container(width: 1, height: 20, color: AppColors.border(context)),
+                Container(
+                  width: 50,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.primary, AppColors.primaryDark],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(14),
+                      bottomRight: Radius.circular(14),
+                    ),
+                  ),
+                  child: const Icon(Icons.tune_rounded, color: Colors.white, size: 19),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
+        
+          SliverToBoxAdapter(
+            child: _buildProductSection(context, viewModel),
           ),
         ],
       ),
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeaderSection(BuildContext context, HomeViewModel viewModel) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.33,
+      height: MediaQuery.of(context).size.height * 0.36,
       width: MediaQuery.of(context).size.width,
       child: ClipPath(
         clipper: CurveClipper(),
@@ -504,92 +504,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-class _SearchPillDelegate extends SliverPersistentHeaderDelegate {
-  @override
-  double get minExtent => 68;
-  @override
-  double get maxExtent => 68;
- 
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.background(context),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const SearchScreen(),
-            transitionsBuilder: (_, anim, __, child) => FadeTransition(
-              opacity: anim,
-              child: child,
-            ),
-            transitionDuration: const Duration(milliseconds: 220),
-          ),
-        ),
-        child: Container(
-          height: 52,
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground(context),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border(context)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 14),
-              Icon(Icons.search_rounded,
-                  color: AppColors.info, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Search products...',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary(context),
-                  ),
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 20,
-                color: AppColors.border(context),
-              ),
-              Container(
-                width: 50,
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(14),
-                    bottomRight: Radius.circular(14),
-                  ),
-                ),
-                child: const Icon(Icons.tune_rounded,
-                    color: Colors.white, size: 19),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
- 
-  @override
-  bool shouldRebuild(_SearchPillDelegate old) => false;
-}
 
 class _ProductCard extends StatelessWidget {
   final String productId;
@@ -828,13 +742,6 @@ class _AnimatedCategoryHeaderState extends State<_AnimatedCategoryHeader>
     r: 0.8 + _rand.nextDouble() * 1.8,
     phase: _rand.nextDouble(),
     speed: 0.4 + _rand.nextDouble() * 0.6,
-  ));
-
-  late final List<_Cloud> _clouds = List.generate(3, (i) => _Cloud(
-    y: 0.12 + i * 0.14,
-    speed: 0.012 + i * 0.006,
-    scale: 0.6 + i * 0.2,
-    opacity: 0.12 + i * 0.06,
   ));
 
   @override
