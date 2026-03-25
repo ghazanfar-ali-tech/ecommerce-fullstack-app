@@ -1,5 +1,4 @@
 import 'package:ecommerceapp/models/filter_model.dart';
-import 'package:ecommerceapp/models/product_model.dart';
 import 'package:ecommerceapp/view_model/see_all_view_model.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/filter_bottom_sheet.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/product_grid_screen.dart';
@@ -20,7 +19,6 @@ class SeeAllScreen extends StatelessWidget {
   }
 }
 
-// ── Inner stateless view ───────────────────────────────────────────────────────
 class _SeeAllView extends StatelessWidget {
   final String title;
   const _SeeAllView({required this.title});
@@ -45,7 +43,6 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  // ── App Bar ───────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context, SeeAllViewModel vm) {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
@@ -67,7 +64,7 @@ class _SeeAllView extends StatelessWidget {
               ),
             ),
           ),
-          // View toggle
+      
           GestureDetector(
             onTap: () => vm.toggleViewMode(),
             child: AnimatedSwitcher(
@@ -95,7 +92,6 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
   Widget _buildSearchBar(BuildContext context, SeeAllViewModel vm) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -148,7 +144,7 @@ class _SeeAllView extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Filter Button
+      
           GestureDetector(
             onTap: () => _openFilterSheet(context),
             child: AnimatedContainer(
@@ -200,7 +196,6 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  // ── Active Filter Chips ───────────────────────────────────────────────────
   Widget _buildFilterChips(BuildContext context, SeeAllViewModel vm) {
     if (!vm.hasActiveFilters && vm.searchQuery.isEmpty) {
       return const SizedBox(height: 12);
@@ -296,7 +291,6 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  // ── Results Bar ───────────────────────────────────────────────────────────
   Widget _buildResultsBar(BuildContext context, SeeAllViewModel vm) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
@@ -338,7 +332,6 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  // ── Product List / Grid ───────────────────────────────────────────────────
   Widget _buildProductList(BuildContext context, SeeAllViewModel vm) {
     if (vm.isLoading) {
       return const Center(
