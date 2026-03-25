@@ -67,72 +67,71 @@ class _HomeScreenState extends State<HomeScreen> {
    
       _buildHeaderSection(context, viewModel),
 
-     
-      Positioned(
-        bottom: -2, 
-        left: 16,
-        right: 16,
-        child: GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const SearchScreen(),
-              transitionsBuilder: (_, anim, __, child) =>
-                  FadeTransition(opacity: anim, child: child),
-              transitionDuration: const Duration(milliseconds: 220),
+     Positioned(
+  bottom: -2,
+  left: 16,
+  right: 16,
+  child: GestureDetector(
+    onTap: () => Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const SearchScreen(),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 220),
+      ),
+    ),
+    child: Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: AppColors.cardBackground(context),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 14),
+          Icon(Icons.search_rounded, color: AppColors.info, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Search products...',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary(context),
+              ),
             ),
           ),
-          child: Container(
+          Container(width: 1, height: 20, color: AppColors.border(context)),
+          
+          Container(
+            width: 55,
             height: 52,
             decoration: BoxDecoration(
-              color: AppColors.cardBackground(context),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border(context)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              gradient: LinearGradient(
+                colors: [AppColors.primary, AppColors.primaryDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(14),
+                bottomRight: Radius.circular(14),
+              ),
             ),
-            child: Row(
-              children: [
-                const SizedBox(width: 14),
-                Icon(Icons.search_rounded, color: AppColors.info, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Search products...',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary(context),
-                    ),
-                  ),
-                ),
-                Container(width: 1, height: 20, color: AppColors.border(context)),
-                Container(
-                  width: 50,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(14),
-                      bottomRight: Radius.circular(14),
-                    ),
-                  ),
-                  child: const Icon(Icons.tune_rounded, color: Colors.white, size: 19),
-                ),
-              ],
-            ),
+            child: const Icon(Icons.tune_rounded, color: Colors.white, size: 19),
           ),
-        ),
+        ],
       ),
+    ),
+  ),
+),
     ],
   ),
 ),
@@ -207,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final categories = snapshot.data!.docs;
           return ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             itemCount: categories.length,
             separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
@@ -345,11 +344,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }).toList(),
       options: CarouselOptions(
-        height: 160,
-        viewportFraction: 1,
-        autoPlay: true,
-        enableInfiniteScroll: true,
-        pauseAutoPlayOnTouch: true,
+       height: 185,
+      viewportFraction: 1,
+      enlargeCenterPage: true,
+      enlargeStrategy: CenterPageEnlargeStrategy.scale,
+      padEnds: false,
+      autoPlay: true,
+      enableInfiniteScroll: true,
+      pauseAutoPlayOnTouch: true,
         onPageChanged: (index, _) =>
             viewModel.currentCarouselIndex = index,
       ),
