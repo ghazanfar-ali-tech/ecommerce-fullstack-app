@@ -5,6 +5,7 @@ import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/home_view_mode.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
+import 'package:ecommerceapp/views/home_screen/components/product_card.dart';
 import 'package:ecommerceapp/views/home_screen/components/product_rating_starts.dart';
 import 'package:ecommerceapp/views/home_screen/components/ribbon_clipper.dart';
 import 'package:ecommerceapp/views/home_screen/curve_clipper.dart';
@@ -326,6 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildSectionHeader(context),
           const SizedBox(height: 10),
           _buildProductGrid(context, viewModel),
+        
           const SizedBox(height: 24),
         ],
       ),
@@ -458,320 +460,52 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.68,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        final p = products[index];
-        final productId = p['id'];
-        final productName = p['productName'] ?? 'N/A';
-        final productPrice = (p['productPrice'] ?? 0).toString();
-        final productDescription = p['productDescription'] ?? '';
-        final productDiscount = p['productDiscount'] ?? 0;
-        final categoryName = p['categoryName'] ?? 'Uncategorized';
-        final productImageUrls =
-            (p['productImageUrls'] as List<dynamic>?)
-                ?.map((u) => u.toString())
-                .toList() ??
-            [];
-        final productImage = productImageUrls.isNotEmpty
-            ? productImageUrls[0]
-            : '';
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    crossAxisSpacing: 12,
+    mainAxisSpacing: 12,
+    childAspectRatio: 0.68,
+  ),
+  itemCount: products.length,
+  itemBuilder: (context, index) {
+    final p = products[index];
+    final productImageUrls =
+        (p['productImageUrls'] as List<dynamic>?)
+            ?.map((u) => u.toString())
+            .toList() ?? [];
 
-        return _ProductCard(
-          productId: productId,
-          productName: productName,
-          productPrice: productPrice,
-          productDescription: productDescription,
-          productDiscount: productDiscount,
-          productImage: productImage,
-          productImageUrls: productImageUrls,
-          categoryName: categoryName,
-          onTap: () {
-            context.read<ProductReviewViewModel>().fetchReviews(productId);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DetailScreen(
-                  productId: productId,
-                  productName: productName,
-                  price: double.parse(productPrice).toInt(),
-                  discount: productDiscount,
-                  productImageUrls: productImageUrls,
-                  description: productDescription,
-                  categoryName: categoryName,
-                ),
-              ),
-            );
-          },
-          onAddToCart: () => viewModel.onAddToCart(productId),
-          onFavorite: () => viewModel.onFavoriteTap(productId),
+    return ProductCard(
+      productId: p['id'],
+      productName: p['productName'] ?? 'N/A',
+      productPrice: (p['productPrice'] ?? 0).toString(),
+      productDescription: p['productDescription'] ?? '',
+      productDiscount: p['productDiscount'] ?? 0,
+      productImage: productImageUrls.isNotEmpty ? productImageUrls[0] : '',
+      productImageUrls: productImageUrls,
+      categoryName: p['categoryName'] ?? 'Uncategorized',
+      onTap: () {
+        context.read<ProductReviewViewModel>().fetchReviews(p['id']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetailScreen(
+              productId: p['id'],
+              productName: p['productName'] ?? 'N/A',
+              price: double.parse((p['productPrice'] ?? 0).toString()).toInt(),
+              discount: p['productDiscount'] ?? 0,
+              productImageUrls: productImageUrls,
+              description: p['productDescription'] ?? '',
+              categoryName: p['categoryName'] ?? 'Uncategorized',
+            ),
+          ),
         );
       },
+      onAddToCart: () => viewModel.onAddToCart(p['id']),
+      onFavorite: () => viewModel.onFavoriteTap(p['id']),
     );
-  }
-}
-
-class _ProductCard extends StatelessWidget {
-  final String productId;
-  final String productName;
-  final String productPrice;
-  final String productDescription;
-  final int productDiscount;
-  final String productImage;
-  final List<String> productImageUrls;
-  final String categoryName;
-  final VoidCallback onTap;
-  final VoidCallback onAddToCart;
-  final VoidCallback onFavorite;
-
-  const _ProductCard({
-    required this.productId,
-    required this.productName,
-    required this.productPrice,
-    required this.productDescription,
-    required this.productDiscount,
-    required this.productImage,
-    required this.productImageUrls,
-    required this.categoryName,
-    required this.onTap,
-    required this.onAddToCart,
-    required this.onFavorite,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground(context),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow(context),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 6,
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: productImage.isNotEmpty
-                        ? Image.network(
-                            productImage,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                _imageFallback(context),
-                          )
-                        : _imageFallback(context),
-                  ),
-
-                  if (productDiscount > 0)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Stack(
-                        children: [
-                          ClipPath(
-                            clipper: RibbonClipper(),
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                left: 14,
-                                right: 14,
-                                top: 4,
-                                bottom: 4,
-                              ),
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 226, 71, 71),
-                                    Color.fromARGB(255, 235, 116, 114),
-                                    Color.fromARGB(255, 226, 71, 71),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                              ),
-                              child: Text(
-                                '$productDiscount% OFF',
-                                style: const TextStyle(
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                  shadows: [
-                                    Shadow(
-                                      color: Color(0x88000000),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          ClipPath(
-                            clipper: RibbonClipper(),
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                left: 14,
-                                right: 14,
-                                top: 4,
-                                bottom: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.22),
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.10),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                              ),
-                              child: Text(
-                                '$productDiscount% OFF',
-                                style: const TextStyle(
-                                  fontSize: 9.5,
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: onFavorite,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border_rounded,
-                          size: 15,
-                          color: Colors.redAccent,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      productName,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary(context),
-                        height: 1.3,
-                      ),
-                    ),
-
-                    ProductRatingStars(productId: productId),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '\$$productPrice',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: onAddToCart,
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: AppColors.accent,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.add_shopping_cart_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _imageFallback(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      child: Icon(
-        Icons.shopping_bag_outlined,
-        size: 48,
-        color: AppColors.primary.withOpacity(0.4),
-      ),
-    );
+  },
+);
   }
 }

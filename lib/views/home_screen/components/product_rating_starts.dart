@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 class ProductRatingStars extends StatefulWidget {
   final String productId;
-  const ProductRatingStars({required this.productId});
+  const ProductRatingStars({super.key, required this.productId});
 
   @override
   State<ProductRatingStars> createState() => _ProductRatingStarsState();
