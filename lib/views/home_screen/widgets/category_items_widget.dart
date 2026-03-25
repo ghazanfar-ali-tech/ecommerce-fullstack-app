@@ -12,7 +12,7 @@ Widget buildCategoryItemFromFirestore(
           color: AppColors.cardBackground(context),
           shape: BoxShape.circle,
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.25),
+            color: AppColors.primaryContainer(context),
             width: 1.5,
           ),
           boxShadow: [
@@ -56,15 +56,15 @@ Widget buildCategoryItemFromFirestore(
       ),
       const SizedBox(height: 6),
       SizedBox(
-        width: 60,
+        width: 70,
         child: Text(
           label,
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: AppColors.textPrimary(context),
-            fontSize: 11,
+            color: AppColors.infoLight,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
             shadows: [
               Shadow(

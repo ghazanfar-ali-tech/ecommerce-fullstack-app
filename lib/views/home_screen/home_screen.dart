@@ -800,7 +800,7 @@ class _AnimatedCategoryHeaderState extends State<_AnimatedCategoryHeader>
 
   
         if (isDark || tod == _TimeOfDay.night || tod == _TimeOfDay.dawn)
-          _buildMoon(context, tod)
+          _buildMoon(context)
         else
           _buildSun(context, tod),
 
@@ -1041,81 +1041,46 @@ class _AnimatedCategoryHeaderState extends State<_AnimatedCategoryHeader>
     );
   }
 
-  Widget _buildMoon(BuildContext context, _TimeOfDay tod) {
-    return Positioned(
-      top: 20, right: 24,
-      child: AnimatedBuilder(
-        animation: _floatCtrl,
-        builder: (_, __) {
-          final float = -4 * math.sin(_floatCtrl.value * math.pi);
-          return Transform.translate(
-            offset: Offset(0, float),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-              
-                Container(
-                  width: 52, height: 52,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.12),
-                        blurRadius: 20,
-                        spreadRadius: 6,
-                      ),
-                    ],
-                  ),
-                ),
-            
-                Container(
-                  width: 38, height: 38,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE8EAF6),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-            
-                Positioned(
-                  top: 4, right: 4,
-                  child: Container(
-                    width: 28, height: 28,
-                    decoration: BoxDecoration(
-                      color: tod == _TimeOfDay.night
-                          ? const Color(0xFF010B1A)
-                          : const Color(0xFF1A237E),
-                      shape: BoxShape.circle,
+  Widget _buildMoon(BuildContext context) {
+  return Positioned(
+    top: 20, right: 24,
+    child: AnimatedBuilder(
+      animation: _floatCtrl,
+      builder: (_, __) {
+        final float = -4 * math.sin(_floatCtrl.value * math.pi);
+        return Transform.translate(
+          offset: Offset(0, float),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+        
+              Container(
+                width: 52, height: 52,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.12),
+                      blurRadius: 20,
+                      spreadRadius: 6,
                     ),
-                  ),
+                  ],
                 ),
-                
-                Positioned(
-                  left: 10, top: 14,
-                  child: Container(
-                    width: 5, height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 7, top: 22,
-                  child: Container(
-                    width: 3, height: 3,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+              ),
+             Transform.rotate(
+  angle: -math.pi / 5,
+  child: CustomPaint(
+    size: const Size(38, 38),
+    painter: _CrescentMoonPainter(),
+  ),
+),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
 
 
   Widget _buildSun(BuildContext context, _TimeOfDay tod) {
@@ -1257,4 +1222,36 @@ class _SunRayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SunRayPainter old) => old.color != color;
+}
+
+
+class _CrescentMoonPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = const Color(0xFFE8EAF6);
+
+    final double r = size.width / 2;
+    final center = Offset(r, r);
+
+
+    final path = Path()..addOval(Rect.fromCircle(center: center, radius: r));
+
+   
+    final cutPath = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(r + r * 0.45, r - r * 0.1),
+        radius: r * 0.85,
+      ));
+
+    final crescent = Path.combine(PathOperation.difference, path, cutPath);
+    canvas.drawPath(crescent, paint);
+
+    
+    final craterPaint = Paint()..color = Colors.white.withOpacity(0.25);
+    canvas.drawCircle(Offset(r * 0.45, r * 0.65), 2.5, craterPaint);
+    canvas.drawCircle(Offset(r * 0.3, r * 0.9), 1.5, craterPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

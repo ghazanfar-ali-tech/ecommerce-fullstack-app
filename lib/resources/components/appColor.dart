@@ -93,10 +93,12 @@ class AppColors {
           ? const Color(0xFF60A5FA)
           : const Color(0xFF003DB5);
 
-  static Color primaryContainer(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF001F5E)
-          : const Color(0xFFEBF3FF);
+ static Color primaryContainer(BuildContext context) {
+  final brightness = Theme.of(context).brightness;
+  return brightness == Brightness.dark
+      ? Color.fromARGB(255, 34, 99, 230)
+      : const Color(0xFFEBF3FF);
+}
 
   // ==============================
   // 10% — Warm Orange CTA (Buy Now / Add to Cart only)
