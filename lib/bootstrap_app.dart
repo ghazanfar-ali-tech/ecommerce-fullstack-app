@@ -87,6 +87,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const MaterialApp(
+           
             home: Scaffold(
               body: Center(child: CircularProgressIndicator()),
             ),
@@ -95,6 +96,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
 
         if (snapshot.hasError) {
           return MaterialApp(
+            
             home: Scaffold(
               body: Center(child: Text('Init error: ${snapshot.error}')),
             ),
