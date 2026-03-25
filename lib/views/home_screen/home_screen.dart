@@ -5,6 +5,7 @@ import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/home_view_mode.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
+import 'package:ecommerceapp/views/home_screen/components/product_rating_starts.dart';
 import 'package:ecommerceapp/views/home_screen/components/ribbon_clipper.dart';
 import 'package:ecommerceapp/views/home_screen/curve_clipper.dart';
 import 'package:ecommerceapp/views/home_screen/components/category_header.dart';
@@ -712,28 +713,7 @@ class _ProductCard extends StatelessWidget {
                       ),
                     ),
 
-                    Consumer<ProductReviewViewModel>(
-                      builder: (context, vm, child) {
-                        final avgRating = vm.reviews.isEmpty
-                            ? 0.0
-                            : vm.reviews
-                                      .map((r) => r.rating)
-                                      .reduce((a, b) => a + b) /
-                                  vm.reviews.length;
-                        return Row(
-                          children: List.generate(
-                            5,
-                            (i) => Icon(
-                              Icons.star,
-                              size: 16,
-                              color: i < avgRating.round()
-                                  ? Colors.amber
-                                  : Colors.grey.shade300,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    ProductRatingStars(productId: productId),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
