@@ -12,9 +12,10 @@ import 'package:ecommerceapp/view_model/auth_view_model.dart';
 import 'package:ecommerceapp/view_model/coupon_view_model.dart';
 import 'package:ecommerceapp/view_model/detail_view_model.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
+import 'package:ecommerceapp/view_model/home_view_model.dart';
 import 'package:ecommerceapp/view_model/notification_view_model.dart';
 import 'package:ecommerceapp/view_model/order_view_model.dart';
+import 'package:ecommerceapp/view_model/see_all_view_model.dart';
 import 'package:ecommerceapp/view_model/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -121,9 +122,10 @@ class _BootstrapAppState extends State<BootstrapApp> {
             ChangeNotifierProvider(create: (_) => StatsViewModel()),
             ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
             ChangeNotifierProvider(create: (_) => OrderViewModel(notifVM)),
-            ChangeNotifierProvider(
-              create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
+            ChangeNotifierProvider(create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
             ),
+            ChangeNotifierProvider(create: (_) => SeeAllViewModel()),
+
           ],
           child: const MyApp(),
         );

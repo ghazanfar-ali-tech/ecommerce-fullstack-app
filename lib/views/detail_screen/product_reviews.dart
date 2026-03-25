@@ -1,5 +1,5 @@
 import 'package:ecommerceapp/models/product_review_model.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
+import 'package:ecommerceapp/view_model/home_view_model.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

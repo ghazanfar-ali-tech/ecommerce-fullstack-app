@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/auth_view_model.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
+import 'package:ecommerceapp/view_model/home_view_model.dart';
 import 'package:ecommerceapp/views/home_screen/cart_screen/cart_screen.dart';
 import 'package:ecommerceapp/views/home_screen/components/geomatricBgPainter.dart';
 import 'package:ecommerceapp/views/home_screen/components/sun_and_moon_painter.dart';

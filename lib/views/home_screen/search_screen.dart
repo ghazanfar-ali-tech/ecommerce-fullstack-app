@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ecommerceapp/resources/components/appColor.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
+import 'package:ecommerceapp/view_model/home_view_model.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 

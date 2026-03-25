@@ -1,16 +1,14 @@
 import 'dart:math' as math;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/resources/components/appColor.dart';
-import 'package:ecommerceapp/view_model/home_view_mode.dart';
+import 'package:ecommerceapp/view_model/home_view_model.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 import 'package:ecommerceapp/views/home_screen/components/product_card.dart';
-import 'package:ecommerceapp/views/home_screen/components/product_rating_starts.dart';
-import 'package:ecommerceapp/views/home_screen/components/ribbon_clipper.dart';
 import 'package:ecommerceapp/views/home_screen/curve_clipper.dart';
 import 'package:ecommerceapp/views/home_screen/components/category_header.dart';
 import 'package:ecommerceapp/views/home_screen/search_screen.dart';
+import 'package:ecommerceapp/views/home_screen/see_all_section/see_all_screen.dart';
 import 'package:ecommerceapp/views/home_screen/widgets/category_items_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -412,12 +410,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Row(
             children: [
-              Text(
-                'See All',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const SeeAllScreen(title: 'All Products'),
+        // Or pass a specific category title:
+        // builder: (_) => const SeeAllScreen(title: 'Electronics'),
+      ),
+    );
+                },
+                child: Text(
+                  'See All',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
               const SizedBox(width: 2),

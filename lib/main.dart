@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:ecommerceapp/bootstrap_app.dart';
 import 'package:ecommerceapp/view_model/theme_provider.dart';
 import 'package:ecommerceapp/views/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
 
 /// https://ecommercestore-ea75d.firebaseapp.com/__/auth/handler

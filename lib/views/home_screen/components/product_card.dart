@@ -118,7 +118,7 @@ class ProductCard extends StatelessWidget {
 
                 
                     Positioned(
-                      top: 10, left: 0,
+                      top: 10, left: 10,
                       child: Stack(
                         children: [
                           ClipPath(
