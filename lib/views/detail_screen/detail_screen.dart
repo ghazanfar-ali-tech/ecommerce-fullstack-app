@@ -92,7 +92,7 @@ Container(
         child: Image.network(
           productImageUrls.isNotEmpty 
             ? productImageUrls[0] 
-            : 'https://via.placeholder.com/260', // Fallback image
+            : 'https://via.placeholder.com/260', 
           height: 260,
           fit: BoxFit.contain,
         ),
@@ -213,7 +213,6 @@ SizedBox(
 
             const SizedBox(height: 20),
 
-            /// Size Selector
             const Text(
               'Select Size',
               style: TextStyle(fontWeight: FontWeight.w600),
@@ -260,8 +259,7 @@ Consumer<ProductReviewViewModel>(
     final avgRating = vm.reviews.isEmpty 
         ? 0.0 
         : vm.reviews.map((r) => r.rating).reduce((a, b) => a + b) / vm.reviews.length;
-    
-    // Calculate rating distribution
+ 
     Map<String, int> ratingLabels = {
       'Excellent': 0,
       'Good': 0,
@@ -308,7 +306,7 @@ Consumer<ProductReviewViewModel>(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+   
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -329,12 +327,11 @@ Consumer<ProductReviewViewModel>(
             ),
             
             const SizedBox(height: 16),
-            
-            // Rating and Bars Row
+     
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Left: Overall Rating
+              
                 Column(
                   children: [
                     Text(
@@ -372,7 +369,6 @@ Consumer<ProductReviewViewModel>(
                 
                 const SizedBox(width: 20),
                 
-                // Right: Rating Bars
                 if (vm.reviews.isNotEmpty)
                   Expanded(
                     child: Column(
@@ -392,7 +388,6 @@ Consumer<ProductReviewViewModel>(
             
             const SizedBox(height: 16),
             
-            // Single Review Preview
             if (vm.reviews.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(12),
@@ -462,7 +457,6 @@ Consumer<ProductReviewViewModel>(
             
             const SizedBox(height: 12),
             
-            // Write Review Button
             SizedBox(
               width: double.infinity,
               height: 42,
@@ -583,7 +577,7 @@ Consumer<ProductReviewViewModel>(
     MaterialPageRoute(
       builder: (_) => CheckOutScreen(
         singleItem: singleItem,
-        // productPrice: price,
+       
       ),
     ),
   );
@@ -633,7 +627,6 @@ void addToCart(BuildContext context, {int stock = 10}) async {
   try {
     final cartBox = context.read<AuthViewModel>().getCartBox();
     
-    // Find existing item
     int? existingIndex;
     for (var i = 0; i < cartBox.length; i++) {
       if (cartBox.getAt(i)!.productName == productName) {
@@ -676,7 +669,7 @@ void addToCart(BuildContext context, {int stock = 10}) async {
       );
     }
   } catch (e) {
-    print('Error adding to cart: $e'); // Debug print
+    print('Error adding to cart: $e');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error: ${e.toString()}')),
     );
