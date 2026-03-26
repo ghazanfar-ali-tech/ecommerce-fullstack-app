@@ -279,6 +279,7 @@ class ProductListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 120, 
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -293,13 +294,14 @@ class ProductListCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-       
+        
           ClipRRect(
             borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(16)),
+              left: Radius.circular(16),
+            ),
             child: SizedBox(
-              width: 110,
-              height: 110,
+              width: 120, 
+              height: 120,
               child: Stack(
                 children: [
                   SizedBox.expand(
@@ -310,36 +312,77 @@ class ProductListCard extends StatelessWidget {
                             errorBuilder: (_, __, ___) => Container(
                               color: const Color(0xFFF0F0F5),
                               child: const Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: Colors.grey),
+                                Icons.image_not_supported_outlined,
+                                color: Colors.grey,
+                              ),
                             ),
                           )
                         : Container(
                             color: const Color(0xFFF0F0F5),
                             child: const Icon(
-                                Icons.image_not_supported_outlined,
-                                color: Colors.grey),
+                              Icons.image_not_supported_outlined,
+                              color: Colors.grey,
+                            ),
                           ),
                   ),
                   if (product.productDiscount > 0)
                     Positioned(
                       top: 6,
                       left: 6,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF4757),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '-${product.productDiscount}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                      child: Stack(
+                        children: [
+                          ClipPath(
+                            clipper: RibbonClipper(),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                left: 10, right: 14, top: 4, bottom: 4,
+                              ),
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFFB71C1C),
+                                    Color(0xFFE53935),
+                                    Color(0xFFB71C1C),
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: Text(
+                                '${product.productDiscount}% OFF',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          ClipPath(
+                            clipper: RibbonClipper(),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                left: 10, right: 14, top: 4, bottom: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.20),
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.08),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: const Text(
+                                ' ',
+                                style: TextStyle(fontSize: 9),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                 ],
@@ -347,13 +390,14 @@ class ProductListCard extends StatelessWidget {
             ),
           ),
 
-        
+         
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), 
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.categoryName,
@@ -364,7 +408,7 @@ class ProductListCard extends StatelessWidget {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     product.productName,
                     style: const TextStyle(
@@ -375,7 +419,7 @@ class ProductListCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     product.productDescription,
                     style: TextStyle(
@@ -383,10 +427,12 @@ class ProductListCard extends StatelessWidget {
                       color: Colors.grey.shade500,
                       height: 1.4,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
+                  ProductRatingStars(productId: product.id),
+                  const SizedBox(height: 2),
                   Row(
                     children: [
                       Text(
@@ -416,8 +462,11 @@ class ProductListCard extends StatelessWidget {
                           color: const Color(0xFF6C63FF).withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.favorite_border_rounded,
-                            size: 16, color: Color(0xFF6C63FF)),
+                        child: const Icon(
+                          Icons.favorite_border_rounded,
+                          size: 16,
+                          color: Color(0xFF6C63FF),
+                        ),
                       ),
                     ],
                   ),
