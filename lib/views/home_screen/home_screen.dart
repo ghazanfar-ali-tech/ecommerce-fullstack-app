@@ -416,8 +416,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => const SeeAllScreen(title: 'All Products'),
-        // Or pass a specific category title:
-        // builder: (_) => const SeeAllScreen(title: 'Electronics'),
+      
       ),
     );
                 },

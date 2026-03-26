@@ -1,4 +1,3 @@
-
 import 'package:ecommerceapp/models/see_all_model.dart';
 import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/store_view_model.dart';
@@ -42,9 +41,8 @@ class ProductGridCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, 
+            mainAxisSize: MainAxisSize.min,
             children: [
-
               SizedBox(
                 height: 160,
                 width: double.infinity,
@@ -58,9 +56,11 @@ class ProductGridCard extends StatelessWidget {
                             errorBuilder: (_, __, ___) => _placeholder(),
                           )
                         : _placeholder(),
-                 
+
                     Positioned(
-                      bottom: 0, left: 0, right: 0,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
                       child: Container(
                         height: 40,
                         decoration: const BoxDecoration(
@@ -72,100 +72,127 @@ class ProductGridCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                 
+
                     if (product.productDiscount > 0)
-                   Positioned(
-                      top: 10, left: 10,
-                      child: Stack(
-                        children: [
-                          ClipPath(
-                            clipper: RibbonClipper(),
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                left: 10, right: 14, top: 4, bottom: 4,
-                              ),
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFFB71C1C),
-                                    Color(0xFFE53935),
-                                    Color(0xFFB71C1C),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Stack(
+                          children: [
+                            ClipPath(
+                              clipper: RibbonClipper(),
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 14,
+                                  top: 4,
+                                  bottom: 4,
                                 ),
-                              ),
-                              child: Text(
-                                '${product.productDiscount}% OFF',
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: 0.4,
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xFFB71C1C),
+                                      Color(0xFFE53935),
+                                      Color(0xFFB71C1C),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${product.productDiscount}% OFF',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 0.4,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          ClipPath(
-                            clipper: RibbonClipper(),
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                left: 10, right: 14, top: 4, bottom: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.20),
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.08),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
+                            ClipPath(
+                              clipper: RibbonClipper(),
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 14,
+                                  top: 4,
+                                  bottom: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.white.withOpacity(0.20),
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.08),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                ),
+                                child: const Text(
+                                  ' ',
+                                  style: TextStyle(fontSize: 9),
                                 ),
                               ),
-                              child: const Text(
-                                ' ',
-                                style: TextStyle(fontSize: 9),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                   
-                    Positioned(
-                      top: 8, right: 8,
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.92),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.12),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.favorite_border_rounded,
-                          size: 16,
-                          color: Color(0xFFFF4757),
-                        ),
+                      ),
+
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Consumer<StoreViewModel>(
+                        builder: (context, viewModel, child) {
+                          final isFavorite = viewModel.isFavValue(
+                            product.productName,
+                          );
+
+                          return GestureDetector(
+                            onTap: () {
+                              viewModel.toggleFavValue({
+                                'id': product.id,
+                                'productName': product.productName,
+                                'productPrice': product.productPrice,
+                                'discountedPrice': product.discountedPrice,
+                                'productDiscount': product.productDiscount,
+                                'productDescription':
+                                    product.productDescription,
+                                'categoryName': product.categoryName,
+                                'productImageUrls': product.productImageUrls,
+                              });
+                            },
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: isFavorite
+                                    ? Colors.red.withOpacity(0.1)
+                                    : const Color(0xFF6C63FF).withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isFavorite
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                size: 15,
+                                color: isFavorite ? Colors.red : Colors.red,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
 
-          
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min, 
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       product.categoryName.toUpperCase(),
@@ -181,7 +208,7 @@ class ProductGridCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       product.productName,
-                      style:  TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary(context),
@@ -192,7 +219,7 @@ class ProductGridCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     ProductRatingStars(productId: product.id),
-                    const SizedBox(height: 6), 
+                    const SizedBox(height: 6),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -228,7 +255,10 @@ class ProductGridCard extends StatelessWidget {
                           height: 36,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [AppColors.primary, AppColors.primaryDark],
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primaryDark,
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -252,7 +282,6 @@ class ProductGridCard extends StatelessWidget {
                   ],
                 ),
               ),
-
             ],
           ),
         ),
@@ -261,18 +290,16 @@ class ProductGridCard extends StatelessWidget {
   }
 
   Widget _placeholder() => Container(
-        color: const Color(0xFFF4F4F8),
-        child: const Center(
-          child: Icon(
-            Icons.image_not_supported_outlined,
-            color: Color(0xFFCCCCD8),
-            size: 28,
-          ),
-        ),
-      );
+    color: const Color(0xFFF4F4F8),
+    child: const Center(
+      child: Icon(
+        Icons.image_not_supported_outlined,
+        color: Color(0xFFCCCCD8),
+        size: 28,
+      ),
+    ),
+  );
 }
-
-
 
 class ProductListCard extends StatelessWidget {
   final SeeAllProductModel product;
@@ -281,7 +308,7 @@ class ProductListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120, 
+      height: 120,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -296,13 +323,12 @@ class ProductListCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-        
           ClipRRect(
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(16),
             ),
             child: SizedBox(
-              width: 120, 
+              width: 120,
               height: 120,
               child: Stack(
                 children: [
@@ -337,7 +363,10 @@ class ProductListCard extends StatelessWidget {
                             clipper: RibbonClipper(),
                             child: Container(
                               padding: const EdgeInsets.only(
-                                left: 10, right: 14, top: 4, bottom: 4,
+                                left: 10,
+                                right: 14,
+                                top: 4,
+                                bottom: 4,
                               ),
                               decoration: const BoxDecoration(
                                 gradient: LinearGradient(
@@ -365,7 +394,10 @@ class ProductListCard extends StatelessWidget {
                             clipper: RibbonClipper(),
                             child: Container(
                               padding: const EdgeInsets.only(
-                                left: 10, right: 14, top: 4, bottom: 4,
+                                left: 10,
+                                right: 14,
+                                top: 4,
+                                bottom: 4,
                               ),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -392,10 +424,9 @@ class ProductListCard extends StatelessWidget {
             ),
           ),
 
-         
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), 
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -457,39 +488,48 @@ class ProductListCard extends StatelessWidget {
                         ),
                       ],
                       const Spacer(),
-                     Container(
-  width: 32,
-  height: 32,
-  decoration: BoxDecoration(
-    color: const Color(0xFF6C63FF).withOpacity(0.1),
-    shape: BoxShape.circle,
-  ),
-  child: Consumer<StoreViewModel>(
-    builder: (context, viewModel, child) {
-      final isFavorite = viewModel.isFavValue(product.productName);
+                      Consumer<StoreViewModel>(
+                        builder: (context, viewModel, child) {
+                          final isFavorite = viewModel.isFavValue(
+                            product.productName,
+                          );
 
-      return GestureDetector(
-       onTap: () {
-  viewModel.toggleFavValue({
-    'id': product.id,
-    'productName': product.productName,
-    'productPrice': product.productPrice,
-    'discountedPrice': product.discountedPrice,
-    'productDiscount': product.productDiscount,
-    'productDescription': product.productDescription,
-    'categoryName': product.categoryName,
-    'productImageUrls': product.productImageUrls,
-  });
-},
-        child: Icon(
-          isFavorite ? Icons.favorite : Icons.favorite_border,
-          size: 16, // ← add size to fit the 32px container
-          color: isFavorite ? Colors.red : const Color(0xFF6C63FF),
-        ),
-      );
-    },
-  ),
-),
+                          return GestureDetector(
+                            onTap: () {
+                              viewModel.toggleFavValue({
+                                'id': product.id,
+                                'productName': product.productName,
+                                'productPrice': product.productPrice,
+                                'discountedPrice': product.discountedPrice,
+                                'productDiscount': product.productDiscount,
+                                'productDescription':
+                                    product.productDescription,
+                                'categoryName': product.categoryName,
+                                'productImageUrls': product.productImageUrls,
+                              });
+                            },
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: isFavorite
+                                    ? Colors.red.withOpacity(0.1)
+                                    : const Color(0xFF6C63FF).withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isFavorite
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                size: 15,
+                                color: isFavorite
+                                    ? Colors.red
+                                    : const Color(0xFF6C63FF),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],
