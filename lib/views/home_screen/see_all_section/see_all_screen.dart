@@ -1,5 +1,7 @@
 import 'package:ecommerceapp/models/filter_model.dart';
+import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/view_model/see_all_view_model.dart';
+import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/filter_bottom_sheet.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/product_grid_screen.dart';
 import 'package:flutter/material.dart';
@@ -382,23 +384,75 @@ class _SeeAllView extends StatelessWidget {
     }
 
     if (vm.viewMode == ViewMode.grid) {
+
+
+
       return GridView.builder(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.72,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+            crossAxisCount: 2,
+  mainAxisExtent: 280, 
+  crossAxisSpacing: 12,
+  mainAxisSpacing: 12,
         ),
         itemCount: products.length,
-        itemBuilder: (_, i) => ProductGridCard(product: products[i]),
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: (){
+
+final p = products[index];
+  final productImageUrls = p.productImageUrls;
+ context
+            .read<ProductReviewViewModel>()
+            .fetchReviews(p.id);
+
+             Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetailScreen(
+                  productId: p.id,
+              productName: p.productName,
+              price: p.productPrice.toInt(),
+              discount: p.productDiscount,
+              productImageUrls: productImageUrls,
+              description: p.productDescription,
+              categoryName: p.categoryName,
+            ),
+          ),
+        );
+
+          },
+          child: ProductGridCard(product: products[index])),
       );
     } else {
-      return ListView.builder(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-        itemCount: products.length,
-        itemBuilder: (_, i) => ProductListCard(product: products[i]),
-      );
+    return ListView.builder(
+  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+  itemCount: products.length,
+  itemBuilder: (context, i) {
+    final p = products[i];
+
+    return GestureDetector(
+      onTap: () {
+        context.read<ProductReviewViewModel>().fetchReviews(p.id);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetailScreen(
+              productId: p.id,
+              productName: p.productName,
+              price: p.productPrice.toInt(),
+              discount: p.productDiscount,
+              productImageUrls: p.productImageUrls,
+              description: p.productDescription,
+              categoryName: p.categoryName,
+            ),
+          ),
+        );
+      },
+      child: ProductListCard(product: p),
+    );
+  },
+);
     }
   }
 
