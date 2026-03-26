@@ -1,9 +1,11 @@
 
 import 'package:ecommerceapp/models/see_all_model.dart';
 import 'package:ecommerceapp/resources/components/appColor.dart';
+import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/home_screen/components/product_rating_starts.dart';
 import 'package:ecommerceapp/views/home_screen/components/ribbon_clipper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductGridCard extends StatelessWidget {
   final SeeAllProductModel product;
@@ -455,19 +457,39 @@ class ProductListCard extends StatelessWidget {
                         ),
                       ],
                       const Spacer(),
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border_rounded,
-                          size: 16,
-                          color: Color(0xFF6C63FF),
-                        ),
-                      ),
+                     Container(
+  width: 32,
+  height: 32,
+  decoration: BoxDecoration(
+    color: const Color(0xFF6C63FF).withOpacity(0.1),
+    shape: BoxShape.circle,
+  ),
+  child: Consumer<StoreViewModel>(
+    builder: (context, viewModel, child) {
+      final isFavorite = viewModel.isFavValue(product.productName);
+
+      return GestureDetector(
+       onTap: () {
+  viewModel.toggleFavValue({
+    'id': product.id,
+    'productName': product.productName,
+    'productPrice': product.productPrice,
+    'discountedPrice': product.discountedPrice,
+    'productDiscount': product.productDiscount,
+    'productDescription': product.productDescription,
+    'categoryName': product.categoryName,
+    'productImageUrls': product.productImageUrls,
+  });
+},
+        child: Icon(
+          isFavorite ? Icons.favorite : Icons.favorite_border,
+          size: 16, // ← add size to fit the 32px container
+          color: isFavorite ? Colors.red : const Color(0xFF6C63FF),
+        ),
+      );
+    },
+  ),
+),
                     ],
                   ),
                 ],
