@@ -1,7 +1,9 @@
 import 'package:ecommerceapp/resources/components/appColor.dart';
+import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/home_screen/components/product_rating_starts.dart';
 import 'package:ecommerceapp/views/home_screen/components/ribbon_clipper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
   final String productId;
@@ -196,11 +198,41 @@ class ProductCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.favorite_border_rounded,
-                          size: 15,
-                          color: Colors.redAccent,
-                        ),
+                        child:Consumer<StoreViewModel>(
+  builder: (context, viewModel, child) {
+    final isFavorite = viewModel.isFavValue(productName);
+
+    return GestureDetector(
+      onTap: () {
+        viewModel.toggleFavValue({
+          'id': productId,
+          'productName': productName,
+          'productPrice': productPrice,
+          'discountedPrice': discountedPrice,
+          'productDiscount': productDiscount,
+          'productDescription': productDescription,
+          'categoryName': categoryName,
+          'productImageUrls': productImageUrls,
+        });
+      },
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: isFavorite
+              ? Colors.red.withOpacity(0.1)
+              : const Color(0xFF6C63FF).withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          size: 15,
+          color: isFavorite ? Colors.red : Colors.red,
+        ),
+      ),
+    );
+  },
+),
                       ),
                     ),
                   ),
