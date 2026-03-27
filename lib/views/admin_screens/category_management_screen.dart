@@ -479,7 +479,7 @@ String? selectedValue;
       ),
     ),
     menuItemStyleData: const MenuItemStyleData(
-      height: 35, // smaller menu item height
+      height: 35, 
       padding: EdgeInsets.symmetric(horizontal: 8),
     ),
   ),

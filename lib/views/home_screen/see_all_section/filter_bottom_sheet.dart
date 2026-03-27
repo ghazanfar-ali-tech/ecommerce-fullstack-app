@@ -1,4 +1,5 @@
 import 'package:ecommerceapp/models/filter_model.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/see_all_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +70,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 },
                 child: const Text(
                   'Reset',
-                  style: TextStyle(color: Color(0xFF6C63FF)),
+                  style: TextStyle(color: AppColors.info),
                 ),
               ),
             ],
@@ -92,12 +93,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF6C63FF)
+                        ? AppColors.info
                         : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFF6C63FF)
+                          ? AppColors.info
                           : Colors.grey.shade200,
                     ),
                   ),
@@ -149,7 +150,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF6C63FF),
+                    color: AppColors.info
                   ),
                 ),
                 Text(
@@ -157,7 +158,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF6C63FF),
+                    color: AppColors.info
                   ),
                 ),
               ],
@@ -165,10 +166,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF6C63FF),
+              activeTrackColor: AppColors.info,
               inactiveTrackColor: Colors.grey.shade200,
-              thumbColor: const Color(0xFF6C63FF),
-              overlayColor: const Color(0xFF6C63FF).withOpacity(0.1),
+              thumbColor: AppColors.info,
+              overlayColor: AppColors.info.withOpacity(0.1),
               rangeThumbShape:
                   const RoundRangeSliderThumbShape(enabledThumbRadius: 10),
             ),
@@ -193,7 +194,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6C63FF),
+                backgroundColor: AppColors.info,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -232,11 +233,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color:
-              selected ? const Color(0xFF6C63FF) : Colors.grey.shade100,
+              selected ? AppColors.info : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: selected
-                ? const Color(0xFF6C63FF)
+                ? AppColors.info
                 : Colors.grey.shade200,
           ),
         ),

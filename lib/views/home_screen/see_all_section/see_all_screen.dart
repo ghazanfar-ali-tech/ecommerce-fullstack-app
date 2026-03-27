@@ -1,11 +1,14 @@
 import 'package:ecommerceapp/models/filter_model.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/view_model/see_all_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/filter_bottom_sheet.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/product_grid_screen.dart';
+import 'package:ecommerceapp/views/home_screen/see_all_section/staggered_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 class SeeAllScreen extends StatelessWidget {
@@ -83,7 +86,7 @@ class _SeeAllView extends StatelessWidget {
                   vm.viewMode == ViewMode.grid
                       ? Icons.view_list_rounded
                       : Icons.grid_view_rounded,
-                  color: const Color(0xFF6C63FF),
+                  color: AppColors.info,
                   size: 20,
                 ),
               ),
@@ -335,11 +338,11 @@ class _SeeAllView extends StatelessWidget {
   }
 
   Widget _buildProductList(BuildContext context, SeeAllViewModel vm) {
-    if (vm.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
-      );
-    }
+  if (vm.isLoading) {
+  return vm.viewMode == ViewMode.grid
+      ? _buildGridShimmer()
+      : _buildListShimmer();
+}
 
     final products = vm.filteredProducts;
 
@@ -384,75 +387,73 @@ class _SeeAllView extends StatelessWidget {
     }
 
     if (vm.viewMode == ViewMode.grid) {
-
-
-
       return GridView.builder(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-  mainAxisExtent: 280, 
-  crossAxisSpacing: 12,
-  mainAxisSpacing: 12,
+          crossAxisCount: 2,
+          mainAxisExtent: 280,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
         itemCount: products.length,
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: (){
-
-final p = products[index];
-  final productImageUrls = p.productImageUrls;
- context
-            .read<ProductReviewViewModel>()
-            .fetchReviews(p.id);
-
-             Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DetailScreen(
-                  productId: p.id,
-              productName: p.productName,
-              price: p.productPrice.toInt(),
-              discount: p.productDiscount,
-              productImageUrls: productImageUrls,
-              description: p.productDescription,
-              categoryName: p.categoryName,
+        itemBuilder: (context, index) {
+          final p = products[index];
+          return StaggeredItem(
+            index: index,
+            child: GestureDetector(
+              onTap: () {
+                context.read<ProductReviewViewModel>().fetchReviews(p.id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailScreen(
+                      productId: p.id,
+                      productName: p.productName,
+                      price: p.productPrice.toInt(),
+                      discount: p.productDiscount,
+                      productImageUrls: p.productImageUrls,
+                      description: p.productDescription,
+                      categoryName: p.categoryName,
+                    ),
+                  ),
+                );
+              },
+              child: ProductGridCard(product: p),
             ),
-          ),
-        );
-
-          },
-          child: ProductGridCard(product: products[index])),
+          );
+        },
       );
     } else {
-    return ListView.builder(
-  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-  itemCount: products.length,
-  itemBuilder: (context, i) {
-    final p = products[i];
-
-    return GestureDetector(
-      onTap: () {
-        context.read<ProductReviewViewModel>().fetchReviews(p.id);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DetailScreen(
-              productId: p.id,
-              productName: p.productName,
-              price: p.productPrice.toInt(),
-              discount: p.productDiscount,
-              productImageUrls: p.productImageUrls,
-              description: p.productDescription,
-              categoryName: p.categoryName,
+      return ListView.builder(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+        itemCount: products.length,
+        itemBuilder: (context, i) {
+          final p = products[i];
+          return StaggeredItem(
+            index: i,
+            child: GestureDetector(
+              onTap: () {
+                context.read<ProductReviewViewModel>().fetchReviews(p.id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailScreen(
+                      productId: p.id,
+                      productName: p.productName,
+                      price: p.productPrice.toInt(),
+                      discount: p.productDiscount,
+                      productImageUrls: p.productImageUrls,
+                      description: p.productDescription,
+                      categoryName: p.categoryName,
+                    ),
+                  ),
+                );
+              },
+              child: ProductListCard(product: p),
             ),
-          ),
-        );
-      },
-      child: ProductListCard(product: p),
-    );
-  },
-);
+          );
+        },
+      );
     }
   }
 
@@ -469,3 +470,206 @@ final p = products[index];
   }
 }
 
+
+
+
+
+Widget _buildListShimmer() {
+  return ListView.builder(
+    padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+    itemCount: 6,
+    itemBuilder: (_, __) => Shimmer.fromColors(
+      baseColor: Colors.grey.shade200,
+      highlightColor: Colors.grey.shade50,
+      child: Container(
+        height: 120,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+        
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(16),
+              ),
+              child: Container(
+                width: 120,
+                height: 120,
+                color: Colors.white,
+              ),
+            ),
+            // content placeholder
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 10,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 14,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      height: 10,
+                      width: 140,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    Container(
+                      height: 10,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          height: 14,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildGridShimmer() {
+  return GridView.builder(
+    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      mainAxisExtent: 280,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+    ),
+    itemCount: 6,
+    itemBuilder: (_, __) => Shimmer.fromColors(
+      baseColor: Colors.grey.shade200,
+      highlightColor: Colors.grey.shade50,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+        
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Container(
+                height: 160,
+                width: double.infinity,
+                color: Colors.white,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 10,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 13,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 10,
+                    width: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        height: 13,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
