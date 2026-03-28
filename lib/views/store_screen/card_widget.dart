@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -5,7 +6,8 @@ Widget brandCard({
   required String savgImage,
   required String name,
   required String products,
-  required Color color
+  required Color color,
+  required BuildContext context,
 }) {
   return Container(
     height: 80,
@@ -18,6 +20,10 @@ Widget brandCard({
     child: Row(
       children: [
          SvgPicture.asset(
+           colorFilter: ColorFilter.mode(
+     AppColors.iconAdaptive(context),  
+    BlendMode.srcIn,
+  ), 
           savgImage,
           height: 36,
           width: 36,

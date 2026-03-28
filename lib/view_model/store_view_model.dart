@@ -98,7 +98,7 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
 
      categories = snapshot.docs.map((doc) {
   final data = doc.data();
-  data['id'] = doc.id; // ← inject the document id
+  data['id'] = doc.id;
   return data;
 }).toList();
       await _saveCategoriesToPrefs(categories);
@@ -150,7 +150,7 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
     }
   }
 
-  // FIXED: Check if product is in favorites by productName
+
   bool isFavValue(String productName) {
     return _favList.any((product) => product['productName'] == productName);
   }
@@ -178,7 +178,7 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
   for (final product in _favList) {
     final productName = product['productName'] ?? '';
     
-    // Skip if already in cart
+   
     final exists = cartBox.values.any((item) => item.productName == productName);
     if (exists) continue;
 
@@ -200,11 +200,11 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
   }
 }
 
-// Single product add
+
 Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBox) async {
   final productName = product['productName'] ?? '';
   
-  // Check if already in cart
+
   final exists = cartBox.values.any((item) => item.productName == productName);
   if (exists) return;
 
@@ -212,9 +212,8 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
     id: DateTime.now().millisecondsSinceEpoch.toString(),
     productName: productName,
     productCategory: product['categoryName'] ?? '',
-    productPrice: (product['productPrice'] is double)
-        ? (product['productPrice'] as double).toInt()
-        : (product['productPrice'] ?? 0) as int,
+   productPrice: int.tryParse(product['productPrice'].toString()) ?? 
+              (product['productPrice'] as num?)?.toInt() ?? 0,
     productImage: (product['productImageUrls'] as List?)?.isNotEmpty == true
         ? product['productImageUrls'][0]
         : '',
@@ -225,7 +224,7 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
   await cartBox.add(cartItem);
 }
 
-  // Load favorites from SharedPreferences
+ 
   Future<void> _loadFavoritesFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -237,11 +236,10 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
         
         final decoded = List<Map<String, dynamic>>.from(json.decode(cachedFavorites));
         
-        // Convert ISO strings back to DateTime if needed
+    
         final restoredFavList = decoded.map((product) {
           final restored = Map<String, dynamic>.from(product);
           
-          // Convert ISO string back to DateTime for timestamp fields
           restored.forEach((key, value) {
             if (value is String && 
                 (key.toLowerCase().contains('date') || 
@@ -251,7 +249,7 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
               try {
                 restored[key] = DateTime.parse(value);
               } catch (e) {
-                // If parsing fails, keep the original string
+                // // debugging line has removed from this code
               }
             }
           });
@@ -279,7 +277,7 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
         if (value is Timestamp) {
           return MapEntry(key, value.toDate().toIso8601String());
         }
-        // Handle lists that might contain DateTime/Timestamp
+   
         if (value is List) {
           return MapEntry(key, value.map((v) {
             if (v is DateTime) return v.toIso8601String();

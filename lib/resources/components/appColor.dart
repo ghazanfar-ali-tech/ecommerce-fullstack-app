@@ -161,4 +161,9 @@ class AppColors {
       offset: const Offset(0, 5),
     ),
   ];
+
+  static Color iconAdaptive(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+        ? const Color.fromARGB(255, 34, 99, 230) // same as primaryContainer dark
+        : Colors.black;
 }
