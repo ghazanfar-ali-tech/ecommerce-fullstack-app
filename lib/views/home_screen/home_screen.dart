@@ -23,11 +23,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearchFocused = false;
   bool _isSearching = false;
+
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -35,9 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeViewModel>().initialize();
     });
+    
     _searchFocusNode.addListener(() {
       setState(() => _isSearchFocused = _searchFocusNode.hasFocus);
     });
+
+     _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  );
+
+  _controller.forward();
   }
 
   @override
@@ -323,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
 
           _buildSectionHeader(context),
-          const SizedBox(height: 10),
+         
           _buildProductGrid(context, viewModel),
         
           const SizedBox(height: 24),
@@ -478,14 +488,37 @@ class _HomeScreenState extends State<HomeScreen> {
     childAspectRatio: 0.68,
   ),
   itemCount: products.length,
-  itemBuilder: (context, index) {
-    final p = products[index];
-    final productImageUrls =
-        (p['productImageUrls'] as List<dynamic>?)
-            ?.map((u) => u.toString())
-            .toList() ?? [];
+ itemBuilder: (context, index) {
+  final p = products[index];
 
-    return ProductCard(
+  final productImageUrls =
+      (p['productImageUrls'] as List<dynamic>?)
+          ?.map((u) => u.toString())
+          .toList() ?? [];
+
+  final animation = Tween<double>(begin: 0, end: 1).animate(
+    CurvedAnimation(
+      parent: _controller,
+      curve: Interval(
+        (index / products.length), // 👈 stagger start
+        1.0,
+        curve: Curves.easeOut,
+      ),
+    ),
+  );
+
+  return AnimatedBuilder(
+    animation: _controller,
+    builder: (context, child) {
+      return Opacity(
+        opacity: animation.value,
+        child: Transform.translate(
+          offset: Offset(0, 50 * (1 - animation.value)),
+          child: child,
+        ),
+      );
+    },
+    child: ProductCard(
       productId: p['id'],
       productName: p['productName'] ?? 'N/A',
       productPrice: (p['productPrice'] ?? 0).toString(),
@@ -513,8 +546,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       onAddToCart: () => viewModel.onAddToCart(p['id']),
       onFavorite: () => viewModel.onFavoriteTap(p['id']),
-    );
-  },
+    ),
+  );
+},
 );
   }
 }
