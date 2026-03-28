@@ -338,7 +338,7 @@ class AdminViewModel extends ChangeNotifier {
 //=> brand methods
 
 void addBrandIntroImage(File image) {
-    if (_brandIntroImages.length < 3) {
+    if (_brandIntroImages.length < 6) {
       _brandIntroImages.add(image);
       notifyListeners();
     }
@@ -399,7 +399,7 @@ void addBrandIntroImage(File image) {
 
     
       final List<String> introUrls = [];
-      for (final img in introImages.take(3)) {
+      for (final img in introImages.take(6)) {
         final url = await CloudinaryService.uploadImage(img);
         if (url != null) introUrls.add(url);
       }

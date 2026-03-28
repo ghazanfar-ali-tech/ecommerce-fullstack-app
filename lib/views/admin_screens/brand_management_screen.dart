@@ -112,7 +112,7 @@ class _BrandManagementScreenState extends State<BrandManagementScreen> {
                           style: TextStyle(fontWeight: FontWeight.w600)),
                       Consumer<AdminViewModel>(
                         builder: (_, vm, __) => Text(
-                          '${vm.brandIntroImages.length}/3',
+                          '${vm.brandIntroImages.length}/6',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -159,7 +159,7 @@ class _BrandManagementScreenState extends State<BrandManagementScreen> {
                           );
                         }),
                   
-                        if (vm.brandIntroImages.length < 3)
+                        if (vm.brandIntroImages.length < 6)
                           InkWell(
                             onTap: () async {
                               final file = await _pickSingleImage();
