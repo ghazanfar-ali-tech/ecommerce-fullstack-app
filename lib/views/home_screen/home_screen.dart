@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -500,7 +501,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     CurvedAnimation(
       parent: _controller,
       curve: Interval(
-        (index / products.length), // 👈 stagger start
+        (index / products.length), 
         1.0,
         curve: Curves.easeOut,
       ),
