@@ -74,8 +74,30 @@ class _ProductRatingStarsState extends State<ProductRatingStars> {
               : Icons.star_outline_rounded,
           size: 14,
           color: i < _avgRating.round()
-              ? Colors.amber
+              ? const Color(0xFFFFD000)
               : Colors.grey.shade300,
+              shadows: i < _avgRating.round()
+      ? Theme.of(context).brightness == Brightness.dark
+          ? [
+             
+              Shadow(
+                color: const Color(0xFFFFD000).withOpacity(0.8),
+                blurRadius: 6,
+              ),
+              Shadow(
+                color: const Color(0xFFFFAA00).withOpacity(0.5),
+                blurRadius: 12,
+              ),
+            ]
+          : [
+              
+              Shadow(
+                color: const Color(0xFFFFAA00).withOpacity(0.3),
+                blurRadius: 4,
+              ),
+            ]
+      : null,
+
         )),
         const SizedBox(width: 4),
         Text(

@@ -425,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: AppColors.textPrimary(context),
                   ),
                 ),
               ),
@@ -433,7 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 11,
-                color: AppColors.primary,
+                color: AppColors.textPrimary(context),
               ),
             ],
           ),

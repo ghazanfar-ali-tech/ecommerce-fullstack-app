@@ -11,31 +11,37 @@ class ProductGridCard extends StatelessWidget {
   final VoidCallback? onTap;
   const ProductGridCard({super.key, required this.product, this.onTap});
 
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBackground(context),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
+              boxShadow: [
+           
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 24,
+              color: isDark
+                  ? Colors.black.withOpacity(0.35)
+                  : AppColors.primary.withOpacity(0.10),
+              blurRadius: 20,
+              spreadRadius: 0,
               offset: const Offset(0, 8),
             ),
+         
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.20)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
           ],
+      
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
@@ -198,8 +204,8 @@ class ProductGridCard extends StatelessWidget {
                       product.categoryName.toUpperCase(),
                       style: TextStyle(
                         fontSize: 9,
-                        color: Colors.grey.shade400,
-                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary(context),
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 0.8,
                       ),
                       maxLines: 1,
@@ -211,7 +217,7 @@ class ProductGridCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary(context),
+                        color: AppColors.primaryText(context),
                         height: 1.25,
                       ),
                       maxLines: 2,
@@ -229,6 +235,15 @@ class ProductGridCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (product.productDiscount > 0)
+                               Text(
+                                '\$${product.discountedPrice.toStringAsFixed(0)}',
+                                style:  TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primaryText(context),
+                                  height: 1.1,
+                                ),
+                              ),
                                 Text(
                                   '\$${product.productPrice.toStringAsFixed(0)}',
                                   style: TextStyle(
@@ -238,15 +253,7 @@ class ProductGridCard extends StatelessWidget {
                                     height: 1,
                                   ),
                                 ),
-                              Text(
-                                '\$${product.discountedPrice.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.primary,
-                                  height: 1.1,
-                                ),
-                              ),
+                             
                             ],
                           ),
                         ),

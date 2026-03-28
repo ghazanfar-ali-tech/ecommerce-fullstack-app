@@ -183,7 +183,7 @@ class _SearchScreenState extends State<SearchScreen>
                 children: [
                   const SizedBox(width: 13),
                   Icon(Icons.search_rounded,
-                      size: 20, color: AppColors.primary),
+                      size: 22, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(

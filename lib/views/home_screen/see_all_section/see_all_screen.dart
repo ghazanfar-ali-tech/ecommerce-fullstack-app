@@ -33,7 +33,7 @@ class _SeeAllView extends StatelessWidget {
     final vm = context.watch<SeeAllViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7FC),
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -54,17 +54,17 @@ class _SeeAllView extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                color: Color(0xFF1A1A2E), size: 20),
+            icon:  Icon(Icons.arrow_back_ios_new_rounded,
+                color: AppColors.textPrimary(context), size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF1A1A2E),
+                color: AppColors.textPrimary(context),
                 letterSpacing: -0.3,
               ),
             ),
@@ -97,88 +97,126 @@ class _SeeAllView extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, SeeAllViewModel vm) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+ Widget _buildSearchBar(BuildContext context, SeeAllViewModel vm) {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+    child: Container(
+      height: 50,
+      decoration: BoxDecoration(
+      //  color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
+          
           Expanded(
-            child: Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            child: SizedBox(
+              height: 70,
               child: TextField(
                 onChanged: vm.updateSearch,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF1A1A2E),
                   fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary(context),
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Search products...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search_rounded,
-                    color: Color(0xFF6C63FF),
-                    size: 22,
-                  ),
-                  suffixIcon: vm.searchQuery.isNotEmpty
-                      ? GestureDetector(
-                          onTap: () => vm.updateSearch(''),
-                          child: Icon(Icons.close_rounded,
-                              color: Colors.grey.shade400, size: 18),
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 14),
+                hintText: 'Search products...',
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary(context),
                 ),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Icon(Icons.search_rounded,
+                      size: 22, color: AppColors.primary),
+                ),
+                suffixIcon: vm.searchQuery.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () => vm.updateSearch(''),
+                        child: Container(
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.textSecondary(context).withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.close_rounded,
+                  color: AppColors.textSecondary(context), size: 14),
+                        ),
+                      )
+                    : null,
+        
+                filled: true,
+                fillColor: AppColors.cardBackground(context),
+              
+            
+                border: OutlineInputBorder(
+                
+                  borderSide: BorderSide(
+                    color: AppColors.border(context),
+                    
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(16),bottomLeft: Radius.circular(16),),
+                  borderSide: BorderSide(
+                    color: AppColors.border(context),
+                    
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                 borderRadius: BorderRadius.only(topLeft: Radius.circular(16),bottomLeft: Radius.circular(16),),
+                  borderSide: BorderSide(
+                    color: AppColors.primary,
+                     
+                  ),
+                ),
+              
+              ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
-      
+
+        
+
+        
           GestureDetector(
             onTap: () => _openFilterSheet(context),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 50,
-              height: 50,
+              height: 49,
               decoration: BoxDecoration(
-                color: vm.hasActiveFilters
-                    ? const Color(0xFF6C63FF)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary,
+                    AppColors.primaryDark,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+               
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
               ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.tune_rounded,
-                    color: vm.hasActiveFilters
-                        ? Colors.white
-                        : const Color(0xFF6C63FF),
+                    color: Colors.white,
                     size: 22,
                   ),
+                 
                   if (vm.hasActiveFilters)
                     Positioned(
                       top: 8,
@@ -198,8 +236,9 @@ class _SeeAllView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFilterChips(BuildContext context, SeeAllViewModel vm) {
     if (!vm.hasActiveFilters && vm.searchQuery.isEmpty) {
@@ -306,18 +345,20 @@ class _SeeAllView extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '${vm.totalResults} ',
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF6C63FF),
+                     
+              color: AppColors.textPrimary(context),
+              fontWeight: FontWeight.w700,
                   ),
                 ),
                 TextSpan(
-                  text: vm.totalResults == 1 ? 'product' : 'products',
+                  text: vm.totalResults == 1 ? 'Product' : 'Products',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade500,
+                   
+              color: AppColors.textPrimary(context),
+              fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -328,8 +369,8 @@ class _SeeAllView extends StatelessWidget {
             vm.selectedSort.label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade500,
-              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary(context),
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -501,7 +542,7 @@ Widget _buildListShimmer() {
                 color: Colors.white,
               ),
             ),
-            // content placeholder
+       
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
