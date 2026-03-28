@@ -319,7 +319,7 @@ class ProductListCard extends StatelessWidget {
       height: 120,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -443,19 +443,20 @@ class ProductListCard extends StatelessWidget {
                   Text(
                     product.categoryName,
                     style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade500,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.5,
+                     fontSize: 9,
+                        color: AppColors.textPrimary(context),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     product.productName,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A2E),
+                    style:  TextStyle(
+                     fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryText(context),
+                       
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -478,10 +479,11 @@ class ProductListCard extends StatelessWidget {
                     children: [
                       Text(
                         '\$ ${product.discountedPrice.toStringAsFixed(0)}',
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF6C63FF),
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primaryText(context),
+                                  height: 1.1,
                         ),
                       ),
                       if (product.productDiscount > 0) ...[

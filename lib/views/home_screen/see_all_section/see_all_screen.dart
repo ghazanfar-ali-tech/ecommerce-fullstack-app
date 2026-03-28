@@ -4,7 +4,7 @@ import 'package:ecommerceapp/view_model/product_review_view_model.dart';
 import 'package:ecommerceapp/view_model/see_all_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/detail_screen.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/filter_bottom_sheet.dart';
-import 'package:ecommerceapp/views/home_screen/see_all_section/product_grid_screen.dart';
+import 'package:ecommerceapp/views/home_screen/see_all_section/product_list_and_grid_screen.dart';
 import 'package:ecommerceapp/views/home_screen/see_all_section/staggered_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -381,8 +381,8 @@ class _SeeAllView extends StatelessWidget {
   Widget _buildProductList(BuildContext context, SeeAllViewModel vm) {
   if (vm.isLoading) {
   return vm.viewMode == ViewMode.grid
-      ? _buildGridShimmer()
-      : _buildListShimmer();
+      ? _buildGridShimmer(context)
+      : _buildListShimmer(context);
 }
 
     final products = vm.filteredProducts;
@@ -514,113 +514,9 @@ class _SeeAllView extends StatelessWidget {
 
 
 
+Widget _buildGridShimmer(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
 
-Widget _buildListShimmer() {
-  return ListView.builder(
-    padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-    itemCount: 6,
-    itemBuilder: (_, __) => Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade50,
-      child: Container(
-        height: 120,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-        
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(16),
-              ),
-              child: Container(
-                width: 120,
-                height: 120,
-                color: Colors.white,
-              ),
-            ),
-       
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 10,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      height: 14,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      height: 10,
-                      width: 140,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    
-                    Container(
-                      height: 10,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          height: 14,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-Widget _buildGridShimmer() {
   return GridView.builder(
     padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -631,25 +527,22 @@ Widget _buildGridShimmer() {
     ),
     itemCount: 6,
     itemBuilder: (_, __) => Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade50,
+      baseColor: isDark ? AppColors.cardBackground(context) : Colors.grey.shade200,
+      highlightColor: isDark ? AppColors.border(context) : Colors.grey.shade50,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBackground(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-        
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: Container(
                 height: 160,
                 width: double.infinity,
-                color: Colors.white,
+                color: AppColors.cardBackground(context),
               ),
             ),
             Padding(
@@ -657,49 +550,21 @@ Widget _buildGridShimmer() {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 10,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
+                  _shimmerBox(context, height: 10, width: 50),
                   const SizedBox(height: 6),
-                  Container(
-                    height: 13,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
+                  _shimmerBox(context, height: 13, width: double.infinity),
                   const SizedBox(height: 6),
-                  Container(
-                    height: 10,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
+                  _shimmerBox(context, height: 10, width: 80),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Container(
-                        height: 13,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
+                      _shimmerBox(context, height: 13, width: 50),
                       const Spacer(),
                       Container(
                         width: 28,
                         height: 28,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBackground(context),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -711,6 +576,83 @@ Widget _buildGridShimmer() {
           ],
         ),
       ),
+    ),
+  );
+}
+
+Widget _buildListShimmer(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+
+  return GridView.builder(
+    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      mainAxisExtent: 280,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+    ),
+    itemCount: 6,
+    itemBuilder: (_, __) => Shimmer.fromColors(
+      baseColor: isDark ? AppColors.cardBackground(context) : Colors.grey.shade200,
+      highlightColor: isDark ? AppColors.border(context) : Colors.grey.shade50,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground(context),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Container(
+                height: 160,
+                width: double.infinity,
+                color: AppColors.cardBackground(context),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _shimmerBox(context, height: 10, width: 50),
+                  const SizedBox(height: 6),
+                  _shimmerBox(context, height: 13, width: double.infinity),
+                  const SizedBox(height: 6),
+                  _shimmerBox(context, height: 10, width: 80),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _shimmerBox(context, height: 13, width: 50),
+                      const Spacer(),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBackground(context),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _shimmerBox(BuildContext context, {required double height, required double width}) {
+  return Container(
+    height: height,
+    width: width,
+    decoration: BoxDecoration(
+      color: AppColors.cardBackground(context),
+      borderRadius: BorderRadius.circular(6),
     ),
   );
 }
