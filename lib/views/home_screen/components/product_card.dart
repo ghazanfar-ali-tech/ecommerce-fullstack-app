@@ -79,21 +79,21 @@ class ProductCard extends StatelessWidget {
               child: Stack(
                 children: [
                
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                    child: productImage.isNotEmpty
-                        ? Image.network(
-                            productImage,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                _imageFallback(context),
-                          )
-                        : _imageFallback(context),
-                  ),
+               Hero(
+  tag: 'product_image_$productId', 
+  child: ClipRRect(
+    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    child: productImage.isNotEmpty
+        ? Image.network(
+            productImage,
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _imageFallback(context),
+          )
+        : _imageFallback(context),
+  ),
+),
 
                  
                   Positioned(

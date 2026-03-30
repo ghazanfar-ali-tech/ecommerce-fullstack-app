@@ -528,23 +528,43 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       productImage: productImageUrls.isNotEmpty ? productImageUrls[0] : '',
       productImageUrls: productImageUrls,
       categoryName: p['categoryName'] ?? 'Uncategorized',
-      onTap: () {
-        context.read<ProductReviewViewModel>().fetchReviews(p['id']);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DetailScreen(
-              productId: p['id'],
-              productName: p['productName'] ?? 'N/A',
-              price: double.parse((p['productPrice'] ?? 0).toString()).toInt(),
-              discount: p['productDiscount'] ?? 0,
-              productImageUrls: productImageUrls,
-              description: p['productDescription'] ?? '',
-              categoryName: p['categoryName'] ?? 'Uncategorized',
-            ),
+onTap: () {
+  context.read<ProductReviewViewModel>().fetchReviews(p['id']);
+  Navigator.push(
+    context,
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 500),
+      reverseTransitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (_, __, ___) => DetailScreen(
+        productId: p['id'],
+        productName: p['productName'] ?? 'N/A',
+        price: double.parse((p['productPrice'] ?? 0).toString()).toInt(),
+        discount: p['productDiscount'] ?? 0,
+        productImageUrls: productImageUrls,
+        description: p['productDescription'] ?? '',
+        categoryName: p['categoryName'] ?? 'Uncategorized',
+      ),
+      transitionsBuilder: (_, animation, __, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOut,
+          ),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.06),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
           ),
         );
       },
+    ),
+  );
+},
       onAddToCart: () => viewModel.onAddToCart(p['id']),
       onFavorite: () => viewModel.onFavoriteTap(p['id']),
     ),
