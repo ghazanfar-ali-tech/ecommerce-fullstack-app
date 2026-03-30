@@ -212,8 +212,7 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
     id: DateTime.now().millisecondsSinceEpoch.toString(),
     productName: productName,
     productCategory: product['categoryName'] ?? '',
-   productPrice: int.tryParse(product['productPrice'].toString()) ?? 
-              (product['productPrice'] as num?)?.toInt() ?? 0,
+   productPrice: int.tryParse(product['productPrice'].toString()) ?? 0,
     productImage: (product['productImageUrls'] as List?)?.isNotEmpty == true
         ? product['productImageUrls'][0]
         : '',

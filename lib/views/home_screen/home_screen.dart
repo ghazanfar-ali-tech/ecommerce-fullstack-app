@@ -345,11 +345,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget _buildCarouselSlider(HomeViewModel viewModel) {
     final List<String> carouselImages = [
-      "https://img.freepik.com/free-vector/gradient-shopping-discount-horizontal-sale-banner_23-2150321996.jpg?w=740&q=80",
-      "https://img.freepik.com/premium-vector/sport-collection-promotion-social-media-facebook-banner-template_252779-280.jpg?w=740&q=80",
-      "https://m.media-amazon.com/images/S/stores-image-uploads-na-prod/3/AmazonStores/ATVPDKIKX0DER/74883b9609f8c50ea9c18969a7a85267.w1900.h600.png",
-      "https://img.freepik.com/free-psd/black-friday-super-sale-facebook-cover-banner-template_120329-5177.jpg?w=740&q=80",
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
+      "https://img.freepik.com/premium-photo/pair-shoes-wooden-deck-with-landscape-background_777078-2046.jpg",
+      "https://www.anideos.com/wp-content/uploads/2024/09/3d-product-animation.jpg",
+      "https://www.toolbox-studio.com/blog/wp-content/uploads/2019/10/3d-product-modeling_new.jpg",
+      "https://www.apple.com/newsroom/images/2024/09/get-ready-to-upgrade-to-the-new-iphone-16-apple-watch-and-airpods-lineups/tile/Apple-September-2024-new-product-lineups-lp.jpg.landing-big_2x.jpg",
+      "https://www.shutterstock.com/image-photo/jacket-photo-sports-brand-sold-600nw-2541439707.jpg",
     ];
 
     return CarouselSlider(

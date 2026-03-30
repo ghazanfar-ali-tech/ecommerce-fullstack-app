@@ -38,6 +38,17 @@ class _FavouriteScreenState extends State<FavouriteScreen>
   void initState() {
     super.initState();
 
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final authVM = Provider.of<AuthViewModel>(context, listen: false);
+    final cartBox = authVM.getCartBox();
+    if (mounted) {
+      setState(() {
+        _cartCount = cartBox.length;
+      });
+      _cartKey.currentState?.updateBadge(_cartCount.toString());
+    }
+  });
+
     _bounceCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 400));
     _bounce = TweenSequence([
@@ -117,24 +128,31 @@ class _FavouriteScreenState extends State<FavouriteScreen>
   }
 
   Future<void> _addAll(StoreViewModel vm) async {
-    final snapshot = List.from(vm.favList);
+  final snapshot = List.from(vm.favList);
 
-    for (int i = 0; i < snapshot.length; i++) {
-      if (!mounted || _cancelled) return;
-      if (i >= _imageKeys.length) break;
+  for (int i = 0; i < snapshot.length; i++) {
+    if (!mounted || _cancelled) return;
+    if (i >= _imageKeys.length) break;
 
-      final name = snapshot[i]['productName'] ?? '';
-      final key  = _imageKeys[i];
+    final name = snapshot[i]['productName'] ?? '';
+    final key  = _imageKeys[i];
 
-      if (key.currentContext == null) continue;
+    if (key.currentContext == null) continue;
 
-      await _addToCart(key, name, vm);
+    await _addToCart(key, name, vm);
 
-      if (!mounted || _cancelled) return;
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (!mounted || _cancelled) return;
-    }
+    if (!mounted || _cancelled) return;
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted || _cancelled) return;
   }
+
+
+  if (mounted) {
+    final authVM = Provider.of<AuthViewModel>(context, listen: false);
+    final cartBox = authVM.getCartBox();
+    setState(() => _cartCount = cartBox.length);
+  }
+}
 
   void _snack(String msg, Color color) {
     if (!mounted) return;
@@ -211,14 +229,14 @@ class _FavouriteScreenState extends State<FavouriteScreen>
                             icon: Icon(Icons.shopping_cart_rounded,
                                 color: AppColors.textPrimary(context),
                                 size: 18),
-                            badgeOptions: BadgeOptions(
-                              active: true,
-                              backgroundColor: AppColors.accent,
-                              foregroundColor: Colors.white,
-                              width: 18,
-                              height: 18,
-                              fontSize: 9,
-                            ),
+                          badgeOptions: BadgeOptions(
+  active: _cartCount > 0,
+  backgroundColor: AppColors.accent,
+  foregroundColor: Colors.white,
+  width: 18,
+  height: 18,
+  fontSize: 9,
+),
                           ),
                         ),
                       ),
