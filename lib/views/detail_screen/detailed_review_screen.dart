@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,16 +25,14 @@ class ProductReviewsScreen extends StatefulWidget {
 class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
   String selectedFilter = 'All';
 
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.cardBackground(context),
+
         title: const Text(
           'Reviews',
           style: TextStyle(fontWeight: FontWeight.w600),
@@ -42,16 +41,17 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
       ),
       body: Consumer<ProductReviewViewModel>(
         builder: (context, vm, _) {
-          final avgRating = vm.reviews.isEmpty 
-              ? 0.0 
-              : vm.reviews.map((r) => r.rating).reduce((a, b) => a + b) / vm.reviews.length;
+          final avgRating = vm.reviews.isEmpty
+              ? 0.0
+              : vm.reviews.map((r) => r.rating).reduce((a, b) => a + b) /
+                    vm.reviews.length;
 
-          // Filter reviews based on selected rating
-          final filteredReviews = selectedFilter == 'All' 
-              ? vm.reviews 
-              : vm.reviews.where((r) => r.rating == int.parse(selectedFilter)).toList();
+          final filteredReviews = selectedFilter == 'All'
+              ? vm.reviews
+              : vm.reviews
+                    .where((r) => r.rating == int.parse(selectedFilter))
+                    .toList();
 
-          // Calculate rating distribution
           Map<int, int> ratingCount = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
           for (var review in vm.reviews) {
             ratingCount[review.rating] = (ratingCount[review.rating] ?? 0) + 1;
@@ -59,10 +59,32 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
 
           return Column(
             children: [
-              // Product Info Header
               Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  color: AppColors.cardBackground(context),
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.border(context)),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow(context),
+                      blurRadius: 10,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 0),
+                    ),
+
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.2),
+                      blurRadius: 4,
+                      spreadRadius: -2,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
                 child: Row(
                   children: [
                     ClipRRect(
@@ -128,20 +150,35 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
                 ),
               ),
 
-              // Rating Summary
               if (vm.reviews.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.cardBackground(context),
                     borderRadius: BorderRadius.circular(12),
+                
+
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadow(context),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 0),
+                      ),
+
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.2),
+                        blurRadius: 4,
+                        spreadRadius: -2,
+                        offset: const Offset(0, 0),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          // Average Rating
                           Column(
                             children: [
                               Text(
@@ -173,21 +210,22 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
                               ),
                             ],
                           ),
-                          
+
                           const SizedBox(width: 32),
-                          
-                          // Rating Bars
+
                           Expanded(
                             child: Column(
                               children: List.generate(5, (index) {
                                 final rating = 5 - index;
                                 final count = ratingCount[rating] ?? 0;
-                                final percentage = vm.reviews.isEmpty 
-                                    ? 0.0 
+                                final percentage = vm.reviews.isEmpty
+                                    ? 0.0
                                     : count / vm.reviews.length;
-                                
+
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -206,13 +244,17 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                           child: LinearProgressIndicator(
                                             value: percentage,
-                                            backgroundColor: Colors.grey.shade200,
-                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                              Colors.amber,
-                                            ),
+                                            backgroundColor:
+                                                Colors.grey.shade200,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Colors.amber,
+                                                ),
                                             minHeight: 6,
                                           ),
                                         ),
@@ -237,11 +279,29 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
                   ),
                 ),
 
-              // Filter Chips
               Container(
                 height: 50,
-                color: Colors.white,
+
                 padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground(context),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow(context),
+                      blurRadius: 10,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 0),
+                    ),
+
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.2),
+                      blurRadius: 4,
+                      spreadRadius: -2,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -260,276 +320,354 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
 
               const SizedBox(height: 8),
 
-              // Reviews List
               Expanded(
                 child: vm.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : filteredReviews.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.rate_review_outlined,
-                                  size: 64,
-                                  color: Colors.grey.shade400,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  selectedFilter == 'All'
-                                      ? "No reviews yet"
-                                      : "No $selectedFilter star reviews",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.rate_review_outlined,
+                              size: 64,
+                              color: Colors.grey.shade400,
                             ),
-                          )
-                        : ListView.separated(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: filteredReviews.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              final review = filteredReviews[index];
-                              final isCurrentUser = FirebaseAuth.instance.currentUser?.uid == review.userId;
+                            const SizedBox(height: 16),
+                            Text(
+                              selectedFilter == 'All'
+                                  ? "No reviews yet"
+                                  : "No $selectedFilter star reviews",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredReviews.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final review = filteredReviews[index];
+                          final isCurrentUser =
+                              FirebaseAuth.instance.currentUser?.uid ==
+                              review.userId;
 
-                              // Wrap review card with Dismissible for swipe-to-delete
-                              return Dismissible(
-                                key: Key(review.id),
-                                direction: isCurrentUser 
-                                    ? DismissDirection.endToStart 
-                                    : DismissDirection.none,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.only(right: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(12),
+                          return Dismissible(
+                            key: Key(review.id),
+                            direction: isCurrentUser
+                                ? DismissDirection.endToStart
+                                : DismissDirection.none,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.shadow(context),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 4),
                                   ),
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.white,
-                                        size: 32,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Delete',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
+
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    spreadRadius: -2,
+                                    offset: const Offset(0, -2),
+                                  ),
+                                ],
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext dialogContext) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.warning_amber_rounded,
+                                          color: Colors.orange,
+                                          size: 28,
                                         ),
+                                        SizedBox(width: 12),
+                                        Text('Delete Review?'),
+                                      ],
+                                    ),
+                                    content: const Text(
+                                      'Are you sure you want to delete this review? This action cannot be undone.',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(
+                                          dialogContext,
+                                        ).pop(false),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () => Navigator.of(
+                                          dialogContext,
+                                        ).pop(true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text('Delete'),
                                       ),
                                     ],
-                                  ),
-                                ),
-                                confirmDismiss: (direction) async {
-                                  // Show confirmation dialog before deleting
-                                  return await showDialog(
-                                    context: context,
-                                    builder: (BuildContext dialogContext) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        title: const Row(
-                                          children: [
-                                            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
-                                            SizedBox(width: 12),
-                                            Text('Delete Review?'),
-                                          ],
-                                        ),
-                                        content: const Text(
-                                          'Are you sure you want to delete this review? This action cannot be undone.',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(dialogContext).pop(false),
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(color: Colors.grey),
-                                            ),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => Navigator.of(dialogContext).pop(true),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red,
-                                              foregroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
                                   );
                                 },
-                                onDismissed: (direction) async {
-                                  await context
-                                      .read<ProductReviewViewModel>()
-                                      .deleteReview(widget.productId, review.id);
-                                  
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Review deleted successfully'),
-                                        backgroundColor: Colors.green,
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: isCurrentUser
-                                        ? Border.all(color: Colors.blue.shade200, width: 1.5)
-                                        : null,
+                              );
+                            },
+                            onDismissed: (direction) async {
+                              await context
+                                  .read<ProductReviewViewModel>()
+                                  .deleteReview(widget.productId, review.id);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Review deleted successfully',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.floating,
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.cardBackground(context),
+                                borderRadius: BorderRadius.circular(12),
+                                
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.shadow(context),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 0),
+                                  ),
+
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    spreadRadius: -2,
+                                    offset: const Offset(0, 0),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 20,
-                                            backgroundColor: Colors.blue.shade100,
-                                            child: Text(
-                                              review.userName.isNotEmpty
-    ? review.userName[0].toUpperCase()
-    : "?",
-                                              style: TextStyle(
-                                                color: Colors.blue.shade900,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.blue.shade100,
+                                        child: Text(
+                                          review.userName.isNotEmpty
+                                              ? review.userName[0].toUpperCase()
+                                              : "?",
+                                          style: TextStyle(
+                                            color: Colors.blue.shade900,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                Row(
-                                                  children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        review.userName,
-                                                        style: const TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 15,
-                                                        ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
+                                                Flexible(
+                                                  child: Text(
+                                                    review.userName,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15,
                                                     ),
-                                                    if (isCurrentUser) ...[
-                                                      const SizedBox(width: 6),
-                                                      Container(
-                                                        padding: const EdgeInsets.symmetric(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                if (isCurrentUser) ...[
+                                                  const SizedBox(width: 6),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
                                                           horizontal: 6,
                                                           vertical: 2,
                                                         ),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.blue.shade50,
-                                                          borderRadius: BorderRadius.circular(4),
-                                                        ),
-                                                        child: Text(
-                                                          "You",
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            fontWeight: FontWeight.w600,
-                                                            color: Colors.blue.shade700,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.blue.shade50,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4,
+                                                          ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color:
+                                                              AppColors.shadow(
+                                                                context,
+                                                              ),
+                                                          blurRadius: 10,
+                                                          spreadRadius: 0,
+                                                          offset: const Offset(
+                                                            0,
+                                                            4,
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Row(
-                                                  children: [
-                                                    Row(
-                                                      children: List.generate(
-                                                        5,
-                                                        (i) => Icon(
-                                                          Icons.star,
-                                                          size: 14,
-                                                          color: i < review.rating
-                                                              ? Colors.amber
-                                                              : Colors.grey.shade300,
+
+                                                        BoxShadow(
+                                                          color: Colors.white
+                                                              .withOpacity(0.2),
+                                                          blurRadius: 4,
+                                                          spreadRadius: -2,
+                                                          offset: const Offset(
+                                                            0,
+                                                            -2,
+                                                          ),
                                                         ),
-                                                      ),
+                                                      ],
                                                     ),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      review.getFormattedDate(),
+                                                    child: Text(
+                                                      "You",
                                                       style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey.shade600,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors
+                                                            .blue
+                                                            .shade700,
                                                       ),
                                                     ),
-                                                  ],
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Row(
+                                                  children: List.generate(
+                                                    5,
+                                                    (i) => Icon(
+                                                      Icons.star,
+                                                      size: 14,
+                                                      color: i < review.rating
+                                                          ? Colors.amber
+                                                          : Colors
+                                                                .grey
+                                                                .shade300,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  review.getFormattedDate(),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey.shade600,
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          if (isCurrentUser)
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.edit_outlined,
-                                                color: Colors.blue.shade700,
-                                                size: 22,
-                                              ),
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (_) => ReviewDialog(
-                                                    productId: widget.productId,
-                                                    existingReview: review,
-                                                  ),
-                                                );
-                                              },
-                                              tooltip: 'Edit review',
-                                            ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                      if (review.comment.isNotEmpty) ...[
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          review.comment,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade800,
-                                            height: 1.5,
+                                      if (isCurrentUser)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.edit_outlined,
+                                            color: Colors.blue.shade700,
+                                            size: 22,
                                           ),
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (_) => ReviewDialog(
+                                                productId: widget.productId,
+                                                existingReview: review,
+                                              ),
+                                            );
+                                          },
+                                          tooltip: 'Edit review',
                                         ),
-                                      ],
-                                      if (isCurrentUser) ...[
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '← Swipe left to delete',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey.shade400,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
                                     ],
                                   ),
-                                ),
-                              );
-                            },
-                          ),
+                                  if (review.comment.isNotEmpty) ...[
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      review.comment,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade800,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                  ],
+                                  if (isCurrentUser) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      '← Swipe left to delete',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade400,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
             ],
           );
@@ -544,19 +682,47 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
             (r) => r.userId == user.uid,
           );
 
-          return FloatingActionButton.extended(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => ReviewDialog(
-                  productId: widget.productId,
-                  existingReview: userReview,
+          return Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow(context),
+                  blurRadius: 10,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
                 ),
-              );
-            },
-            backgroundColor: Colors.blue,
-            icon: Icon(userReview != null ? Icons.edit : Icons.add),
-            label: Text(userReview != null ? "Edit Review" : "Write Review"),
+
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.2),
+                  blurRadius: 4,
+                  spreadRadius: -2,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => ReviewDialog(
+                    productId: widget.productId,
+                    existingReview: userReview,
+                  ),
+                );
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              icon: Icon(
+                userReview != null ? Icons.edit : Icons.add,
+                color: AppColors.accentDark,
+              ),
+              label: Text(
+                userReview != null ? "Edit Review" : "Write Review",
+                style: TextStyle(color: AppColors.warningLight),
+              ),
+            ),
           );
         },
       ),
@@ -573,7 +739,7 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ? Colors.white : AppColors.primary,
           ),
         ),
         selected: isSelected,
@@ -582,9 +748,10 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
             selectedFilter = label;
           });
         },
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: AppColors.background(context),
         selectedColor: Colors.blue,
         checkmarkColor: Colors.white,
+        side: BorderSide(color: AppColors.border(context)),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
     );

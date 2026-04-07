@@ -319,7 +319,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white, // IMPORTANT
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -664,30 +664,35 @@ class _DetailScreenState extends State<DetailScreen> {
     5,
     (i) => Container(
       decoration: BoxDecoration(
-        boxShadow: Theme.of(context).brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: const Color(0xFFFFD000).withOpacity(0.8),
-                  blurRadius: 6,
-                ),
-                BoxShadow(
-                  color: const Color(0xFFFFAA00).withOpacity(0.5),
-                  blurRadius: 12,
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: const Color(0xFFFFAA00).withOpacity(0.3),
-                  blurRadius: 4,
-                ),
-              ],
+      
       ),
       child: Icon(
         Icons.star,
         size: 12,
         color: i < vm.reviews.first.rating
             ? const Color(0xFFFFD000)
-            : Colors.grey.shade100,
+            : Colors.grey.shade300,
+               shadows: i < vm.reviews.first.rating
+      ? Theme.of(context).brightness == Brightness.dark
+          ? [
+             
+              Shadow(
+                color: const Color(0xFFFFD000).withOpacity(0.8),
+                blurRadius: 6,
+              ),
+              Shadow(
+                color: const Color(0xFFFFAA00).withOpacity(0.5),
+                blurRadius: 12,
+              ),
+            ]
+          : [
+              
+              Shadow(
+                color: const Color(0xFFFFAA00).withOpacity(0.3),
+                blurRadius: 4,
+              ),
+            ]
+      : null,
       ),
     ),
   ),
@@ -772,7 +777,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
-                                                Colors.transparent, // IMPORTANT
+                                                Colors.transparent, 
                                             shadowColor: Colors.transparent,
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
@@ -841,7 +846,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         child: Icon(
                           Icons.add_shopping_cart_rounded,
                           size: 20,
-                          color: Colors.white, // IMPORTANT: keep this white
+                          color: Colors.white, 
                         ),
                       ),
                       const SizedBox(width: 8),
