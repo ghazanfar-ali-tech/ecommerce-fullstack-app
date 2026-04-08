@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
 import 'package:ecommerceapp/view_model/auth_view_model.dart';
 import 'package:ecommerceapp/view_model/product_review_view_model.dart';
+import 'package:ecommerceapp/view_model/store_view_model.dart';
 import 'package:ecommerceapp/views/detail_screen/check_out_screeen.dart';
 import 'package:ecommerceapp/views/detail_screen/detailed_review_screen.dart';
 import 'package:ecommerceapp/views/detail_screen/product_reviews.dart';
@@ -12,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ecommerceapp/resources/components/appColor.dart';
+import 'package:ecommerceapp/models/see_all_model.dart';
 
 class DetailScreen extends StatefulWidget {
   final List<String> productImageUrls;
@@ -79,6 +81,8 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     final sizeList = ['S', 'M', 'L', 'XL'];
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final SeeAllProductModel product;
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -220,10 +224,34 @@ class _DetailScreenState extends State<DetailScreen> {
                                 },
                               ),
                               const SizedBox(width: 8),
-                              _overlayIconButton(
-                                icon: Icons.favorite_border_rounded,
-                                onTap: () {},
-                              ),
+                             Consumer<StoreViewModel>(
+  builder: (context, viewModel, child) {
+    final isFavorite = viewModel.isFavValue(widget.productName);
+    return _overlayIconButton(
+      icon: isFavorite
+          ? Icons.favorite_rounded
+          : Icons.favorite_border_rounded,
+      iconColor: isFavorite ? Colors.red.shade400 : Colors.white,
+      backgroundColor: isFavorite
+         ? Colors.red.withOpacity(0.2)  
+    : Colors.white.withOpacity(0.18),
+      borderColor: isFavorite
+            ? Colors.red.withOpacity(0.1)  
+    : Colors.white.withOpacity(0.35),
+   onTap: () {
+  viewModel.toggleFavValue({
+    'productName': widget.productName,
+    'productImageUrls': widget.productImageUrls,
+    'categoryName': widget.categoryName,
+    'price': widget.price,
+    'discount': widget.discount,
+    'description': widget.description,
+    'productId': widget.productId,
+  });
+},
+    );
+  },
+),
                             ],
                           ),
                         ),
@@ -924,6 +952,9 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget _overlayIconButton({
     required IconData icon,
     required VoidCallback onTap,
+      Color? iconColor,        
+  Color? backgroundColor,   
+  Color? borderColor, 
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -931,14 +962,17 @@ class _DetailScreenState extends State<DetailScreen> {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.18),
+          color: backgroundColor ?? Colors.white.withOpacity(0.18),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.35), width: 1),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8),
-          ],
+          border: Border.all(
+          color: borderColor ?? Colors.white.withOpacity(0.35),
+          width: 1,
         ),
-        child: Icon(icon, color: Colors.white, size: 18),
+           boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8),
+        ],
+        ),
+           child: Icon(icon, color: iconColor ?? Colors.white, size: 18),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:flutter/material.dart';
 
 Widget couponField({
@@ -33,20 +34,29 @@ Widget couponField({
         ),
       ),
       const SizedBox(width: 10),
-      ElevatedButton(
-        onPressed: onApply,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColor,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-        ),
+     Container(
+  decoration: BoxDecoration(
+    gradient: AppColors.primaryGradient,
+    borderRadius: BorderRadius.circular(borderRadius),
+  ),
+  child: Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(borderRadius),
+      onTap: onApply,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Text(
           buttonText,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
+    ),
+  ),
+),
     ],
   );
 }
