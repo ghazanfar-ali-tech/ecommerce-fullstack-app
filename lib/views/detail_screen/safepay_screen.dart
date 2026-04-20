@@ -16,83 +16,82 @@ class SafepayScreen extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           ),
-          onPressed: () async {
-            try {
-             
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
+        onPressed: () async {
+  // Save references before any async gap
+  final navigator = Navigator.of(context);
+  final messenger = ScaffoldMessenger.of(context);
 
-              final payment = await PaymentService.createPayment(
-                amount: 500,
-                userId: 1,
-              );
+  try {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
 
-              Navigator.pop(context);
+    final payment = await PaymentService.createPayment(
+      amount: 500,
+      userId: 1,
+    );
 
-              print("Payment response: $payment");
+    navigator.pop();
 
-              final tracker = payment["tracker"];
-              final orderId = payment["order_id"];
+    final tracker = payment["tracker"];
+    final orderId = payment["order_id"];
 
-              if (tracker == null || orderId == null) {
-                throw Exception("Invalid backend response: $payment");
-              }
+    if (tracker == null || orderId == null) {
+      throw Exception("Invalid backend response: $payment");
+    }
 
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SafepayWebViewScreen(
-                    tracker: tracker,
-                    orderId: orderId,
-                  ),
-                ),
-              );
+    final result = await navigator.push(
+      MaterialPageRoute(
+        builder: (context) => SafepayWebViewScreen(
+          tracker: tracker,
+          orderId: orderId,
+        ),
+      ),
+    );
 
-              if (result == "paid") {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("✅ Payment Successful!"),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              } else if (result == "failed") {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Payment Failed"),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Payment Cancelled"),
-                    backgroundColor: Colors.orange,
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              }
-            } catch (e) {
-             
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-              
-              debugPrint("Error: $e");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Error: $e"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
+    if (result == "paid") {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("✅ Payment Successful!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else if (result == "failed") {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("Payment Failed"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("Payment Cancelled"),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  } catch (e) {
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+
+    debugPrint("Error: $e");
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text("Error: $e"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+},
         ),
       ),
     );
