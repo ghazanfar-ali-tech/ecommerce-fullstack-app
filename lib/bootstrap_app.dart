@@ -1,7 +1,8 @@
 import 'package:ecommerceapp/core/constants.dart';
 import 'package:ecommerceapp/main.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
-import 'package:ecommerceapp/models/hive_models/shipping_address/address.dart' as hive_address;
+import 'package:ecommerceapp/models/hive_models/shipping_address/address.dart'
+    as hive_address;
 import 'package:ecommerceapp/resources/constants.dart';
 import 'package:ecommerceapp/services/notification_services.dart/notification_services.dart';
 import 'package:ecommerceapp/view_model/address_view_model.dart';
@@ -38,7 +39,6 @@ class BootstrapApp extends StatefulWidget {
 }
 
 class _BootstrapAppState extends State<BootstrapApp> {
-
   late Future<(NotificationViewModel, ThemeProvider)> _initFuture;
 
   @override
@@ -86,23 +86,19 @@ class _BootstrapAppState extends State<BootstrapApp> {
     return FutureBuilder<(NotificationViewModel, ThemeProvider)>(
       future: _initFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const MaterialApp(
-           
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
-
         if (snapshot.hasError) {
           return MaterialApp(
-            
             home: Scaffold(
               body: Center(child: Text('Init error: ${snapshot.error}')),
             ),
           );
         }
+        if (!snapshot.hasData) {
+          return const MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          );
+        }
+
         final (notifVM, themeProvider) = snapshot.data!;
 
         return MultiProvider(
@@ -122,10 +118,10 @@ class _BootstrapAppState extends State<BootstrapApp> {
             ChangeNotifierProvider(create: (_) => StatsViewModel()),
             ChangeNotifierProvider(create: (_) => AppSettingsViewModel()),
             ChangeNotifierProvider(create: (_) => OrderViewModel(notifVM)),
-            ChangeNotifierProvider(create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
+            ChangeNotifierProvider(
+              create: (_) => AppVersionInfoViewModel()..loadPackageInfo(),
             ),
             ChangeNotifierProvider(create: (_) => SeeAllViewModel()),
-
           ],
           child: const MyApp(),
         );
