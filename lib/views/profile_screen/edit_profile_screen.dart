@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/setting_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +16,6 @@ class EditProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingViewModel>(
       builder: (context, viewModel, child) {
-        // Initialize controllers with current values
         if (_usernameController.text.isEmpty && viewModel.username != null) {
           _usernameController.text = viewModel.username!;
         }
@@ -24,8 +24,13 @@ class EditProfileScreen extends StatelessWidget {
         }
 
         return Scaffold(
+          backgroundColor: AppColors.background(context),
           appBar: AppBar(
-            title: const Text('Edit Profile'),
+            backgroundColor: AppColors.background(context),
+            title: const Text(
+              'Edit Profile',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            ),
             actions: [
               if (viewModel.isLoading)
                 const Center(
@@ -43,10 +48,7 @@ class EditProfileScreen extends StatelessWidget {
                   onPressed: () => _saveProfile(context, viewModel),
                   child: const Text(
                     'Save',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
             ],
@@ -60,23 +62,49 @@ class EditProfileScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        
-                        // Profile Photo Section
+
                         GestureDetector(
-                          onTap: () => _showImageSourceDialog(context, viewModel),
+                          onTap: () =>
+                              _showImageSourceDialog(context, viewModel),
                           child: Stack(
                             children: [
-                              CircleAvatar(
-                                radius: 60,
-                                backgroundColor: Colors.grey[200],
-                                backgroundImage: _getProfileImage(viewModel),
-                                child: _getProfileImage(viewModel) == null
-                                    ? Icon(
-                                        Icons.person,
-                                        size: 60,
-                                        color: Colors.grey[400],
-                                      )
-                                    : null,
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.border(context),
+                                    width: 3,
+                                  ),
+
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromARGB(
+                                        255,
+                                        241,
+                                        228,
+                                        41,
+                                      ).withOpacity(0.55),
+                                      blurRadius: 20,
+                                      spreadRadius: 4,
+                                      offset: Offset.zero,
+                                    ),
+                                  ],
+                                ),
+                                child: CircleAvatar(
+                                  radius: 60,
+
+                                  backgroundColor: AppColors.surfaceVariant(
+                                    context,
+                                  ),
+                                  backgroundImage: _getProfileImage(viewModel),
+                                  child: _getProfileImage(viewModel) == null
+                                      ? Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: AppColors.iconDefault(context),
+                                        )
+                                      : null,
+                                ),
                               ),
                               Positioned(
                                 bottom: 0,
@@ -101,32 +129,74 @@ class EditProfileScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 10),
-                        
+
                         Text(
                           viewModel.selectedImage != null
                               ? 'New photo selected'
                               : 'Tap to change profile photo',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: AppColors.textPrimary(context),
                             fontSize: 14,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
-                        // Username Field
+
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: 'Username',
-                            prefixIcon: const Icon(Icons.person_outline),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color: AppColors.iconDefault(context),
+                            ),
+                            fillColor: AppColors.cardBackground(context),
+                            filled: true,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.border(context),
+                                width: 0.5,
+                              ),
                             ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.border(context),
+                                width: 0.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                                width: 1.5,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.error,
+                                width: 0.5,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.error,
+                                width: 1.5,
+                              ),
+                            ),
+                            errorStyle: TextStyle(
+                              color: AppColors.error,
+                              fontSize: 11,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -138,21 +208,63 @@ class EditProfileScreen extends StatelessWidget {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
-                        // Email Field
+
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: const Icon(Icons.email_outlined),
+                            prefixIcon: Icon(
+                              Icons.email_outlined,
+                              color: AppColors.iconDefault(context),
+                            ),
+                            fillColor: AppColors.cardBackground(context),
+                            filled: true,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.border(context),
+                                width: 0.5,
+                              ),
                             ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.border(context),
+                                width: 0.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                                width: 1.5,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.error,
+                                width: 0.5,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: AppColors.error,
+                                width: 1.5,
+                              ),
+                            ),
+                            errorStyle: TextStyle(
+                              color: AppColors.error,
+                              fontSize: 11,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -167,10 +279,9 @@ class EditProfileScreen extends StatelessWidget {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 30),
-                        
-                        // Error Message
+
                         if (viewModel.error != null)
                           Container(
                             padding: const EdgeInsets.all(12),
@@ -181,7 +292,10 @@ class EditProfileScreen extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.error_outline, color: Colors.red[700]),
+                                Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red[700],
+                                ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -192,38 +306,47 @@ class EditProfileScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                        
+
                         const SizedBox(height: 30),
-                        
-                        // Save Button (Alternative to AppBar)
+
                         SizedBox(
                           width: double.infinity,
                           height: 50,
-                          child: ElevatedButton(
-                            onPressed: viewModel.isLoading
-                                ? null
-                                : () => _saveProfile(context, viewModel),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: viewModel.isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
+                            child: ElevatedButton(
+                              onPressed: viewModel.isLoading
+                                  ? null
+                                  : () => _saveProfile(context, viewModel),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: viewModel.isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Save Changes',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.accentLight,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  )
-                                : const Text(
-                                    'Save Changes',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            ),
                           ),
                         ),
                       ],
@@ -244,7 +367,10 @@ class EditProfileScreen extends StatelessWidget {
     return null;
   }
 
-  void _showImageSourceDialog(BuildContext context, SettingViewModel viewModel) {
+  void _showImageSourceDialog(
+    BuildContext context,
+    SettingViewModel viewModel,
+  ) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -277,7 +403,8 @@ class EditProfileScreen extends StatelessWidget {
                   _pickImage(context, ImageSource.gallery, viewModel);
                 },
               ),
-              if (viewModel.selectedImage != null || viewModel.profilePhotoUrl != null)
+              if (viewModel.selectedImage != null ||
+                  viewModel.profilePhotoUrl != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
                   title: const Text('Remove Photo'),
@@ -312,9 +439,9 @@ class EditProfileScreen extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick image: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
       }
     }
   }

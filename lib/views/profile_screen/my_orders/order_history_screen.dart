@@ -1,5 +1,6 @@
 import 'package:ecommerceapp/enums/order_status.dart';
 import 'package:ecommerceapp/models/order_model.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:ecommerceapp/views/profile_screen/my_orders/order_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ class OrderHistoryScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F6FA),
+        backgroundColor: AppColors.background(context),
         appBar: _buildAppBar(context),
         body: Consumer<OrderViewModel>(
           builder: (context, orderVM, _) {
@@ -85,12 +86,41 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildTab(BuildContext context, String label, int index) {
+    final tabController = DefaultTabController.of(context);
+
+    return AnimatedBuilder(
+      animation: tabController,
+      builder: (context, _) {
+        final isSelected = tabController.index == index;
+        return Tab(
+          height: 32,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label),
+              SizedBox(height: 5),
+              Container(
+                height: 2.5,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: isSelected ? Color(0xFF4F46E5) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(110),
+      preferredSize: const Size.fromHeight(90),
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground(context),
           boxShadow: [
             BoxShadow(
               color: Color(0x0F000000),
@@ -103,63 +133,89 @@ class OrderHistoryScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 16, 0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).maybePop(),
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F6FA),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          size: 16,
-                          color: Color(0xFF1A1A2E),
+              Container(
+                color: AppColors.cardBackground(context),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 16, 0),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(
+                              255,
+                              149,
+                              139,
+                              241,
+                            ).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 16,
+                            color: const Color.fromARGB(255, 230, 69, 11),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Text(
-                      'My Orders',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A2E),
-                        letterSpacing: -0.3,
+                      const SizedBox(width: 14),
+                      Text(
+                        'My Orders',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary(context),
+                          letterSpacing: -0.3,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
-              const TabBar(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                labelColor: Color(0xFF4F46E5),
-                unselectedLabelColor: Color(0xFF9CA3AF),
-                labelStyle: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.1,
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground(context),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
+                child: Builder(
+                  builder: (context) {
+                    return TabBar(
+                      dividerColor: Colors.transparent,
+                      indicatorColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      labelPadding: EdgeInsets.only(bottom: 0),
+                      labelColor: Color(0xFF4F46E5),
+                      unselectedLabelColor: Color(0xFF9CA3AF),
+                      labelStyle: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.1,
+                      ),
+                      unselectedLabelStyle: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      // indicator: UnderlineTabIndicator(
+                      //   borderSide: BorderSide(
+                      //     color: Color(0xFF4F46E5),
+                      //     width: 2.5,
+                      //   ),
+                      //   borderRadius: BorderRadius.all(Radius.circular(4)),
+                      // ),
+                      indicatorSize: TabBarIndicatorSize.label,
+
+                      tabs: [
+                        _buildTab(context, 'Active', 0),
+                        _buildTab(context, 'Completed', 1),
+                        _buildTab(context, 'Cancelled', 2),
+                      ],
+                    );
+                  },
                 ),
-                indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(color: Color(0xFF4F46E5), width: 2.5),
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
-                indicatorSize: TabBarIndicatorSize.label,
-                tabs: [
-                  Tab(text: 'Active'),
-                  Tab(text: 'Completed'),
-                  Tab(text: 'Cancelled'),
-                ],
               ),
             ],
           ),
@@ -265,7 +321,7 @@ class _OrderCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -382,23 +438,23 @@ class _OrderCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 12),
-            const Divider(height: 1, color: Color(0xFFF3F4F6)),
+            const Divider(height: 1, color: Color.fromARGB(255, 17, 71, 177)),
             const SizedBox(height: 12),
 
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.calendar_today_outlined,
                   size: 13,
-                  color: Color(0xFF9CA3AF),
+                  color: AppColors.textSecondary(context),
                 ),
                 const SizedBox(width: 5),
                 Text(
                   _formatDate(order.createdAt),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
-                    color: Color(0xFF9CA3AF),
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary(context),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Spacer(),
@@ -527,7 +583,7 @@ class _ViewDetailsButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: const Color(0xFF4F46E5),
+          gradient: AppColors.primaryGradient,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(

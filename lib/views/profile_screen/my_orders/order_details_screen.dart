@@ -5,25 +5,33 @@ import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 class OrderDetailScreen extends StatelessWidget {
   final OrderModel order;
-  
 
   const OrderDetailScreen({super.key, required this.order});
-String _formatDate(DateTime date) {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun',
-                    'Jul','Aug','Sep','Oct','Nov','Dec'];
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
     final minute = date.minute.toString().padLeft(2, '0');
     final period = date.hour >= 12 ? 'PM' : 'AM';
     return '${months[date.month - 1]} ${date.day}, ${date.year} · $hour:$minute $period';
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: CustomScrollView(
@@ -34,15 +42,15 @@ String _formatDate(DateTime date) {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 Text(
-        _formatDate(order.createdAt),
-        style: TextStyle(
-          fontSize: 13,
-          color: AppColors.textSecondary(context),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
+                  _formatDate(order.createdAt),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary(context),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
 
-      const SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _StatusTimeline(status: order.status),
                 const SizedBox(height: 16),
                 _OrderIdCard(orderId: order.orderId),
@@ -114,13 +122,17 @@ class _OrderIdCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight,
+        color: AppColors.cardBackground(context),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 20),
+          const Icon(
+            Icons.receipt_long_rounded,
+            color: AppColors.primary,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +163,10 @@ class _OrderIdCard extends StatelessWidget {
               Clipboard.setData(ClipboardData(text: orderId));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('Order ID copied'),
+                  content: const Text(
+                    'Order ID copied',
+                    style: TextStyle(color: AppColors.accentLight),
+                  ),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -168,7 +183,11 @@ class _OrderIdCard extends StatelessWidget {
                 color: AppColors.primary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.copy_rounded, size: 15, color: AppColors.primary),
+              child: const Icon(
+                Icons.copy_rounded,
+                size: 15,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ],
@@ -177,23 +196,26 @@ class _OrderIdCard extends StatelessWidget {
   }
 }
 
-
 class _StatusTimeline extends StatelessWidget {
   final String status;
 
   const _StatusTimeline({required this.status});
 
   static const _steps = [
-    {'label': 'Placed',     'icon': Icons.check_circle_rounded},
+    {'label': 'Placed', 'icon': Icons.check_circle_rounded},
     {'label': 'Processing', 'icon': Icons.inventory_2_rounded},
-    {'label': 'Shipped',    'icon': Icons.local_shipping_rounded},
-    {'label': 'Delivered',  'icon': Icons.home_rounded},
+    {'label': 'Shipped', 'icon': Icons.local_shipping_rounded},
+    {'label': 'Delivered', 'icon': Icons.home_rounded},
   ];
 
   @override
   Widget build(BuildContext context) {
     final isCancelled = status == 'cancelled';
-    final activeStep = isCancelled ? 0 : status == 'completed' ? 4 : 2;
+    final activeStep = isCancelled
+        ? 0
+        : status == 'completed'
+        ? 4
+        : 2;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -224,7 +246,10 @@ class _StatusTimeline extends StatelessWidget {
               const Spacer(),
               if (isCancelled)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -248,7 +273,9 @@ class _StatusTimeline extends StatelessWidget {
                 return Expanded(
                   child: Container(
                     height: 2,
-                    color: isFilled ? AppColors.primary : AppColors.border(context),
+                    color: isFilled
+                        ? AppColors.primary
+                        : AppColors.border(context),
                   ),
                 );
               }
@@ -288,24 +315,24 @@ class _StepDot extends StatelessWidget {
     final bgColor = isCancelled
         ? Colors.grey.shade100
         : isDone
-            ? AppColors.primary
-            : isCurrent
-                ? AppColors.primaryLight
-                : Colors.grey.shade100;
+        ? AppColors.primary
+        : isCurrent
+        ? AppColors.primaryLight
+        : const Color.fromARGB(255, 243, 230, 230);
 
     final iconColor = isCancelled
         ? Colors.grey.shade300
         : isDone
-            ? Colors.white
-            : isCurrent
-                ? AppColors.primary
-                : Colors.grey.shade300;
+        ? Colors.white
+        : isCurrent
+        ? AppColors.primary
+        : const Color.fromARGB(255, 216, 18, 18);
 
     final labelColor = isCancelled
         ? Colors.grey.shade300
         : isDone || isCurrent
-            ? AppColors.primary
-            : Colors.grey.shade400;
+        ? AppColors.primary
+        : Colors.grey.shade400;
 
     return Column(
       children: [
@@ -353,7 +380,6 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-
 class _ItemRow extends StatelessWidget {
   final CartItemModel item;
   const _ItemRow({required this.item});
@@ -387,8 +413,11 @@ class _ItemRow extends StatelessWidget {
                 width: 64,
                 height: 64,
                 color: AppColors.background(context),
-                child: Icon(Icons.image_outlined,
-                    color: AppColors.border(context), size: 24),
+                child: Icon(
+                  Icons.image_outlined,
+                  color: AppColors.border(context),
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -419,7 +448,10 @@ class _ItemRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.background(context),
                     borderRadius: BorderRadius.circular(6),
@@ -465,7 +497,6 @@ class _ItemRow extends StatelessWidget {
   }
 }
 
-
 class _AddressCard extends StatelessWidget {
   final String address;
   const _AddressCard({required this.address});
@@ -495,8 +526,11 @@ class _AddressCard extends StatelessWidget {
               color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.location_on_rounded,
-                color: AppColors.primary, size: 18),
+            child: const Icon(
+              Icons.location_on_rounded,
+              color: AppColors.primary,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -515,7 +549,6 @@ class _AddressCard extends StatelessWidget {
     );
   }
 }
-
 
 class _PriceSummaryCard extends StatelessWidget {
   final OrderModel order;
@@ -581,17 +614,12 @@ class _PriceSummaryCard extends StatelessWidget {
   }
 }
 
-
 class _PriceRow extends StatelessWidget {
   final String label;
   final String value;
   final Color? valueColor;
 
-  const _PriceRow({
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
+  const _PriceRow({required this.label, required this.value, this.valueColor});
 
   @override
   Widget build(BuildContext context) {

@@ -77,6 +77,7 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
+  String _selectedSize = 'L';
   @override
   Widget build(BuildContext context) {
     final sizeList = ['S', 'M', 'L', 'XL'];
@@ -224,34 +225,39 @@ class _DetailScreenState extends State<DetailScreen> {
                                 },
                               ),
                               const SizedBox(width: 8),
-                             Consumer<StoreViewModel>(
-  builder: (context, viewModel, child) {
-    final isFavorite = viewModel.isFavValue(widget.productName);
-    return _overlayIconButton(
-      icon: isFavorite
-          ? Icons.favorite_rounded
-          : Icons.favorite_border_rounded,
-      iconColor: isFavorite ? Colors.red.shade400 : Colors.white,
-      backgroundColor: isFavorite
-         ? Colors.red.withOpacity(0.2)  
-    : Colors.white.withOpacity(0.18),
-      borderColor: isFavorite
-            ? Colors.red.withOpacity(0.1)  
-    : Colors.white.withOpacity(0.35),
-   onTap: () {
-  viewModel.toggleFavValue({
-    'productName': widget.productName,
-    'productImageUrls': widget.productImageUrls,
-    'categoryName': widget.categoryName,
-    'price': widget.price,
-    'discount': widget.discount,
-    'description': widget.description,
-    'productId': widget.productId,
-  });
-},
-    );
-  },
-),
+                              Consumer<StoreViewModel>(
+                                builder: (context, viewModel, child) {
+                                  final isFavorite = viewModel.isFavValue(
+                                    widget.productName,
+                                  );
+                                  return _overlayIconButton(
+                                    icon: isFavorite
+                                        ? Icons.favorite_rounded
+                                        : Icons.favorite_border_rounded,
+                                    iconColor: isFavorite
+                                        ? Colors.red.shade400
+                                        : Colors.white,
+                                    backgroundColor: isFavorite
+                                        ? Colors.red.withOpacity(0.2)
+                                        : Colors.white.withOpacity(0.18),
+                                    borderColor: isFavorite
+                                        ? Colors.red.withOpacity(0.1)
+                                        : Colors.white.withOpacity(0.35),
+                                    onTap: () {
+                                      viewModel.toggleFavValue({
+                                        'productName': widget.productName,
+                                        'productImageUrls':
+                                            widget.productImageUrls,
+                                        'categoryName': widget.categoryName,
+                                        'price': widget.price,
+                                        'discount': widget.discount,
+                                        'description': widget.description,
+                                        'productId': widget.productId,
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -393,34 +399,43 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
+
                         Row(
                           children: sizeList.map((size) {
-                            final isSelected = size == 'L';
-                            return Container(
-                              margin: const EdgeInsets.only(right: 10),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: isSelected
-                                    ? AppColors.primaryGradient
-                                    : null,
-                                color: isSelected
-                                    ? null
-                                    : AppColors.surfaceVariant(context),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: isSelected
-                                    ? AppColors.primaryShadow
-                                    : null,
-                              ),
-                              child: Text(
-                                size,
-                                style: TextStyle(
+                            final isSelected = size == _selectedSize;
+                            return GestureDetector(
+                              onTap: () => setState(() => _selectedSize = size),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                margin: const EdgeInsets.only(right: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: isSelected
+                                      ? AppColors.primaryGradient
+                                      : null,
                                   color: isSelected
-                                      ? Colors.white
-                                      : AppColors.textPrimary(context),
-                                  fontWeight: FontWeight.w600,
+                                      ? null
+                                      : AppColors.surfaceVariant(context),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: isSelected
+                                      ? AppColors.primaryShadow
+                                      : null,
+                                ),
+                                child: AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.linear,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.textPrimary(context),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                  child: Text(size),
                                 ),
                               ),
                             );
@@ -565,22 +580,33 @@ class _DetailScreenState extends State<DetailScreen> {
                                                   color: i < avgRating.round()
                                                       ? Colors.amber
                                                       : Colors.grey.shade300,
-                                                      shadows: Theme.of(context).brightness == Brightness.dark ? [
-                Shadow(
-                  color: const Color(0xFFFFD000).withOpacity(0.8),
-                  blurRadius: 6,
-                ),
-                Shadow(
-                  color: const Color(0xFFFFAA00).withOpacity(0.5),
-                  blurRadius: 12,
-                ),
-              ]
-            : [
-                Shadow(
-                  color: const Color(0xFFFFAA00).withOpacity(0.3),
-                  blurRadius: 4,
-                ),
-              ],
+                                                  shadows:
+                                                      Theme.of(
+                                                            context,
+                                                          ).brightness ==
+                                                          Brightness.dark
+                                                      ? [
+                                                          Shadow(
+                                                            color: const Color(
+                                                              0xFFFFD000,
+                                                            ).withOpacity(0.8),
+                                                            blurRadius: 6,
+                                                          ),
+                                                          Shadow(
+                                                            color: const Color(
+                                                              0xFFFFAA00,
+                                                            ).withOpacity(0.5),
+                                                            blurRadius: 12,
+                                                          ),
+                                                        ]
+                                                      : [
+                                                          Shadow(
+                                                            color: const Color(
+                                                              0xFFFFAA00,
+                                                            ).withOpacity(0.3),
+                                                            blurRadius: 4,
+                                                          ),
+                                                        ],
                                                 ),
                                               ),
                                             ),
@@ -687,44 +713,73 @@ class _DetailScreenState extends State<DetailScreen> {
                                                               ),
                                                         ),
                                                       ),
-                                                     Row(
-  children: List.generate(
-    5,
-    (i) => Container(
-      decoration: BoxDecoration(
-      
-      ),
-      child: Icon(
-        Icons.star,
-        size: 12,
-        color: i < vm.reviews.first.rating
-            ? const Color(0xFFFFD000)
-            : Colors.grey.shade300,
-               shadows: i < vm.reviews.first.rating
-      ? Theme.of(context).brightness == Brightness.dark
-          ? [
-             
-              Shadow(
-                color: const Color(0xFFFFD000).withOpacity(0.8),
-                blurRadius: 6,
-              ),
-              Shadow(
-                color: const Color(0xFFFFAA00).withOpacity(0.5),
-                blurRadius: 12,
-              ),
-            ]
-          : [
-              
-              Shadow(
-                color: const Color(0xFFFFAA00).withOpacity(0.3),
-                blurRadius: 4,
-              ),
-            ]
-      : null,
-      ),
-    ),
-  ),
-)
+                                                      Row(
+                                                        children: List.generate(
+                                                          5,
+                                                          (i) => Container(
+                                                            decoration:
+                                                                BoxDecoration(),
+                                                            child: Icon(
+                                                              Icons.star,
+                                                              size: 12,
+                                                              color:
+                                                                  i <
+                                                                      vm
+                                                                          .reviews
+                                                                          .first
+                                                                          .rating
+                                                                  ? const Color(
+                                                                      0xFFFFD000,
+                                                                    )
+                                                                  : Colors
+                                                                        .grey
+                                                                        .shade300,
+                                                              shadows:
+                                                                  i <
+                                                                      vm
+                                                                          .reviews
+                                                                          .first
+                                                                          .rating
+                                                                  ? Theme.of(
+                                                                              context,
+                                                                            ).brightness ==
+                                                                            Brightness.dark
+                                                                        ? [
+                                                                            Shadow(
+                                                                              color:
+                                                                                  const Color(
+                                                                                    0xFFFFD000,
+                                                                                  ).withOpacity(
+                                                                                    0.8,
+                                                                                  ),
+                                                                              blurRadius: 6,
+                                                                            ),
+                                                                            Shadow(
+                                                                              color:
+                                                                                  const Color(
+                                                                                    0xFFFFAA00,
+                                                                                  ).withOpacity(
+                                                                                    0.5,
+                                                                                  ),
+                                                                              blurRadius: 12,
+                                                                            ),
+                                                                          ]
+                                                                        : [
+                                                                            Shadow(
+                                                                              color:
+                                                                                  const Color(
+                                                                                    0xFFFFAA00,
+                                                                                  ).withOpacity(
+                                                                                    0.3,
+                                                                                  ),
+                                                                              blurRadius: 4,
+                                                                            ),
+                                                                          ]
+                                                                  : null,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                   const SizedBox(height: 4),
@@ -804,8 +859,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.transparent, 
+                                            backgroundColor: Colors.transparent,
                                             shadowColor: Colors.transparent,
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
@@ -874,7 +928,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         child: Icon(
                           Icons.add_shopping_cart_rounded,
                           size: 20,
-                          color: Colors.white, 
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -952,9 +1006,9 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget _overlayIconButton({
     required IconData icon,
     required VoidCallback onTap,
-      Color? iconColor,        
-  Color? backgroundColor,   
-  Color? borderColor, 
+    Color? iconColor,
+    Color? backgroundColor,
+    Color? borderColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -965,14 +1019,14 @@ class _DetailScreenState extends State<DetailScreen> {
           color: backgroundColor ?? Colors.white.withOpacity(0.18),
           shape: BoxShape.circle,
           border: Border.all(
-          color: borderColor ?? Colors.white.withOpacity(0.35),
-          width: 1,
+            color: borderColor ?? Colors.white.withOpacity(0.35),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8),
+          ],
         ),
-           boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8),
-        ],
-        ),
-           child: Icon(icon, color: iconColor ?? Colors.white, size: 18),
+        child: Icon(icon, color: iconColor ?? Colors.white, size: 18),
       ),
     );
   }
