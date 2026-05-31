@@ -2,6 +2,7 @@ import 'package:ecommerceapp/views/home_screen/home_screen.dart';
 import 'package:ecommerceapp/views/whileList/favourite_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/profile_screen.dart';
 import 'package:ecommerceapp/views/store_screen/store_screen.dart';
+import 'package:ecommerceapp/views/chat_screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -21,6 +22,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     StoreScreen(),
     FavouriteScreen(),
     ProfileScreen(),
+    ChatScreen(),
   ];
 
   @override
@@ -53,7 +55,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
             right: width * 0.05,
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: width * 0.05,
+            horizontal: width * 0.03,
             vertical: height * 0.015,
           ),
           decoration: BoxDecoration(
@@ -65,21 +67,22 @@ class _BottomNavigationState extends State<BottomNavigation> {
             onTabChange: (index) {
               _pageController.jumpToPage(index);
             },
-            gap: width * 0.02,
+            gap: width * 0.01,
             padding: EdgeInsets.symmetric(
-              horizontal: width * 0.04,
+              horizontal: width * 0.02,
               vertical: height * 0.012,
             ),
             color: Colors.white70,
             activeColor: Colors.black,
             tabBackgroundColor: const Color(0xFFD9F99D),
-            iconSize: width * 0.06,
+            iconSize: width * 0.05,
             tabBorderRadius: 15,
             tabs: const [
               GButton(icon: Icons.home, text: 'Home'),
               GButton(icon: Icons.storefront_sharp, text: 'Store'),
               GButton(icon: Iconsax.heart, text: 'Wishlist'),
               GButton(icon: Icons.person, text: 'Profile'),
+              GButton(icon: Icons.chat_bubble_outline, text: 'Chat'),
             ],
           ),
         ),

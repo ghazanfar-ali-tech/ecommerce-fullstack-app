@@ -7,6 +7,7 @@ import 'package:ecommerceapp/view_model/address_view_model.dart';
 import 'package:ecommerceapp/view_model/coupon_view_model.dart';
 import 'package:ecommerceapp/view_model/order_view_model.dart';
 import 'package:ecommerceapp/view_model/stats_view_model.dart';
+import 'package:ecommerceapp/views/detail_screen/SafePay_cardscreen.dart';
 import 'package:ecommerceapp/views/detail_screen/safepay_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/address_screen/address_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +17,9 @@ import 'package:provider/provider.dart';
 class CheckOutScreen extends StatelessWidget {
   final List<CartModel> cartItems;
 
-  CheckOutScreen({
-    Key? key,
-    List<CartModel>? cartItems,
-    CartModel? singleItem,
-  })  : cartItems = singleItem != null ? [singleItem] : (cartItems ?? []),
-        super(key: key);
+  CheckOutScreen({Key? key, List<CartModel>? cartItems, CartModel? singleItem})
+    : cartItems = singleItem != null ? [singleItem] : (cartItems ?? []),
+      super(key: key);
 
   int get subtotal {
     int sub = 0;
@@ -32,13 +30,17 @@ class CheckOutScreen extends StatelessWidget {
   }
 
   List<CartItemModel> get cartItemModels {
-    return cartItems.map((cartModel) => CartItemModel(
-      productName: cartModel.productName,
-      productPic: cartModel.productImage,
-      price: cartModel.productPrice,
-      quantity: cartModel.quantity,  
-      categoryName: cartModel.productCategory,
-    )).toList();
+    return cartItems
+        .map(
+          (cartModel) => CartItemModel(
+            productName: cartModel.productName,
+            productPic: cartModel.productImage,
+            price: cartModel.productPrice,
+            quantity: cartModel.quantity,
+            categoryName: cartModel.productCategory,
+          ),
+        )
+        .toList();
   }
 
   final TextEditingController _couponController = TextEditingController();
@@ -51,10 +53,10 @@ class CheckOutScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.background(context),
         leading: IconButton(
-          icon:  Icon(Icons.arrow_back, color: AppColors.iconAdaptive(context)),
+          icon: Icon(Icons.arrow_back, color: AppColors.iconAdaptive(context)),
           onPressed: () => Navigator.pop(context),
         ),
-        title:  Text(
+        title: Text(
           "Checkout",
           style: TextStyle(
             color: AppColors.textPrimary(context),
@@ -92,30 +94,35 @@ class CheckOutScreen extends StatelessWidget {
                             return _AddressCard(address: address);
                           },
                         ),
-                        const SizedBox(height: 24),
-                  
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => SafepayScreen()));
-                          },
-                          child: Text("Safe pay"),
-                        ),
+                        const SizedBox(height: 15),
                         _SectionHeader(
                           title: "Payment Method",
                           icon: Icons.payment_outlined,
                         ),
                         const SizedBox(height: 12),
                         _PaymentMethodCard(),
+                        const SizedBox(height: 12),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SafepayScreen(cartItems: cartItems),
+                              ),
+                            );
+                          },
+                          child: SafePayCard(),
+                        ),
                         const SizedBox(height: 24),
-                  
+
                         couponField(
                           controller: _couponController,
                           onApply: () {
                             couponVM.applyCoupon(
-                                _couponController.text.trim(), context);
+                              _couponController.text.trim(),
+                              context,
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
@@ -139,8 +146,8 @@ class CheckOutScreen extends StatelessWidget {
 
               _CheckoutBottomBar(
                 totalAmount: totalAfterDiscount,
-                cartItemModels: cartItemModels, 
-                  subtotal: subtotal,  
+                cartItemModels: cartItemModels,
+                subtotal: subtotal,
               ),
             ],
           );
@@ -154,10 +161,7 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const _SectionHeader({
-    required this.title,
-    required this.icon,
-  });
+  const _SectionHeader({required this.title, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +174,7 @@ class _SectionHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color:  AppColors.textPrimary(context),
+            color: AppColors.textPrimary(context),
           ),
         ),
       ],
@@ -269,8 +273,10 @@ class _AddressCard extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => AddressScreen()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => AddressScreen()),
+                          );
                         },
                         icon: Icon(
                           Icons.edit_outlined,
@@ -292,7 +298,7 @@ class _AddressCard extends StatelessWidget {
                   Text(
                     '${address.street}',
                     style: TextStyle(
-                     color: AppColors.textSecondary(context),
+                      color: AppColors.textSecondary(context),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -327,24 +333,19 @@ class _EmptyAddressState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(
-          Icons.location_off_outlined,
-          size: 48,
-          color: Colors.grey[400],
-        ),
+        Icon(Icons.location_off_outlined, size: 48, color: Colors.grey[400]),
         const SizedBox(height: 12),
         Text(
           "No shipping address added",
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
+          style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (_) => AddressScreen()));
+              context,
+              MaterialPageRoute(builder: (_) => AddressScreen()),
+            );
           },
           icon: const Icon(Icons.add, size: 18),
           label: const Text("Add Address"),
@@ -381,14 +382,18 @@ class _PaymentMethodCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
-                color: AppColors.infoLight,
-                borderRadius: BorderRadius.circular(10),
+                color: const Color.fromARGB(255, 11, 89, 192),
+                shape: BoxShape.circle,
               ),
-              child: SvgPicture.asset(
-                "assets/stripe.svg",
-                height: 24,
+              child: Center(
+                child: SvgPicture.asset(
+                  "assets/stripe.svg",
+                  color: Colors.white,
+                  height: 30,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -398,10 +403,7 @@ class _PaymentMethodCard extends StatelessWidget {
                 children: [
                   const Text(
                     "Stripe Payment",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -414,7 +416,7 @@ class _PaymentMethodCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.credit_score_rounded,
               color: Colors.green,
               size: 24,
@@ -461,11 +463,7 @@ class OrderSummaryCard extends StatelessWidget {
               color: Colors.green,
             ),
           const Divider(),
-          _SummaryRow(
-            label: "Total",
-            value: "\$$totalAmount",
-            isTotal: true,
-          ),
+          _SummaryRow(label: "Total", value: "\$$totalAmount", isTotal: true),
         ],
       ),
     );
@@ -505,7 +503,9 @@ class _SummaryRow extends StatelessWidget {
             style: TextStyle(
               fontSize: isTotal ? 18 : 15,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w600,
-              color: color ?? (isTotal ? AppColors.primaryEnd : AppColors.primaryEnd),
+              color:
+                  color ??
+                  (isTotal ? AppColors.primaryEnd : AppColors.primaryEnd),
             ),
           ),
         ],
@@ -516,13 +516,13 @@ class _SummaryRow extends StatelessWidget {
 
 class _CheckoutBottomBar extends StatelessWidget {
   final int totalAmount;
-  final List<CartItemModel> cartItemModels; 
-  
- final int subtotal;  
+  final List<CartItemModel> cartItemModels;
+
+  final int subtotal;
 
   const _CheckoutBottomBar({
     required this.totalAmount,
-     required this.subtotal, 
+    required this.subtotal,
     required this.cartItemModels,
   });
 
@@ -570,78 +570,88 @@ class _CheckoutBottomBar extends StatelessWidget {
                   ],
                 ),
                 Container(
-  decoration: BoxDecoration(
-    gradient: AppColors.primaryGradient, 
-    borderRadius: BorderRadius.circular(12),
-  ),
-  child: Material(
-    color: Colors.transparent,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () async {
-        final statsVM = context.read<StatsViewModel>();
-        final orderVM = context.read<OrderViewModel>();
-        final couponVM = context.read<CouponViewModel>();
-        final addressVM = context.read<AddressViewModel>();
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        final statsVM = context.read<StatsViewModel>();
+                        final orderVM = context.read<OrderViewModel>();
+                        final couponVM = context.read<CouponViewModel>();
+                        final addressVM = context.read<AddressViewModel>();
 
-        bool success = await StripeServices.instance.makePayment(
-          amount: totalAmount,
-          currency: 'usd',
-          userName: "John Doe",
-          statsViewModel: statsVM,
-          cartItems: cartItemModels,
-        );
+                        bool success = await StripeServices.instance
+                            .makePayment(
+                              amount: totalAmount,
+                              currency: 'usd',
+                              userName: "John Doe",
+                              statsViewModel: statsVM,
+                              cartItems: cartItemModels,
+                            );
 
-        if (success) {
-          await orderVM.placeOrder(
-            items: cartItemModels,
-            subtotal: subtotal,
-            shipping: 15,
-            tax: 24,
-            discount: couponVM.discount,
-            totalAmount: totalAmount,
-            shippingAddress: addressVM.checkoutAddress != null
-                ? '${addressVM.checkoutAddress!.name}, '
-                  '${addressVM.checkoutAddress!.street}, '
-                  '${addressVM.checkoutAddress!.city}, '
-                  '${addressVM.checkoutAddress!.state} '
-                  '${addressVM.checkoutAddress!.zip}, '
-                  '${addressVM.checkoutAddress!.country}'
-                : '',
-          );
+                        if (success) {
+                          await orderVM.placeOrder(
+                            items: cartItemModels,
+                            subtotal: subtotal,
+                            shipping: 15,
+                            tax: 24,
+                            discount: couponVM.discount,
+                            totalAmount: totalAmount,
+                            shippingAddress: addressVM.checkoutAddress != null
+                                ? '${addressVM.checkoutAddress!.name}, '
+                                      '${addressVM.checkoutAddress!.street}, '
+                                      '${addressVM.checkoutAddress!.city}, '
+                                      '${addressVM.checkoutAddress!.state} '
+                                      '${addressVM.checkoutAddress!.zip}, '
+                                      '${addressVM.checkoutAddress!.country}'
+                                : '',
+                          );
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Purchase successful!')),
-          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Purchase successful!'),
+                            ),
+                          );
 
-          await Future.delayed(const Duration(seconds: 2));
-          Navigator.pop(context);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Payment failed!')),
-          );
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        child: Row(
-          children: const [
-            Text(
-              "Place Order",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 20, color: Colors.white),
-          ],
-        ),
-      ),
-    ),
-  ),
-),
+                          await Future.delayed(const Duration(seconds: 2));
+                          Navigator.pop(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Payment failed!')),
+                          );
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 16,
+                        ),
+                        child: Row(
+                          children: const [
+                            Text(
+                              "Place Order",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
