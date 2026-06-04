@@ -13,6 +13,7 @@ class BottomNavigation extends StatefulWidget {
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
 }
+
 class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
@@ -21,8 +22,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
     HomeScreen(),
     StoreScreen(),
     FavouriteScreen(),
-    ProfileScreen(),
     ChatScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -42,20 +43,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
-          setState(() => _selectedIndex = index); 
+          setState(() => _selectedIndex = index);
         },
         children: _screens,
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
-         
           margin: EdgeInsets.only(
             bottom: height * 0.015,
             left: width * 0.05,
             right: width * 0.05,
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: width * 0.03,
+            horizontal: width * 0.033,
             vertical: height * 0.015,
           ),
           decoration: BoxDecoration(
@@ -78,11 +78,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
             iconSize: width * 0.05,
             tabBorderRadius: 15,
             tabs: const [
-              GButton(icon: Icons.home, text: 'Home'),
-              GButton(icon: Icons.storefront_sharp, text: 'Store'),
-              GButton(icon: Iconsax.heart, text: 'Wishlist'),
-              GButton(icon: Icons.person, text: 'Profile'),
-              GButton(icon: Icons.chat_bubble_outline, text: 'Chat'),
+              GButton(icon: Icons.home, text: 'Home', iconSize: 24),
+              GButton(
+                icon: Icons.storefront_sharp,
+                text: 'Store',
+                iconSize: 24,
+              ),
+              GButton(icon: Iconsax.heart, text: 'Wishlist', iconSize: 24),
+              GButton(
+                icon: Icons.chat_bubble_outline,
+                text: 'Chat',
+                iconSize: 24,
+              ),
+              GButton(icon: Icons.person, text: 'Profile', iconSize: 24),
             ],
           ),
         ),

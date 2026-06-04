@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ecommerceapp/models/category_model.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/admin_view_model.dart';
 import 'package:ecommerceapp/views/admin_screens/brand_management_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
 
   @override
-  State<CategoryManagementScreen> createState() => _CategoryManagementScreenState();
+  State<CategoryManagementScreen> createState() =>
+      _CategoryManagementScreenState();
 }
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
@@ -20,14 +22,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   File? _selectedImage;
   final TextEditingController _searchController = TextEditingController();
 
-
-  final List<String> sortItems = [
-    'A → Z',
-    'Z → A',
-  'Date',
-  'Total Items',
-];
-String? selectedValue;
+  final List<String> sortItems = ['A → Z', 'Z → A', 'Date', 'Total Items'];
+  String? selectedValue;
 
   @override
   void initState() {
@@ -40,7 +36,7 @@ String? selectedValue;
   @override
   void dispose() {
     _categoryNameController.dispose();
-      _searchController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -59,267 +55,280 @@ String? selectedValue;
     }
   }
 
- void _showAddCategoryDialog() {
-  _categoryNameController.clear();
-  _selectedImage = null;
+  void _showAddCategoryDialog() {
+    _categoryNameController.clear();
+    _selectedImage = null;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Add Category'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: _categoryNameController,
-                  
-                    decoration: const InputDecoration(
-                      labelText: "Category Name",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Category'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: _categoryNameController,
 
-                  InkWell(
-                    onTap: () async {
-                      await _pickImage();
-                      setState(() {});
-                    },
-                    child: Container(
-                      height: 150,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
+                      decoration: const InputDecoration(
+                        labelText: "Category Name",
+                        border: OutlineInputBorder(),
                       ),
-                      child: _selectedImage != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                _selectedImage!,
-                                fit: BoxFit.cover,
+                    ),
+                    const SizedBox(height: 16),
+
+                    InkWell(
+                      onTap: () async {
+                        await _pickImage();
+                        setState(() {});
+                      },
+                      child: Container(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: _selectedImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  _selectedImage!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate, size: 50),
+                                  SizedBox(height: 8),
+                                  Text('Tap to select image'),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
+                ),
+                Consumer<AdminViewModel>(
+                  builder: (context, viewModel, child) {
+                    return ElevatedButton(
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () async {
+                              bool success = await viewModel.addCategory(
+                                _categoryNameController.text.trim(),
+                                _selectedImage,
+                              );
+
+                              if (!mounted) return;
+
+                              if (success) {
+                                Navigator.pop(dialogContext);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Category added'),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.red,
+                                    content: Text(
+                                      viewModel.errorMessage ??
+                                          'Something went wrong',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 18,
+                        ),
+                      ),
+
+                      child: viewModel.isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
                               ),
                             )
-                          : const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add_photo_alternate, size: 50),
-                                SizedBox(height: 8),
-                                Text('Tap to select image'),
-                              ],
+                          : const Text(
+                              "Add Category",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                    ),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showEditCategoryDialog(Category category) {
+    _categoryNameController.text = category.categoryName;
+    _selectedImage = null;
+
+    final categoryViewModel = context.read<AdminViewModel>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Edit Category'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _categoryNameController,
+                  decoration: const InputDecoration(
+                    labelText: "Category Name",
+                    border: OutlineInputBorder(),
                   ),
-                ],
-              ),
-            ),
-
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
-              ),
-              Consumer<AdminViewModel>(
-                builder: (context, viewModel, child) {
-                  return ElevatedButton(
-                    onPressed: viewModel.isLoading
-                        ? null
-                        : () async {
-                            bool success = await viewModel.addCategory(
-                              _categoryNameController.text.trim(),
-                              _selectedImage,
-                            );
-
-                            if (!mounted) return;
-
-                            if (success) {
-                              Navigator.pop(dialogContext);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Category added')),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor: Colors.red,
-                                  content: Text(
-                                      viewModel.errorMessage ??
-                                          'Something went wrong'),
-                                ),
-                              );
-                            }
-                          },
-
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 18,
-                      ),
+                ),
+                const SizedBox(height: 16),
+                InkWell(
+                  onTap: () async {
+                    await _pickImage();
+                    setState(() {});
+                  },
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-
-                    child: viewModel.isLoading
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                    child: _selectedImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _selectedImage!,
+                              fit: BoxFit.cover,
                             ),
                           )
-                        : const Text(
-                            "Add Category",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              category.imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(child: Icon(Icons.error));
+                              },
                             ),
                           ),
-                  );
-                },
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
-
- void _showEditCategoryDialog(Category category) {
-  _categoryNameController.text = category.categoryName;
-  _selectedImage = null;
-
-  final categoryViewModel = context.read<AdminViewModel>();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext dialogContext) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('Edit Category'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _categoryNameController,
-                decoration: const InputDecoration(
-                  labelText: "Category Name",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: () async {
-                  await _pickImage();
-                  setState(() {}); 
-                },
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: _selectedImage != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImage!,
-                            fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Tap image to change',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            Consumer<AdminViewModel>(
+              builder: (context, model, child) {
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 18,
+                    ),
+                  ),
+                  onPressed: model.isLoading
+                      ? null
+                      : () async {
+                          bool success = await categoryViewModel.updateCategory(
+                            category.id,
+                            _categoryNameController.text.trim(),
+                            _selectedImage,
+                            category.imageUrl,
+                          );
+
+                          if (success && dialogContext.mounted) {
+                            Navigator.pop(dialogContext);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Category updated successfully'),
+                              ),
+                            );
+                          } else if (dialogContext.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  categoryViewModel.errorMessage ??
+                                      'Failed to update category',
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                  child: model.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
                         )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            category.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(Icons.error),
-                              );
-                            },
+                      : const Text(
+                          "Update",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Tap image to change',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
+                );
+              },
+            ),
+          ],
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          Consumer<AdminViewModel>(
-            builder: (context, model, child) {
-              return ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
-                ),
-                onPressed: model.isLoading
-                    ? null
-                    : () async {
-                        bool success = await categoryViewModel.updateCategory(
-                          category.id,
-                          _categoryNameController.text.trim(),
-                          _selectedImage,
-                          category.imageUrl,
-                        );
-
-                        if (success && dialogContext.mounted) {
-                          Navigator.pop(dialogContext);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Category updated successfully')),
-                          );
-                        } else if (dialogContext.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(categoryViewModel.errorMessage ?? 'Failed to update category'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                child: model.isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Text(
-                        "Update",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              );
-            },
-          ),
-        ],
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _showDeleteConfirmation(Category category) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
         title: const Text('Delete Category'),
-        content: Text('Are you sure you want to delete "${category.categoryName}"?'),
+        content: Text(
+          'Are you sure you want to delete "${category.categoryName}"?',
+        ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -328,18 +337,25 @@ String? selectedValue;
           TextButton(
             onPressed: () async {
               final categoryViewModel = context.read<AdminViewModel>();
-              bool success = await categoryViewModel.deleteCategory(category.id);
+              bool success = await categoryViewModel.deleteCategory(
+                category.id,
+              );
 
               if (success && mounted) {
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category deleted successfully')),
+                  const SnackBar(
+                    content: Text('Category deleted successfully'),
+                  ),
                 );
               } else if (mounted) {
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(categoryViewModel.errorMessage ?? 'Failed to delete category'),
+                    content: Text(
+                      categoryViewModel.errorMessage ??
+                          'Failed to delete category',
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -357,9 +373,17 @@ String? selectedValue;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Category Management'),
+        title: const Text(
+          'Category Management',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
         centerTitle: true,
-        elevation: 2,
+
+        backgroundColor: const Color(0xFF3B82F6),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -367,24 +391,37 @@ String? selectedValue;
           children: [
             Row(
               children: [
-               Expanded(
-      child: TextFormField(
-        controller: _searchController,
-        onChanged: (value) {
-                setState(() {});
-              },
-        decoration: InputDecoration(
-          prefixIcon: Icon(Icons.search),
-          hintText: "Search category",
-          border: OutlineInputBorder(),
-        ),
-      ),
-    ),
+                SizedBox(
+                  height: 44,
+                  width: 210,
+                  child: TextFormField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Icon(Icons.search),
+                      ),
+                      prefixIconConstraints: const BoxConstraints(
+                        minWidth: 30,
+                        minHeight: 0,
+                      ),
+                      hintText: "Search category",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 1),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
                 InkWell(
                   onTap: _showAddCategoryDialog,
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(6),
                       color: Colors.blue,
                     ),
                     child: const Padding(
@@ -408,7 +445,10 @@ String? selectedValue;
             Consumer<AdminViewModel>(
               builder: (context, viewModel, child) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 5,
+                  ),
                   color: Colors.green[100],
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -420,72 +460,90 @@ String? selectedValue;
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 10,),
-                      
+                      SizedBox(width: 10),
+
                       SizedBox(
                         height: 50,
-  width: 150,
-  child: DropdownButtonFormField2<String>(
-    isExpanded: true,
-    decoration: InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8), 
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-    ),
-    hint: const Text(
-      'Sort By:',
-      style: TextStyle(fontSize: 12),
-    ),
-    items: sortItems
-        .map((item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
-                style: const TextStyle(fontSize: 12),
-              ),
-            ))
-        .toList(),
-    onChanged: (value) {
-  setState(() {
-    selectedValue = value;
+                        width: 150,
+                        child: DropdownButtonFormField2<String>(
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          hint: const Text(
+                            'Sort By:',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          items: sortItems
+                              .map(
+                                (item) => DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedValue = value;
 
-    final categories = context.read<AdminViewModel>().categories;
+                              final categories = context
+                                  .read<AdminViewModel>()
+                                  .categories;
 
-    if (value == 'A → Z') {
-      categories.sort((a, b) => a.categoryName.compareTo(b.categoryName));
-    } else if (value == 'Z → A') {
-      categories.sort((a, b) => b.categoryName.compareTo(a.categoryName));
-    } else if (value == 'Date') {
-      categories.sort((a, b) => b.createdAt.compareTo(a.createdAt)); 
-    } else if (value == 'Total Items') {
-      categories.sort((a, b) => b.totalItems.compareTo(a.totalItems));
-    }
-  });
-},
+                              if (value == 'A → Z') {
+                                categories.sort(
+                                  (a, b) =>
+                                      a.categoryName.compareTo(b.categoryName),
+                                );
+                              } else if (value == 'Z → A') {
+                                categories.sort(
+                                  (a, b) =>
+                                      b.categoryName.compareTo(a.categoryName),
+                                );
+                              } else if (value == 'Date') {
+                                categories.sort(
+                                  (a, b) => b.createdAt.compareTo(a.createdAt),
+                                );
+                              } else if (value == 'Total Items') {
+                                categories.sort(
+                                  (a, b) =>
+                                      b.totalItems.compareTo(a.totalItems),
+                                );
+                              }
+                            });
+                          },
 
-    buttonStyleData: const ButtonStyleData(
-      height: 40, 
-      padding: EdgeInsets.symmetric(horizontal: 8),
-    ),
-    iconStyleData: const IconStyleData(
-      icon: Icon(Icons.arrow_drop_down, color: Colors.black45),
-      iconSize: 20,
-    ),
-    dropdownStyleData: DropdownStyleData(
-      maxHeight: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-      ),
-    ),
-    menuItemStyleData: const MenuItemStyleData(
-      height: 35, 
-      padding: EdgeInsets.symmetric(horizontal: 8),
-    ),
-  ),
-)
-
-                     
+                          buttonStyleData: const ButtonStyleData(
+                            height: 40,
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          iconStyleData: const IconStyleData(
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black45,
+                            ),
+                            iconSize: 20,
+                          ),
+                          dropdownStyleData: DropdownStyleData(
+                            maxHeight: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            height: 35,
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -501,22 +559,25 @@ String? selectedValue;
 
                   if (viewModel.categories.isEmpty) {
                     return const Center(
-                      child: Text('No categories found. Add your first category!'),
+                      child: Text(
+                        'No categories found. Add your first category!',
+                      ),
                     );
                   }
 
                   final query = _searchController.text.toLowerCase();
 
-final filteredCategories = viewModel.categories.where((category) {
-  return query.isEmpty ||
-      category.categoryName.toLowerCase().contains(query);
-}).toList();
-      
+                  final filteredCategories = viewModel.categories.where((
+                    category,
+                  ) {
+                    return query.isEmpty ||
+                        category.categoryName.toLowerCase().contains(query);
+                  }).toList();
+
                   return ListView.builder(
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
                       final category = filteredCategories[index];
- 
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -530,32 +591,44 @@ final filteredCategories = viewModel.categories.where((category) {
                           ),
                           title: Text(category.categoryName),
                           subtitle: Text("Total items: ${category.totalItems}"),
-                       trailing: Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    IconButton(
-      icon: const Icon(Icons.branding_watermark, color: Colors.orange),
-      tooltip: 'Manage Brands',
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                BrandManagementScreen(category: category),
-          ),
-        );
-      },
-    ),
-    IconButton(
-      icon: const Icon(Icons.edit, color: Colors.blue),
-      onPressed: () => _showEditCategoryDialog(category),
-    ),
-    IconButton(
-      icon: const Icon(Icons.delete, color: Colors.red),
-      onPressed: () => _showDeleteConfirmation(category),
-    ),
-  ],
-),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.branding_watermark,
+                                  color: Colors.orange,
+                                ),
+                                tooltip: 'Manage Brands',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => BrandManagementScreen(
+                                        category: category,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () =>
+                                    _showEditCategoryDialog(category),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () =>
+                                    _showDeleteConfirmation(category),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
