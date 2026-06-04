@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart' as MyAppColor;
 
 class AppColors {
   static const Color lightBg = Color(0xFFF6F7FB);
@@ -2054,7 +2055,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     padding: const EdgeInsets.all(6),
     decoration: BoxDecoration(
       gradient: const LinearGradient(
-        colors: [AppColors.accent, AppColors.accentLight],
+        colors: [
+          Color.fromARGB(255, 21, 21, 22),
+          Color.fromARGB(255, 116, 117, 117),
+        ],
       ),
       borderRadius: BorderRadius.circular(10),
     ),
@@ -2071,9 +2075,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     width: 32,
     height: 32,
     decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [AppColors.accent, AppColors.accentLight],
-      ),
+      gradient: MyAppColor.AppColors.primaryGradient,
       borderRadius: BorderRadius.circular(10),
     ),
     child: const Icon(Icons.person_rounded, color: Colors.white, size: 18),
@@ -2102,8 +2104,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   BoxDecoration _userBubbleDecoration(bool isDark) => BoxDecoration(
     gradient: LinearGradient(
       colors: isDark
-          ? [AppColors.darkUserBubble, const Color(0xFF6366F1)]
-          : [AppColors.lightUserBubble, const Color(0xFF2D2D50)],
+          ? [
+              AppColors.lightUserBubble,
+              const Color.fromARGB(255, 127, 127, 134),
+            ]
+          : [
+              AppColors.lightUserBubble,
+              const Color.fromARGB(255, 127, 127, 134),
+            ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
@@ -2198,13 +2206,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       height: 36,
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.12),
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [
+                                  AppColors.lightUserBubble,
+                                  const Color.fromARGB(255, 78, 77, 77),
+                                ]
+                              : [
+                                  AppColors.lightUserBubble,
+                                  const Color.fromARGB(255, 78, 77, 77),
+                                ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Image.network(
                         kGrokLogoUrl,
                         fit: BoxFit.contain,
-                        color: AppColors.accent,
+                        color: AppColors.darkText,
                         errorBuilder: (_, __, ___) => const Icon(
                           Icons.smart_toy_rounded,
                           color: AppColors.accent,
@@ -2233,11 +2253,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       horizontal: 14,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.accent, AppColors.accentLight],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: MyAppColor.AppColors.cardGradient,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
@@ -2340,24 +2356,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.accent.withOpacity(0.1)
-                : Colors.transparent,
+            color: isActive ? Colors.transparent : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: isActive
                 ? Border.all(
-                    color: AppColors.accent.withOpacity(0.25),
+                    color: MyAppColor.AppColors.primaryDark.withBlue(200),
                     width: 1,
                   )
                 : null,
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.chat_bubble_outline_rounded,
-                size: 16,
-                color: isActive ? AppColors.accent : subText,
-              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -2368,7 +2377,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isActive ? AppColors.accent : textColor,
+                        color: isActive
+                            ? MyAppColor.AppColors.textPrimary(context)
+                            : textColor,
                         fontSize: 13,
                         fontWeight: isActive
                             ? FontWeight.w600
@@ -2430,43 +2441,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               child: Icon(Icons.menu_rounded, size: 20, color: textColor),
             ),
           ),
-          const SizedBox(width: 12),
 
-          Container(
-            width: 36,
-            height: 36,
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.accent, AppColors.accentLight],
-              ),
-              borderRadius: BorderRadius.circular(11),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.accentGlow,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Image.network(
-              kGrokLogoUrl,
-              fit: BoxFit.contain,
-              color: Colors.white,
-              errorBuilder: (_, __, ___) => const Icon(
-                Icons.smart_toy_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Grok AI Assistant',
+                  'Ecommerce AI Assistant',
                   style: TextStyle(
                     color: textColor,
                     fontSize: 15,
@@ -2475,26 +2457,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(height: 1),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Online • Ready to help',
-                      style: TextStyle(
-                        color: AppColors.success.withOpacity(0.9),
-                        fontSize: 11.5,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -2507,7 +2469,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 color: isDark ? AppColors.darkBg : AppColors.lightBg,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.edit_note_rounded, size: 20, color: textColor),
+              child: Icon(
+                Icons.add,
+                size: 20,
+                color: textColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

@@ -2,7 +2,7 @@ import 'package:ecommerceapp/views/home_screen/home_screen.dart';
 import 'package:ecommerceapp/views/whileList/favourite_screen.dart';
 import 'package:ecommerceapp/views/profile_screen/profile_screen.dart';
 import 'package:ecommerceapp/views/store_screen/store_screen.dart';
-import 'package:ecommerceapp/views/chat_screen/chat_screen.dart';
+import 'package:ecommerceapp/views/grok_screen/grok_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
