@@ -51,20 +51,23 @@ def get_products_context():
             image_urls_list = data.get('productImageUrls', [])
             image_url = image_urls_list[0] if image_urls_list else ''
 
-            if discount and int(discount) > 0:
-                discounted = int(price) - (int(price) * int(discount) / 100)
-                price_text = f"Rs {int(discounted)} (was Rs {price}, {discount}% off)"
+            if discount and int(float(discount)) > 0:
+                discounted = int(float(price)) - (int(float(price)) * int(float(discount)) / 100)
+                final_price = str(int(discounted))   
             else:
-                price_text = f"Rs {price}"
+                final_price = str(int(float(price)))
 
             product_list.append(
-                f"- {name} | Category: {category} | Price: {price_text} | {description[:60]}..."
+                f"- {name} | Category: {category} | Price: {final_price} | {description[:60]}..."
             )
 
             products_data.append({
-                'name': name.lower(),
-                'image_url': image_url
-            })
+               'name': name.lower(),
+               'image_url': image_url,
+               'price': final_price,   
+               'discount': str(int(float(discount or 0))),
+               'category': category,
+})
 
         if not product_list:
             return "No products currently available.", []
@@ -169,6 +172,93 @@ RULES:
 """
 
 
+def detect_intent(user_text, bot_text, products_data):
+    user_lower = user_text.lower()
+    bot_lower = bot_text.lower()
+
+    cart_keywords = ['add to cart', 'add it', 'add this', 'put in cart', 'buy it',
+                     'i want to buy', 'add', 'cart mein dalo', 'cart mein add']
+    checkout_keywords = ['checkout', 'place order', 'buy now', 'proceed',
+                         'order karna', 'order place']
+    wishlist_navigate_keywords = ['go to wishlist', 'open wishlist', 'show wishlist',
+                                  'view wishlist', 'wishlist dekho', 'my wishlist']
+    wishlist_keywords = ['add to wishlist', 'favourite', 'save it', 'wishlist mein']
+    navigate_keywords = ['go to cart', 'open cart', 'show cart', 'view cart', 'cart dekho']
+
+    intent = None
+    matched_products = []
+
+    if any(k in user_lower for k in cart_keywords):
+        intent = 'add_to_cart'
+    elif any(k in user_lower for k in checkout_keywords):
+        intent = 'checkout'
+    elif any(k in user_lower for k in wishlist_navigate_keywords):
+        intent = 'navigate_wishlist'
+    elif any(k in user_lower for k in wishlist_keywords):
+        intent = 'add_to_wishlist'
+    elif any(k in user_lower for k in navigate_keywords):
+        intent = 'navigate_cart'
+
+    if intent in ['add_to_cart', 'add_to_wishlist']:
+        combined = user_lower + ' ' + bot_lower
+
+      
+        add_all = any(k in user_lower for k in ['all', 'sab', 'everything', 'all products'])
+
+      
+        all_categories = set(p['category'].lower() for p in products_data if p.get('category'))
+
+        requested_category = None
+        for category in all_categories:
+            
+            category_words = [w for w in category.split() if len(w) > 3]
+            if category_words and all(w in user_lower for w in category_words):
+                requested_category = category
+                break
+            elif category in user_lower:
+                requested_category = category
+                break
+
+        for product in products_data:
+            if not product['image_url']:
+                continue
+
+            name = product['name']
+            product_category = product.get('category', '').lower()
+            words = [w for w in name.split() if len(w) > 3]
+            name_match = name in combined
+            word_match = words and all(w in combined for w in words)
+
+            if add_all:
+               
+                if requested_category:
+                    if product_category == requested_category:
+                        matched_products.append({
+                            'name': product['name'],
+                            'image_url': product['image_url'],
+                            'price': product.get('price', '0'),
+                            'discount': product.get('discount', '0'),
+                            'category': product.get('category', ''),
+                        })
+                else:
+                   
+                    matched_products.append({
+                        'name': product['name'],
+                        'image_url': product['image_url'],
+                        'price': product.get('price', '0'),
+                        'discount': product.get('discount', '0'),
+                        'category': product.get('category', ''),
+                    })
+            elif name_match or word_match:
+                matched_products.append({
+                    'name': product['name'],
+                    'image_url': product['image_url'],
+                    'price': product.get('price', '0'),
+                    'discount': product.get('discount', '0'),
+                    'category': product.get('category', ''),
+                })
+
+    return intent, matched_products
 
 class ChatSendAPIView(APIView):
     def post(self, request, *args, **kwargs):
@@ -247,7 +337,9 @@ class ChatSendAPIView(APIView):
         if matched_urls:
             bot_text = bot_text.strip() + "\n" + "\n".join(matched_urls)
 
-    
+        intent, matched_product = detect_intent(text, bot_text, products_data)  
+
+        
         bot_message = ChatMessage.objects.create(
             session=session,
             sender='bot',
@@ -255,10 +347,12 @@ class ChatSendAPIView(APIView):
         )
 
         return Response({
-            'session_id': str(session.id),
-            'user_message': ChatMessageSerializer(user_message).data,
-            'bot_message':  ChatMessageSerializer(bot_message).data,
-        }, status=status.HTTP_200_OK)
+    'session_id': str(session.id),
+    'user_message': ChatMessageSerializer(user_message).data,
+    'bot_message': ChatMessageSerializer(bot_message).data,
+    'intent': intent,
+    'intent_products': matched_product,
+}, status=status.HTTP_200_OK)
 
 
 
