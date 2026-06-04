@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -17,21 +18,28 @@ class DetailedSalesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primaryLight),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
           'Sales Details',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryLight,
+          ),
         ),
         backgroundColor: Colors.orange,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // ////
-            },
+            icon: const Icon(Icons.filter_list, color: AppColors.primaryLight),
+            onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: AppColors.primaryLight),
             onPressed: () {
               context.read<StatsViewModel>().refreshStats();
             },
@@ -61,8 +69,11 @@ class DetailedSalesScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Bounce(
-                      child: Icon(Icons.error_outline,
-                          size: 64, color: Colors.red[300]),
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red[300],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -90,14 +101,14 @@ class DetailedSalesScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-           
                 FadeInDown(
                   duration: const Duration(milliseconds: 600),
-                  child: const Text(
+                  child: Text(
                     'Sales Overview',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.primaryText(context),
                     ),
                   ),
                 ),
@@ -134,10 +145,11 @@ class DetailedSalesScreen extends StatelessWidget {
 
                 FadeInUp(
                   duration: const Duration(milliseconds: 800),
-                  child: const Text(
+                  child: Text(
                     'Sales Trend (Last 7 Days)',
                     style: TextStyle(
                       fontSize: 20,
+                      color: AppColors.primaryText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -156,26 +168,23 @@ class DetailedSalesScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Daily Breakdown',
                         style: TextStyle(
+                          color: AppColors.primaryText(context),
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         '${dailySales.length} days',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
 
-              
                 ...dailySales.entries.map((entry) {
                   final index = dailySales.keys.toList().indexOf(entry.key);
                   return _DailySalesCard(
@@ -193,22 +202,19 @@ class DetailedSalesScreen extends StatelessWidget {
   }
 
   Map<DateTime, List<Map<String, dynamic>>> _groupSalesByDate(
-      StatsViewModel statsVM) {
+    StatsViewModel statsVM,
+  ) {
     final Map<DateTime, List<Map<String, dynamic>>> grouped = {};
 
     for (var order in statsVM.recentOrders) {
-      
       DateTime orderDate;
-      
+
       if (order['timestamp'] != null) {
-     
         if (order['timestamp'] is DateTime) {
           orderDate = order['timestamp'];
         } else if (order['timestamp'].runtimeType.toString() == 'Timestamp') {
-       
           orderDate = order['timestamp'].toDate();
         } else {
-       
           try {
             orderDate = DateTime.parse(order['timestamp'].toString());
           } catch (e) {
@@ -234,7 +240,8 @@ class DetailedSalesScreen extends StatelessWidget {
   }
 
   String _calculateAverageSalesPerDay(
-      Map<DateTime, List<Map<String, dynamic>>> dailySales) {
+    Map<DateTime, List<Map<String, dynamic>>> dailySales,
+  ) {
     if (dailySales.isEmpty) return '0';
 
     double totalRevenue = 0;
@@ -368,10 +375,7 @@ class _WeeklySalesChart extends StatelessWidget {
             drawVerticalLine: false,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: Colors.grey[300]!,
-                strokeWidth: 1,
-              );
+              return FlLine(color: Colors.grey[300]!, strokeWidth: 1);
             },
           ),
           titlesData: FlTitlesData(
@@ -405,8 +409,12 @@ class _WeeklySalesChart extends StatelessWidget {
                 },
               ),
             ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           borderData: FlBorderData(show: false),
           lineBarsData: [
@@ -452,7 +460,11 @@ class _WeeklySalesChart extends StatelessWidget {
     final now = DateTime.now();
 
     for (int i = 6; i >= 0; i--) {
-      final date = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
+      final date = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: i));
       double dayTotal = 0;
 
       if (dailySales.containsKey(date)) {
@@ -553,19 +565,13 @@ class _DailySalesCard extends StatelessWidget {
             ),
             title: Text(
               DateFormat('EEEE, MMMM d, y').format(date),
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 '$totalItems items • \$$totalRevenue total',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
             ),
             trailing: Chip(
@@ -616,19 +622,17 @@ class _ProductSaleItem extends StatelessWidget {
   String _formatTimestamp(dynamic timestamp) {
     try {
       DateTime dateTime;
-      
+
       if (timestamp == null) {
         return 'N/A';
       } else if (timestamp is DateTime) {
         dateTime = timestamp;
       } else if (timestamp.runtimeType.toString() == 'Timestamp') {
-    
         dateTime = timestamp.toDate();
       } else {
-      
         dateTime = DateTime.parse(timestamp.toString());
       }
-      
+
       return DateFormat('hh:mm a').format(dateTime);
     } catch (e) {
       return 'N/A';
@@ -681,10 +685,7 @@ class _ProductSaleItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   sale['userName'] ?? 'Unknown User',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -710,10 +711,7 @@ class _ProductSaleItem extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       _formatTimestamp(sale['timestamp']),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -733,10 +731,7 @@ class _ProductSaleItem extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),

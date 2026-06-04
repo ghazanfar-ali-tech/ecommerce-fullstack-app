@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ecommerceapp/models/category_model.dart';
-import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/admin_view_model.dart';
 import 'package:ecommerceapp/views/admin_screens/brand_management_screen.dart';
 import 'package:flutter/material.dart';

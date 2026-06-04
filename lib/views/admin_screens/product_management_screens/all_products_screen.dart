@@ -1,4 +1,4 @@
-
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/views/admin_screens/product_management_screens/product_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -68,96 +68,295 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     }
   }
 
-  void _showEditDialog(BuildContext context, Map<String, dynamic> productData, String docId) {
-    final nameController = TextEditingController(text: productData['productName'] ?? '');
-    final priceController = TextEditingController(text: productData['productPrice']?.toString() ?? '');
-    final descriptionController = TextEditingController(text: productData['productDescription'] ?? '');
+  void _showEditDialog(
+    BuildContext context,
+    Map<String, dynamic> productData,
+    String docId,
+  ) {
+    final nameController = TextEditingController(
+      text: productData['productName'] ?? '',
+    );
+    final priceController = TextEditingController(
+      text: productData['productPrice']?.toString() ?? '',
+    );
+    final descriptionController = TextEditingController(
+      text: productData['productDescription'] ?? '',
+    );
+    final discountController = TextEditingController(
+      text: productData['productDiscount']?.toString() ?? '',
+    );
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Product'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Product Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: priceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Price',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descriptionController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+      builder: (context) {
+        final size = MediaQuery.of(context).size;
+        return Dialog(
+          backgroundColor: AppColors.cardBackground(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: size.width * 0.05,
+            vertical: size.height * 0.08,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                await FirebaseFirestore.instance
-                    .collection('products')
-                    .doc(docId)
-                    .update({
-                  'productName': nameController.text,
-                  'productPrice': double.tryParse(priceController.text) ?? 0,
-                  'productDescription': descriptionController.text,
-                });
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Edit Product',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary(context),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant(context),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: AppColors.textSecondary(context),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
 
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Product updated successfully'),
-                      backgroundColor: Colors.green,
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _editField(
+                          context: context,
+                          controller: nameController,
+                          label: 'Product Name',
+                          icon: Icons.shopping_bag_outlined,
+                        ),
+                        const SizedBox(height: 12),
+                        _editField(
+                          context: context,
+                          controller: priceController,
+                          label: 'Price (Rs)',
+                          icon: Icons.payments_outlined,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 12),
+                        _editField(
+                          context: context,
+                          controller: discountController,
+                          label: 'Discount (%)',
+                          icon: Icons.discount_outlined,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 12),
+                        _editField(
+                          context: context,
+                          controller: descriptionController,
+                          label: 'Description',
+                          icon: Icons.description_outlined,
+                          maxLines: 3,
+                        ),
+                      ],
                     ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error updating product: $e'),
-                      backgroundColor: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          side: BorderSide(color: AppColors.border(context)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  );
-                }
-              }
-            },
-            child: const Text('Update'),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: AppColors.primaryShadow,
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection('products')
+                                  .doc(docId)
+                                  .update({
+                                    'productName': nameController.text.trim(),
+                                    'productPrice':
+                                        int.tryParse(
+                                          priceController.text.trim(),
+                                        ) ??
+                                        0,
+                                    'productDiscount':
+                                        int.tryParse(
+                                          discountController.text.trim(),
+                                        ) ??
+                                        0,
+                                    'productDescription': descriptionController
+                                        .text
+                                        .trim(),
+                                  });
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_outline,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text('Product updated successfully'),
+                                      ],
+                                    ),
+                                    backgroundColor: AppColors.success,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    margin: const EdgeInsets.all(12),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error: $e'),
+                                    backgroundColor: AppColors.error,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    margin: const EdgeInsets.all(12),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Update',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  Widget _editField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: AppColors.textSecondary(context),
+          fontSize: 13,
+        ),
+        prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
+        filled: true,
+        fillColor: AppColors.surfaceVariant(context),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.border(context)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
       ),
     );
   }
 
-  List<QueryDocumentSnapshot> _filterProducts(List<QueryDocumentSnapshot> products) {
+  List<QueryDocumentSnapshot> _filterProducts(
+    List<QueryDocumentSnapshot> products,
+  ) {
     if (searchQuery.isEmpty) {
       return products;
     }
-    
+
     return products.where((doc) {
       final productData = doc.data() as Map<String, dynamic>;
       final name = (productData['productName'] ?? '').toString().toLowerCase();
@@ -169,7 +368,16 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("All Products"),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF3B82F6),
+        title: const Text(
+          "All Products",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -184,29 +392,51 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      controller: searchController,
-                      decoration: const InputDecoration(
-                        hintText: "Search products...",
-                        prefixIcon: Icon(Icons.search),
+                    child: SizedBox(
+                      height: 44,
+                      width: 210,
+                      child: TextFormField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Icon(Icons.search),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 30,
+                            minHeight: 0,
+                          ),
+                          hintText: "Search Products..",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 1),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value;
+                          });
+                        },
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery = value;
-                        });
-                      },
                     ),
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductManagementScreen())),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductManagementScreen(),
+                      ),
+                    ),
                     child: Container(
+                      height: 44,
+                      width: 150,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(6),
                         color: Colors.blue,
                       ),
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                        padding: EdgeInsets.all(8.0),
                         child: Center(
                           child: Text(
                             "+ Add Products",
@@ -222,24 +452,17 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Products"),
-                  const Text("Price"),
-                  const Text("Action"),
-                ],
-              ),
-              const SizedBox(height: 15),
-              
+
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('products').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('products')
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
-
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -249,88 +472,280 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
                   if (filteredProducts.isEmpty) {
                     return Center(
-                      child: Text(
-                        searchQuery.isEmpty ? 'No products found' : 'No products match your search',
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 48,
+                            color: AppColors.textHint(context),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            searchQuery.isEmpty
+                                ? 'No products found'
+                                : 'No products match your search',
+                            style: TextStyle(
+                              color: AppColors.textSecondary(context),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
 
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final doc = filteredProducts[index];
-                      final docId = doc.id;
-                      final productData = doc.data() as Map<String, dynamic>;
-                      
-                      final productName = productData['productName'] ?? 'N/A';
-                      final productPrice = (productData['productPrice'] ?? 0).toString();
-                      final productImageUrls = (productData['productImageUrls'] as List<dynamic>?)
-                              ?.map((url) => url.toString())
-                              .toList() ??
-                          [];
-                      final productImage = productImageUrls.isNotEmpty ? productImageUrls[0] : '';
+                  final size = MediaQuery.of(context).size;
+                  final isTablet = size.width > 600;
 
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage: productImage.isNotEmpty ? NetworkImage(productImage) : null,
-                                child: productImage.isEmpty ? const Icon(Icons.image_not_supported) : null,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant(context),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: isTablet ? 50 : 40,
+                              child: Text(
+                                'Image',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary(context),
+                                ),
                               ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Product',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary(context),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: isTablet ? 90 : 70,
+                              child: Text(
+                                'Price',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary(context),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: isTablet ? 100 : 80,
+                              child: Text(
+                                'Actions',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary(context),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
 
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredProducts.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final doc = filteredProducts[index];
+                          final docId = doc.id;
+                          final productData =
+                              doc.data() as Map<String, dynamic>;
+
+                          final productName =
+                              productData['productName'] ?? 'N/A';
+                          final productPrice =
+                              (productData['productPrice'] ?? 0).toString();
+                          final productImageUrls =
+                              (productData['productImageUrls']
+                                      as List<dynamic>?)
+                                  ?.map((url) => url.toString())
+                                  .toList() ??
+                              [];
+                          final productImage = productImageUrls.isNotEmpty
+                              ? productImageUrls[0]
+                              : '';
+
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: isTablet ? 14 : 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardBackground(context),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: AppColors.border(context),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadow(context),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: isTablet ? 50 : 42,
+                                  height: isTablet ? 50 : 42,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceVariant(context),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.border(context),
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: productImage.isNotEmpty
+                                        ? Image.network(
+                                            productImage,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Icon(
+                                              Icons
+                                                  .image_not_supported_outlined,
+                                              size: 20,
+                                              color: AppColors.textHint(
+                                                context,
+                                              ),
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.image_not_supported_outlined,
+                                            size: 20,
+                                            color: AppColors.textHint(context),
+                                          ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+
+                                Expanded(
                                   child: Text(
                                     productName,
                                     overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      fontSize: isTablet ? 14 : 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textPrimary(context),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
 
-                              Text("\$ $productPrice"),
-
-                              Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: Colors.black),
+                                SizedBox(
+                                  width: isTablet ? 90 : 70,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
                                     ),
-                                    child: IconButton(
-                                      iconSize: 16,
-                                      icon: const Icon(Icons.edit_outlined),
-                                      onPressed: () {
-                                        _showEditDialog(context, productData, docId);
-                                      },
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryLight,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Rs $productPrice',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(width: 5),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: IconButton(
-                                      iconSize: 18,
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () {
-                                        _deleteProduct(context, docId);
-                                      },
-                                    ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                SizedBox(
+                                  width: isTablet ? 100 : 80,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () => _showEditDialog(
+                                          context,
+                                          productData,
+                                          docId,
+                                        ),
+                                        child: Container(
+                                          width: 34,
+                                          height: 34,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight,
+                                            borderRadius: BorderRadius.circular(
+                                              9,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.primary
+                                                  .withOpacity(0.2),
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.edit_outlined,
+                                            size: 16,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+
+                                      GestureDetector(
+                                        onTap: () =>
+                                            _deleteProduct(context, docId),
+                                        child: Container(
+                                          width: 34,
+                                          height: 34,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.errorLight,
+                                            borderRadius: BorderRadius.circular(
+                                              9,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.error
+                                                  .withOpacity(0.2),
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            size: 16,
+                                            color: AppColors.error,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               ),

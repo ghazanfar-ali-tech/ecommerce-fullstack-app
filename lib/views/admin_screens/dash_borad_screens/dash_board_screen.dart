@@ -1,3 +1,4 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/views/admin_screens/dash_borad_screens/empty_screen.dart';
 import 'package:ecommerceapp/views/admin_screens/statistics_screens/animated_sales_button.dart';
 import 'package:ecommerceapp/views/admin_screens/statistics_screens/detail_stats_screen.dart';
@@ -19,15 +20,15 @@ class DashBoardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Dashboard',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         backgroundColor: Colors.orange,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: AppColors.primaryLight),
             onPressed: () {
               context.read<StatsViewModel>().refreshStats();
             },
@@ -57,8 +58,11 @@ class DashBoardScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Bounce(
-                      child: Icon(Icons.error_outline,
-                          size: 64, color: Colors.red[300]),
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red[300],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -87,20 +91,19 @@ class DashBoardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-       
                 FadeInDown(
                   duration: const Duration(milliseconds: 600),
-                  child: const Text(
+                  child: Text(
                     'Balance Overview',
                     style: TextStyle(
                       fontSize: 22,
+                      color: AppColors.primaryText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Stats Cards Row
                 Row(
                   children: [
                     Expanded(
@@ -175,10 +178,11 @@ class DashBoardScreen extends StatelessWidget {
 
                 FadeInUp(
                   duration: const Duration(milliseconds: 800),
-                  child: const Text(
+                  child: Text(
                     'Top Categories',
                     style: TextStyle(
                       fontSize: 20,
+                      color: AppColors.primaryText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -194,10 +198,11 @@ class DashBoardScreen extends StatelessWidget {
 
                 FadeInUp(
                   duration: const Duration(milliseconds: 800),
-                  child: const Text(
+                  child: Text(
                     'Top Selling Products',
                     style: TextStyle(
                       fontSize: 20,
+                      color: AppColors.primaryText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -213,10 +218,11 @@ class DashBoardScreen extends StatelessWidget {
 
                 FadeInUp(
                   duration: const Duration(milliseconds: 800),
-                  child: const Text(
+                  child: Text(
                     'Recent Orders',
                     style: TextStyle(
                       fontSize: 20,
+                      color: AppColors.primaryText(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -226,18 +232,18 @@ class DashBoardScreen extends StatelessWidget {
                 _RecentOrdersList(statsVM: statsVM),
                 const SizedBox(height: 24),
 
-AnimatedDetailedSalesButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DetailedSalesScreen(),
-      ),
-    );
-  },
-),
+                AnimatedDetailedSalesButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DetailedSalesScreen(),
+                      ),
+                    );
+                  },
+                ),
 
-const SizedBox(height: 24),
+                const SizedBox(height: 24),
               ],
             ),
           );
@@ -246,6 +252,7 @@ const SizedBox(height: 24),
     );
   }
 }
+
 class _StatCard extends StatefulWidget {
   final String title;
   final num value;
@@ -283,8 +290,7 @@ class _StatCardState extends State<_StatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.all(widget.isLarge ? 20 : 16),
-        transform: Matrix4.identity()
-          ..scale(_isPressed ? 0.95 : 1.0),
+        transform: Matrix4.identity()..scale(_isPressed ? 0.95 : 1.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -318,7 +324,11 @@ class _StatCardState extends State<_StatCard> {
                   Bounce(
                     infinite: true,
                     duration: const Duration(seconds: 2),
-                    child: Icon(Icons.arrow_upward, color: Colors.green, size: 20),
+                    child: Icon(
+                      Icons.arrow_upward,
+                      color: Colors.green,
+                      size: 20,
+                    ),
                   ),
               ],
             ),
@@ -371,11 +381,13 @@ class _AnimatedNumberState extends AnimatedWidgetBaseState<AnimatedNumber> {
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _valueTween = visitor(
-      _valueTween,
-      widget.value,
-      (dynamic value) => Tween<num>(begin: value as num),
-    ) as Tween<num>?;
+    _valueTween =
+        visitor(
+              _valueTween,
+              widget.value,
+              (dynamic value) => Tween<num>(begin: value as num),
+            )
+            as Tween<num>?;
   }
 
   @override
@@ -384,10 +396,7 @@ class _AnimatedNumberState extends AnimatedWidgetBaseState<AnimatedNumber> {
     final displayValue = widget.isLarge && widget.value is double
         ? currentValue.toStringAsFixed(2)
         : currentValue.toInt().toString();
-    return Text(
-      '${widget.prefix ?? ''}$displayValue',
-      style: widget.style,
-    );
+    return Text('${widget.prefix ?? ''}$displayValue', style: widget.style);
   }
 }
 
@@ -434,28 +443,32 @@ class _CategoryPieChart extends StatelessWidget {
                       return;
                     }
                     statsVM.setTouchedPieIndex(
-                        pieTouchResponse.touchedSection!.touchedSectionIndex);
+                      pieTouchResponse.touchedSection!.touchedSectionIndex,
+                    );
                   },
                 ),
                 sectionsSpace: 2,
                 centerSpaceRadius: 45,
-                sections: _generatePieSections(topCategories, statsVM.touchedPieIndex),
+                sections: _generatePieSections(
+                  topCategories,
+                  statsVM.touchedPieIndex,
+                ),
               ),
               duration: const Duration(milliseconds: 1200),
               curve: Curves.elasticOut,
             ),
           ),
           const SizedBox(width: 16),
-          Expanded(
-            child: _CategoryLegend(categories: topCategories),
-          ),
+          Expanded(child: _CategoryLegend(categories: topCategories)),
         ],
       ),
     );
   }
 
   List<PieChartSectionData> _generatePieSections(
-      List<MapEntry<String, int>> categories, int touchedIndex) {
+    List<MapEntry<String, int>> categories,
+    int touchedIndex,
+  ) {
     final colors = [
       Colors.blue,
       Colors.orange,
@@ -489,7 +502,6 @@ class _CategoryPieChart extends StatelessWidget {
   }
 }
 
-// Category Legend with animations
 class _CategoryLegend extends StatelessWidget {
   final List<MapEntry<String, int>> categories;
 
@@ -588,7 +600,7 @@ class _TopProductsBarChart extends StatelessWidget {
             },
             touchTooltipData: BarTouchTooltipData(
               getTooltipColor: (group) => Colors.grey[800]!,
-              //tooltipRoundedRadius: 8,
+
               tooltipPadding: const EdgeInsets.all(8),
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 final product = topProducts[groupIndex];
@@ -618,7 +630,8 @@ class _TopProductsBarChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= topProducts.length) return const Text('');
+                  if (value.toInt() >= topProducts.length)
+                    return const Text('');
                   final productName = topProducts[value.toInt()].key;
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -644,18 +657,19 @@ class _TopProductsBarChart extends StatelessWidget {
                 },
               ),
             ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: Colors.grey[300]!,
-                strokeWidth: 1,
-              );
+              return FlLine(color: Colors.grey[300]!, strokeWidth: 1);
             },
           ),
           borderData: FlBorderData(show: false),
@@ -668,7 +682,9 @@ class _TopProductsBarChart extends StatelessWidget {
   }
 
   List<BarChartGroupData> _generateBarGroups(
-      List<MapEntry<String, int>> topProducts, int touchedIndex) {
+    List<MapEntry<String, int>> topProducts,
+    int touchedIndex,
+  ) {
     return List.generate(
       topProducts.length,
       (index) => BarChartGroupData(
@@ -684,9 +700,7 @@ class _TopProductsBarChart extends StatelessWidget {
               end: Alignment.topCenter,
             ),
             width: index == touchedIndex ? 28 : 22,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(8),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
               toY: topProducts.first.value.toDouble() * 1.2,
@@ -748,8 +762,10 @@ class _RecentOrdersList extends StatelessWidget {
                           width: 60,
                           height: 60,
                           color: Colors.grey[200],
-                          child: Icon(Icons.image_outlined,
-                              color: Colors.grey[400]),
+                          child: Icon(
+                            Icons.image_outlined,
+                            color: Colors.grey[400],
+                          ),
                         );
                       },
                     ),
@@ -831,5 +847,3 @@ class _RecentOrdersList extends StatelessWidget {
     );
   }
 }
-
-
