@@ -15,430 +15,515 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final padding = MediaQuery.paddingOf(context);
+    final isSmall = size.height < 700;
+
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    width: MediaQuery.sizeOf(context).width,
-                    height: MediaQuery.sizeOf(context).height * 0.4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                      ),
-                      gradient: AppColors.heroGradient,
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        width: MediaQuery.sizeOf(context).width * 0.6,
-                        height: MediaQuery.sizeOf(context).height * 0.6,
-                        child: Lottie.asset(
-                          'assets/Animation - 1743764351883.json',
+      body: Stack(
+        children: [
+          Container(
+            width: size.width,
+            height: size.height * (isSmall ? 0.38 : 0.42),
+            decoration: BoxDecoration(
+              gradient: AppColors.heroGradient,
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(40),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: size.height * (isSmall ? 0.28 : 0.32),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        top: size.height * 0.01,
+                        child: SizedBox(
+                          width: size.width * 0.55,
+                          height: size.height * 0.22,
+                          child: Lottie.asset(
+                            'assets/Animation - 1743764351883.json',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 295,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardBackground(context),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(23),
-                          topRight: Radius.circular(23),
-                        ),
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                        ),
+                      Positioned(
+                        bottom: isSmall ? 4 : 10,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: 10),
-                            Container(
-                              height: 47,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border.all(
-                                  color: AppColors.primary,
-                                  width: 0.5,
-                                ),
-                                color: AppColors.surfaceVariant(context),
-                              ),
-                              child: Consumer<AuthViewModel>(
-                                builder: (context, model, child) {
-                                  return Stack(
-                                    children: [
-                                      AnimatedAlign(
-                                        duration: Duration(milliseconds: 400),
-                                        curve: Curves.easeInOut,
-                                        alignment: model.isLoginSelected
-                                            ? Alignment.centerLeft
-                                            : Alignment.centerRight,
-                                        child: Container(
-                                          width: 150,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            gradient: AppColors.primaryGradient,
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 300,
-                                        height: 50,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SizedBox(
-                                              width: 140,
-                                              child: TextButton(
-                                                onPressed: () =>
-                                                    model.selectLogin(),
-                                                child: Text(
-                                                  "Login",
-                                                  style: TextStyle(
-                                                    fontSize: 15.3,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: model.isLoginSelected
-                                                        ? Colors.white
-                                                        : AppColors.primaryText(
-                                                            context,
-                                                          ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 140,
-                                              child: TextButton(
-                                                onPressed: () =>
-                                                    model.selectSignIn(),
-                                                child: Text(
-                                                  "Sign Up",
-                                                  style: TextStyle(
-                                                    fontSize: 15.3,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: model.isLoginSelected
-                                                        ? AppColors.primaryText(
-                                                            context,
-                                                          )
-                                                        : Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                            Text(
+                              'Welcome Back',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: size.width * 0.055,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
                               ),
                             ),
-
-                            SizedBox(height: 20),
-
-                            Consumer<AuthViewModel>(
-                              builder: (context, model, child) {
-                                return Form(
-                                  key: _formkey,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      AnimatedSize(
-                                        duration: Duration(milliseconds: 400),
-                                        curve: Curves.easeInOut,
-                                        child: AnimatedSwitcher(
-                                          duration: Duration(milliseconds: 400),
-                                          transitionBuilder:
-                                              (child, animation) {
-                                                final offsetAnim =
-                                                    Tween<Offset>(
-                                                      begin: Offset(0, -0.3),
-                                                      end: Offset(0, 0),
-                                                    ).animate(
-                                                      CurvedAnimation(
-                                                        parent: animation,
-                                                        curve: Curves.easeInOut,
-                                                      ),
-                                                    );
-                                                return SlideTransition(
-                                                  position: offsetAnim,
-                                                  child: FadeTransition(
-                                                    opacity: animation,
-                                                    child: child,
-                                                  ),
-                                                );
-                                              },
-                                          child: model.isLoginSelected
-                                              ? SizedBox.shrink(
-                                                  key: ValueKey('empty'),
-                                                )
-                                              : Column(
-                                                  children: [
-                                                    customField(
-                                                      context: context,
-                                                      controller: context
-                                                          .read<AuthViewModel>()
-                                                          .usernameController,
-                                                      hintName: "Name",
-                                                      icon: Icons.person,
-                                                      labelText: "Name",
-                                                      validator: (value) {
-                                                        if (value!.isEmpty) {
-                                                          return "Enter user name";
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                  ],
-                                                ),
-                                        ),
-                                      ),
-
-                                      AnimatedSlide(
-                                        duration: Duration(milliseconds: 400),
-                                        curve: Curves.easeInOut,
-                                        offset: model.isLoginSelected
-                                            ? Offset(0, 0)
-                                            : Offset(0, 0),
-                                        child: Column(
-                                          children: [
-                                            customField(
-                                              context: context,
-                                              controller: context
-                                                  .read<AuthViewModel>()
-                                                  .emailController,
-                                              hintName: "Email",
-                                              icon: Icons.email_outlined,
-                                              labelText: "Email",
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return "Enter email";
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                            SizedBox(height: 10),
-                                            customField(
-                                              context: context,
-                                              controller: context
-                                                  .read<AuthViewModel>()
-                                                  .passwordController,
-                                              hintName: "Password",
-                                              labelText: "Password",
-                                              icon: Icons.lock_outline_rounded,
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return "Enter Password";
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-
-                            SizedBox(height: 5),
-
-                            Consumer<AuthViewModel>(
-                              builder: (context, model, child) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (model.isLoginSelected) {
-                                      print("Login clicked");
-                                      model.login(
-                                        context,
-                                        context.read<NotificationViewModel>(),
-                                      );
-                                    } else {
-                                      print("Sign Up clicked");
-                                      model.signUp(
-                                        context,
-                                        context.read<NotificationViewModel>(),
-                                      );
-                                    }
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: Duration(milliseconds: 600),
-                                    curve: Curves.easeInOut,
-                                    margin: EdgeInsets.only(top: 20),
-                                    width: 300,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      boxShadow: [BoxShadow()],
-                                      gradient: AppColors.primaryGradient,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Center(
-                                      child: AnimatedSwitcher(
-                                        duration: Duration(milliseconds: 600),
-                                        transitionBuilder: (child, animation) {
-                                          final offsetAnim = Tween<Offset>(
-                                            begin: Offset(0, -0.5),
-                                            end: Offset(0, 0),
-                                          ).animate(animation);
-                                          return SlideTransition(
-                                            position: offsetAnim,
-                                            child: FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          model.isLoginSelected
-                                              ? "Login"
-                                              : "Sign Up",
-                                          key: ValueKey(model.isLoginSelected),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.02,
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ForgotPasswordScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  'Forgot password',
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 85, 59, 59),
-                                  ),
-                                ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Sign in to continue shopping',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.65),
+                                fontSize: size.width * 0.032,
+                                letterSpacing: 0.2,
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      thickness: 1.2,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                    ),
-                                    child: Text(
-                                      'Or',
-                                      style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Divider(
-                                      thickness: 1.2,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () async {
-                                    final user = await context
-                                        .read<AuthViewModel>()
-                                        .loginWithGoogle(context);
-                                    if (user != null) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => BottomNavigation(),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => AuthScreen(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: Image(
-                                    height: 35,
-                                    width: 35,
-                                    image: AssetImage("assets/google.png"),
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    final user = await context
-                                        .read<AuthViewModel>()
-                                        .loginWithFacebook(context);
-                                    if (user != null) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => BottomNavigation(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: Image(
-                                    height: 35,
-                                    width: 35,
-                                    image: AssetImage("assets/facebook.png"),
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
                         ),
                       ),
+                    ],
+                  ),
+                ),
+
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBackground(context),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow(context),
+                          blurRadius: 24,
+                          offset: const Offset(0, -4),
+                        ),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.only(
+                        left: size.width * 0.06,
+                        right: size.width * 0.06,
+                        top: size.height * 0.025,
+                        bottom:
+                            MediaQuery.of(context).viewInsets.bottom +
+                            padding.bottom +
+                            20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: AppColors.border(context),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.025),
+
+                          Consumer<AuthViewModel>(
+                            builder: (context, model, _) {
+                              return Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceVariant(context),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: AppColors.border(context),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    AnimatedAlign(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      alignment: model.isLoginSelected
+                                          ? Alignment.centerLeft
+                                          : Alignment.centerRight,
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.5,
+                                        child: Container(
+                                          margin: const EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                            gradient: AppColors.primaryGradient,
+                                            borderRadius: BorderRadius.circular(
+                                              11,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withOpacity(0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: model.selectLogin,
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Center(
+                                              child: Text(
+                                                'Login',
+                                                style: TextStyle(
+                                                  fontSize: size.width * 0.038,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: model.isLoginSelected
+                                                      ? Colors.white
+                                                      : AppColors.textSecondary(
+                                                          context,
+                                                        ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: model.selectSignIn,
+                                            behavior: HitTestBehavior.opaque,
+                                            child: Center(
+                                              child: Text(
+                                                'Sign Up',
+                                                style: TextStyle(
+                                                  fontSize: size.width * 0.038,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: !model.isLoginSelected
+                                                      ? Colors.white
+                                                      : AppColors.textSecondary(
+                                                          context,
+                                                        ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+
+                          SizedBox(height: size.height * 0.03),
+
+                          Consumer<AuthViewModel>(
+                            builder: (context, model, _) {
+                              return Form(
+                                key: _formkey,
+                                child: Column(
+                                  children: [
+                                    AnimatedSize(
+                                      duration: const Duration(
+                                        milliseconds: 350,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      child: model.isLoginSelected
+                                          ? const SizedBox.shrink()
+                                          : Column(
+                                              children: [
+                                                customField(
+                                                  context: context,
+                                                  controller: context
+                                                      .read<AuthViewModel>()
+                                                      .usernameController,
+                                                  hintName: 'Full name',
+                                                  icon: Icons.person_outline,
+                                                  labelText: 'Name',
+                                                  validator: (v) => v!.isEmpty
+                                                      ? 'Enter your name'
+                                                      : null,
+                                                ),
+                                                SizedBox(
+                                                  height: size.height * 0.016,
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+
+                                    customField(
+                                      context: context,
+                                      controller: context
+                                          .read<AuthViewModel>()
+                                          .emailController,
+                                      hintName: 'Email address',
+                                      icon: Icons.email_outlined,
+                                      labelText: 'Email',
+                                      validator: (v) =>
+                                          v!.isEmpty ? 'Enter email' : null,
+                                    ),
+                                    SizedBox(height: size.height * 0.016),
+
+                                    customField(
+                                      context: context,
+                                      controller: context
+                                          .read<AuthViewModel>()
+                                          .passwordController,
+                                      hintName: 'Password',
+                                      labelText: 'Password',
+                                      icon: Icons.lock_outline_rounded,
+                                      validator: (v) =>
+                                          v!.isEmpty ? 'Enter password' : null,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ForgotPasswordScreen(),
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                  horizontal: 2,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                'Forgot password?',
+                                style: TextStyle(
+                                  color: AppColors.primaryText(context),
+                                  fontSize: size.width * 0.033,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: size.height * 0.018),
+
+                          Consumer<AuthViewModel>(
+                            builder: (context, model, _) {
+                              return SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.primaryGradient,
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: AppColors.primaryShadow,
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: () {
+                                        if (model.isLoginSelected) {
+                                          model.login(
+                                            context,
+                                            context
+                                                .read<NotificationViewModel>(),
+                                          );
+                                        } else {
+                                          model.signUp(
+                                            context,
+                                            context
+                                                .read<NotificationViewModel>(),
+                                          );
+                                        }
+                                      },
+                                      child: Center(
+                                        child: model.loading
+                                            ? const SizedBox(
+                                                width: 22,
+                                                height: 22,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                      strokeWidth: 2.5,
+                                                    ),
+                                              )
+                                            : AnimatedSwitcher(
+                                                duration: const Duration(
+                                                  milliseconds: 300,
+                                                ),
+                                                child: Text(
+                                                  model.isLoginSelected
+                                                      ? 'Login'
+                                                      : 'Create Account',
+                                                  key: ValueKey(
+                                                    model.isLoginSelected,
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        size.width * 0.042,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.3,
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          SizedBox(height: size.height * 0.025),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: AppColors.border(context),
+                                  thickness: 1,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                child: Text(
+                                  'or continue with',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary(context),
+                                    fontSize: size.width * 0.03,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: AppColors.border(context),
+                                  thickness: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: size.height * 0.022),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _SocialButton(
+                                assetPath: 'assets/google.png',
+                                label: 'Google',
+                                size: size,
+                                context: context,
+                                onTap: () async {
+                                  final user = await context
+                                      .read<AuthViewModel>()
+                                      .loginWithGoogle(context);
+                                  if (user != null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BottomNavigation(),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => AuthScreen(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              SizedBox(width: size.width * 0.04),
+
+                              _SocialButton(
+                                assetPath: 'assets/facebook.png',
+                                label: 'Facebook',
+                                size: size,
+                                context: context,
+                                onTap: () async {
+                                  final user = await context
+                                      .read<AuthViewModel>()
+                                      .loginWithFacebook(context);
+                                  if (user != null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BottomNavigation(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: size.height * 0.02),
+                        ],
+                      ),
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({
+    required this.assetPath,
+    required this.label,
+    required this.size,
+    required this.context,
+    required this.onTap,
+  });
+
+  final String assetPath;
+  final String label;
+  final Size size;
+  final BuildContext context;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext ctx) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size.width * 0.38,
+        height: 50,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant(context),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: AppColors.border(context), width: 0.8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(assetPath, width: 22, height: 22, fit: BoxFit.contain),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: size.width * 0.033,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],

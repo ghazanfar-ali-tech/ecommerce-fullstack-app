@@ -17,21 +17,21 @@ class GoogleSignInService {
   }
   static Future<UserCredential?> signInWithGoogle() async {
     try {
-      initSignIn();
+      await initSignIn();
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
       final idToken = googleUser.authentication.idToken;
       final authorizationClient = googleUser.authorizationClient;
       GoogleSignInClientAuthorization? authorization = await authorizationClient
           .authorizationForScopes(['email', 'profile']);
-      final accessToken = authorization?.accessToken;
+      String? accessToken = authorization?.accessToken;
       if (accessToken == null) {
-        final authorization2 = await authorizationClient.authorizationForScopes(
+        final authorization2 = await authorizationClient.authorizeScopes(
           ['email', 'profile'],
         );
-        if (authorization2?.accessToken == null) {
+        accessToken = authorization2.accessToken;
+        if (accessToken == null) {
           throw FirebaseAuthException(code: "error", message: "error");
         }
-        authorization = authorization2;
       }
       final credential = GoogleAuthProvider.credential(
         accessToken: accessToken,

@@ -266,6 +266,9 @@ class AuthViewModel extends ChangeNotifier {
 
       final result = await GoogleSignInService.signInWithGoogle();
 
+      print("Google sign-in result: $result");
+      print("User: ${result?.user}");
+
       if (result?.user != null) {
         final user = result!.user!;
         _userId = user.uid;
@@ -300,7 +303,8 @@ class AuthViewModel extends ChangeNotifier {
       return result?.user;
     } catch (e) {
       _setLoading(false);
-      print("Error: $e");
+      print("Error in loginWithGoogle: $e");
+      Utils.toastMessage('Google Login Error: $e');
       return null;
     }
   }
