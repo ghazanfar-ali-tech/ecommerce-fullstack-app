@@ -47,8 +47,11 @@ lib/constants.dart
 .env
 
 /lib/core/constants.dart
-assets/service_account.jsonf i r e b a s e _ c r e d e n t i a l s . j s o n  
+/lib/resources/constants.dart
+assets/service_account.jsonf i r e b a s e _ c r e d e n t i a l s . j s o n 
+ 
 firebase_credentials.json
 service_account.json
-.env 
+.env
+ 
  

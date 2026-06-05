@@ -8,16 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StoreViewModel extends ChangeNotifier {
   final FirebaseFirestore _firebaseStore = FirebaseFirestore.instance;
- 
-  
- final bool _isLoading = false;
+
+  final bool _isLoading = false;
 
   List<Map<String, dynamic>> categoryWiseProducts = [];
   List<Map<String, dynamic>> categories = [];
   bool _isFetching = false;
   bool _isLoadingFromPrefs = true;
-
-  
 
   final List<Map<String, dynamic>> _favList = [];
 
@@ -42,21 +39,20 @@ class StoreViewModel extends ChangeNotifier {
     _loadCategoriesFromPrefs();
   }
 
+  Future<void> initForUser(String uid) async {
+    _currentUid = uid;
+    _favList.clear();
+    await _loadFavoritesFromPrefs();
+    notifyListeners();
+  }
 
-Future<void> initForUser(String uid) async {
-  _currentUid = uid;
-  _favList.clear();
-  await _loadFavoritesFromPrefs();
-  notifyListeners();
-}
+  Future<void> clearFavorites() async {
+    _favList.clear();
+    _currentUid = null;
+    notifyListeners();
+  }
 
-Future<void> clearFavorites() async {
-  _favList.clear();
-  _currentUid = null;
-  notifyListeners();
-}
-
-String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
+  String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
 
   void verticalDragUpdate(DragUpdateDetails details) {
     tabTop += details.delta.dy;
@@ -93,14 +89,14 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
       final snapshot = await _firebaseStore
           .collection('categories')
           .orderBy('createdAt', descending: true)
-          .limit(4)
+          .limit(5)
           .get();
 
-     categories = snapshot.docs.map((doc) {
-  final data = doc.data();
-  data['id'] = doc.id;
-  return data;
-}).toList();
+      categories = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
       await _saveCategoriesToPrefs(categories);
     } catch (e) {
       debugPrint('Error fetching categories: $e');
@@ -150,45 +146,72 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
     }
   }
 
-
   bool isFavValue(String productName) {
     return _favList.any((product) => product['productName'] == productName);
   }
 
-  void toggleFavValue(Map<String, dynamic> product) async{
+  void toggleFavValue(Map<String, dynamic> product) async {
     final productName = product['productName'];
-    
+
     if (isFavValue(productName)) {
       _favList.removeWhere((p) => p['productName'] == productName);
     } else {
       _favList.add(product);
     }
-    
-  await  _saveFavoritesToPrefs();
+
+    await _saveFavoritesToPrefs();
     notifyListeners();
   }
 
-  void removeFromFavorites(String productName)async {
+  void removeFromFavorites(String productName) async {
     _favList.removeWhere((product) => product['productName'] == productName);
-  await   _saveFavoritesToPrefs();
+    await _saveFavoritesToPrefs();
     notifyListeners();
   }
 
- Future<void> addAllToCart(Box<CartModel> cartBox) async {
-  for (final product in _favList) {
+  Future<void> addAllToCart(Box<CartModel> cartBox) async {
+    for (final product in _favList) {
+      final productName = product['productName'] ?? '';
+
+      final exists = cartBox.values.any(
+        (item) => item.productName == productName,
+      );
+      if (exists) continue;
+
+      final cartItem = CartModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        productName: productName,
+        productCategory: product['categoryName'] ?? '',
+        productPrice: (product['productPrice'] is double)
+            ? (product['productPrice'] as double).toInt()
+            : (product['productPrice'] ?? 0) as int,
+        productImage: (product['productImageUrls'] as List?)?.isNotEmpty == true
+            ? product['productImageUrls'][0]
+            : '',
+        quantity: 1,
+        stock: 10,
+      );
+
+      await cartBox.add(cartItem);
+    }
+  }
+
+  Future<void> addSingleToCart(
+    Map<String, dynamic> product,
+    Box<CartModel> cartBox,
+  ) async {
     final productName = product['productName'] ?? '';
-    
-   
-    final exists = cartBox.values.any((item) => item.productName == productName);
-    if (exists) continue;
+
+    final exists = cartBox.values.any(
+      (item) => item.productName == productName,
+    );
+    if (exists) return;
 
     final cartItem = CartModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       productName: productName,
       productCategory: product['categoryName'] ?? '',
-      productPrice: (product['productPrice'] is double)
-          ? (product['productPrice'] as double).toInt()
-          : (product['productPrice'] ?? 0) as int,
+      productPrice: int.tryParse(product['productPrice'].toString()) ?? 0,
       productImage: (product['productImageUrls'] as List?)?.isNotEmpty == true
           ? product['productImageUrls'][0]
           : '',
@@ -198,64 +221,40 @@ String get _favKey => 'favorites_${_currentUid ?? 'guest'}';
 
     await cartBox.add(cartItem);
   }
-}
 
-
-Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBox) async {
-  final productName = product['productName'] ?? '';
-  
-
-  final exists = cartBox.values.any((item) => item.productName == productName);
-  if (exists) return;
-
-  final cartItem = CartModel(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    productName: productName,
-    productCategory: product['categoryName'] ?? '',
-   productPrice: int.tryParse(product['productPrice'].toString()) ?? 0,
-    productImage: (product['productImageUrls'] as List?)?.isNotEmpty == true
-        ? product['productImageUrls'][0]
-        : '',
-    quantity: 1,
-    stock: 10,
-  );
-
-  await cartBox.add(cartItem);
-}
-
- 
   Future<void> _loadFavoritesFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-       print('🔍 Loading favorites with key: $_favKey');
-      final cachedFavorites = prefs.getString(_favKey); 
-       print('🔍 Found data: ${cachedFavorites != null ? "YES" : "NO"}');
+      print('🔍 Loading favorites with key: $_favKey');
+      final cachedFavorites = prefs.getString(_favKey);
+      print('🔍 Found data: ${cachedFavorites != null ? "YES" : "NO"}');
       if (cachedFavorites != null) {
         _favList.clear();
-        
-        final decoded = List<Map<String, dynamic>>.from(json.decode(cachedFavorites));
-        
-    
+
+        final decoded = List<Map<String, dynamic>>.from(
+          json.decode(cachedFavorites),
+        );
+
         final restoredFavList = decoded.map((product) {
           final restored = Map<String, dynamic>.from(product);
-          
+
           restored.forEach((key, value) {
-            if (value is String && 
-                (key.toLowerCase().contains('date') || 
-                 key.toLowerCase().contains('time') ||
-                 key == 'createdAt' || 
-                 key == 'updatedAt')) {
+            if (value is String &&
+                (key.toLowerCase().contains('date') ||
+                    key.toLowerCase().contains('time') ||
+                    key == 'createdAt' ||
+                    key == 'updatedAt')) {
               try {
                 restored[key] = DateTime.parse(value);
               } catch (e) {
-                // // debugging line has removed from this code
+                // //
               }
             }
           });
-          
+
           return restored;
         }).toList();
-        
+
         _favList.addAll(restoredFavList);
         notifyListeners();
       }
@@ -264,37 +263,38 @@ Future<void> addSingleToCart(Map<String, dynamic> product, Box<CartModel> cartBo
     }
   }
 
- Future<void> _saveFavoritesToPrefs() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _saveFavoritesToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
 
-    final sanitizedFavList = _favList.map((product) {
-      return product.map((key, value) {
-        if (value is DateTime) {
-          return MapEntry(key, value.toIso8601String());
-        }
-        if (value is Timestamp) {
-          return MapEntry(key, value.toDate().toIso8601String());
-        }
-   
-        if (value is List) {
-          return MapEntry(key, value.map((v) {
-            if (v is DateTime) return v.toIso8601String();
-            if (v is Timestamp) return v.toDate().toIso8601String();
-            return v;
-          }).toList());
-        }
-        return MapEntry(key, value);
-      });
-    }).toList();
+      final sanitizedFavList = _favList.map((product) {
+        return product.map((key, value) {
+          if (value is DateTime) {
+            return MapEntry(key, value.toIso8601String());
+          }
+          if (value is Timestamp) {
+            return MapEntry(key, value.toDate().toIso8601String());
+          }
 
-    print('💾 Sanitized list: $sanitizedFavList');
-    await prefs.setString(_favKey, json.encode(sanitizedFavList));
-    print('💾 Saved successfully!');
-  } catch (e) {
-    debugPrint('Error saving favorites: $e');
+          if (value is List) {
+            return MapEntry(
+              key,
+              value.map((v) {
+                if (v is DateTime) return v.toIso8601String();
+                if (v is Timestamp) return v.toDate().toIso8601String();
+                return v;
+              }).toList(),
+            );
+          }
+          return MapEntry(key, value);
+        });
+      }).toList();
+
+      print('💾 Sanitized list: $sanitizedFavList');
+      await prefs.setString(_favKey, json.encode(sanitizedFavList));
+      print('💾 Saved successfully!');
+    } catch (e) {
+      debugPrint('Error saving favorites: $e');
+    }
   }
-}
-
-
 }

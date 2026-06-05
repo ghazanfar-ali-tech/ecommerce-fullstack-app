@@ -1,4 +1,5 @@
 import 'package:ecommerceapp/models/app_settings_model.dart';
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:ecommerceapp/view_model/admin_settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,19 +16,17 @@ class AppSettingScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0,
           flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue, Colors.black],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
-            ),
+            decoration: const BoxDecoration(color: const Color(0xFF3B82F6)),
           ),
-          title: const Text(
-            'App Settings',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 15.0),
+            child: const Text(
+              'App Settings',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: Colors.white,
+              ),
             ),
           ),
           actions: [
@@ -42,7 +41,11 @@ class AppSettingScreen extends StatelessWidget {
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.add, size: 24),
+                      child: const Icon(
+                        Icons.add,
+                        size: 24,
+                        color: Colors.white,
+                      ),
                     ),
                     onPressed: () => _showSettingsDialog(context, viewModel),
                   ),
@@ -61,11 +64,7 @@ class AppSettingScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Colors.blue, Colors.black],
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                        ),
+                        gradient: AppColors.primaryGradient,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const CircularProgressIndicator(
@@ -140,19 +139,12 @@ class AppSettingScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Create your first app settings',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Colors.blue, Colors.black],
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                        ),
+                        gradient: AppColors.primaryGradient,
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
@@ -163,7 +155,8 @@ class AppSettingScreen extends StatelessWidget {
                         ],
                       ),
                       child: ElevatedButton.icon(
-                        onPressed: () => _showSettingsDialog(context, viewModel),
+                        onPressed: () =>
+                            _showSettingsDialog(context, viewModel),
                         icon: const Icon(Icons.add_circle_outline),
                         label: const Text('Create Settings'),
                         style: ElevatedButton.styleFrom(
@@ -196,11 +189,7 @@ class AppSettingScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.blue, Colors.black],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
+                      gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
@@ -212,14 +201,32 @@ class AppSettingScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const Icon(
-                          Icons.store,
-                          size: 50,
-                          color: Colors.white,
-                        ),
+                        settings.storeLogo.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  settings.storeLogo,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
+                                        Icons.store,
+                                        size: 50,
+                                        color: Colors.white,
+                                      ),
+                                ),
+                              )
+                            : const Icon(
+                                Icons.store,
+                                size: 50,
+                                color: Colors.white,
+                              ),
                         const SizedBox(height: 12),
                         Text(
-                          settings.storeName.isEmpty ? 'Store Name' : settings.storeName,
+                          settings.storeName.isEmpty
+                              ? 'Store Name'
+                              : settings.storeName,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -238,7 +245,9 @@ class AppSettingScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            settings.currencySymbol.isEmpty ? 'No Currency' : settings.currencySymbol,
+                            settings.currencySymbol.isEmpty
+                                ? 'No Currency'
+                                : settings.currencySymbol,
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.white,
@@ -250,14 +259,14 @@ class AppSettingScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Settings Cards
-                  _buildModernInfoCard(
-                    'Store Logo',
-                    settings.storeLogo,
-                    Icons.image,
-                    Colors.purple,
-                  ),
+
+                  // // Settings Cards
+                  // _buildModernInfoCard(
+                  //   'Store Logo',
+                  //   settings.storeLogo,
+                  //   Icons.image,
+                  //   Colors.purple,
+                  // ),
                   _buildModernInfoCard(
                     'Support Email',
                     settings.supportEmail,
@@ -270,20 +279,15 @@ class AppSettingScreen extends StatelessWidget {
                     Icons.info,
                     Colors.teal,
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
-                  // Action Buttons
+
                   Row(
                     children: [
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Colors.blue, Colors.black],
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                            ),
+                            gradient: AppColors.primaryGradient,
                             borderRadius: BorderRadius.circular(15),
                             boxShadow: [
                               BoxShadow(
@@ -294,9 +298,16 @@ class AppSettingScreen extends StatelessWidget {
                             ],
                           ),
                           child: ElevatedButton.icon(
-                            onPressed: () => _showSettingsDialog(context, viewModel, settings),
-                            icon: const Icon(Icons.edit),
-                            label: const Text('Edit'),
+                            onPressed: () => _showSettingsDialog(
+                              context,
+                              viewModel,
+                              settings,
+                            ),
+                            icon: const Icon(Icons.edit, color: Colors.white),
+                            label: const Text(
+                              'Edit',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -313,11 +324,7 @@ class AppSettingScreen extends StatelessWidget {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.red[400]!, Colors.red[900]!],
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                            ),
+                            gradient: AppColors.accentGradient,
                             borderRadius: BorderRadius.circular(15),
                             boxShadow: [
                               BoxShadow(
@@ -328,9 +335,13 @@ class AppSettingScreen extends StatelessWidget {
                             ],
                           ),
                           child: ElevatedButton.icon(
-                            onPressed: () => _confirmDelete(context, viewModel, settings.id),
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Delete'),
+                            onPressed: () =>
+                                _confirmDelete(context, viewModel, settings.id),
+                            icon: const Icon(Icons.delete, color: Colors.white),
+                            label: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -355,7 +366,12 @@ class AppSettingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildModernInfoCard(String label, String value, IconData icon, Color color) {
+  Widget _buildModernInfoCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -415,33 +431,40 @@ class AppSettingScreen extends StatelessWidget {
     );
   }
 
-  void _showSettingsDialog(BuildContext context, AppSettingsViewModel viewModel, [AppSettings? settings]) {
-    final storeNameController = TextEditingController(text: settings?.storeName ?? '');
-    final storeLogoController = TextEditingController(text: settings?.storeLogo ?? '');
-    final supportEmailController = TextEditingController(text: settings?.supportEmail ?? '');
-    final storeInfoController = TextEditingController(text: settings?.storeInfo ?? '');
-    final currencySymbolController = TextEditingController(text: settings?.currencySymbol ?? '');
+  void _showSettingsDialog(
+    BuildContext context,
+    AppSettingsViewModel viewModel, [
+    AppSettings? settings,
+  ]) {
+    final storeNameController = TextEditingController(
+      text: settings?.storeName ?? '',
+    );
+    final storeLogoController = TextEditingController(
+      text: settings?.storeLogo ?? '',
+    );
+    final supportEmailController = TextEditingController(
+      text: settings?.supportEmail ?? '',
+    );
+    final storeInfoController = TextEditingController(
+      text: settings?.storeInfo ?? '',
+    );
+    final currencySymbolController = TextEditingController(
+      text: settings?.currencySymbol ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 500),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blue, Colors.black],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -465,7 +488,7 @@ class AppSettingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Content
+
               Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
@@ -505,7 +528,7 @@ class AppSettingScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              // Actions
+
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -533,11 +556,7 @@ class AppSettingScreen extends StatelessWidget {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Colors.blue, Colors.black],
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                          ),
+                          gradient: AppColors.primaryGradient,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ElevatedButton(
@@ -554,7 +573,10 @@ class AppSettingScreen extends StatelessWidget {
                             if (settings == null) {
                               viewModel.createSettings(newSettings);
                             } else {
-                              viewModel.updateSettings(settings.id, newSettings);
+                              viewModel.updateSettings(
+                                settings.id,
+                                newSettings,
+                              );
                             }
 
                             Navigator.pop(context);
@@ -571,6 +593,7 @@ class AppSettingScreen extends StatelessWidget {
                             settings == null ? 'Create' : 'Update',
                             style: const TextStyle(
                               fontSize: 16,
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -599,9 +622,7 @@ class AppSettingScreen extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey[300]!),
@@ -616,13 +637,15 @@ class AppSettingScreen extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, AppSettingsViewModel viewModel, String id) {
+  void _confirmDelete(
+    BuildContext context,
+    AppSettingsViewModel viewModel,
+    String id,
+  ) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -631,7 +654,7 @@ class AppSettingScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
+                  color: Colors.red[100],
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -643,19 +666,13 @@ class AppSettingScreen extends StatelessWidget {
               const SizedBox(height: 20),
               const Text(
                 'Confirm Delete',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(
                 'Are you sure you want to delete these settings? This action cannot be undone.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
               const SizedBox(height: 24),
               Row(
@@ -708,6 +725,7 @@ class AppSettingScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),

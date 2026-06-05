@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/models/hive_models/cart_model/cart_model.dart';
-import 'package:ecommerceapp/services/notification_services.dart/notification_services.dart';
 import 'package:ecommerceapp/services/notification_services.dart/push_notification_services.dart';
 import 'package:ecommerceapp/utils/utils.dart';
 import 'package:ecommerceapp/view_model/google_sign.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthViewModel extends ChangeNotifier {
   String? _userRole;
@@ -60,7 +60,10 @@ class AuthViewModel extends ChangeNotifier {
 
   bool get isAdmin => _userRole?.toLowerCase() == 'admin';
 
-  Future<void> signUp(BuildContext context,NotificationViewModel notificationVM,) async {
+  Future<void> signUp(
+    BuildContext context,
+    NotificationViewModel notificationVM,
+  ) async {
     _setLoading(true);
 
     try {
@@ -68,20 +71,20 @@ class AuthViewModel extends ChangeNotifier {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      
+
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'username': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
         'uid': userCredential.user!.uid,
-        'role': 'user', 
+        'role': 'user',
         'createdAt': FieldValue.serverTimestamp(),
       });
 
       Utils.toastMessage('Account created successfully!');
       notificationVM.showNotification(
-         'SignUP Successful',
-    'Account created successfully!',
-        );
+        'SignUP Successful',
+        'Account created successfully!',
+      );
       _usernameController.clear();
       _emailController.clear();
       _passwordController.clear();
@@ -123,12 +126,12 @@ class AuthViewModel extends ChangeNotifier {
     _userRole = prefs.getString('userRole');
     _userId = prefs.getString('userId');
     _email = prefs.getString('email');
-    
+
     if (_userId != null) {
       await openUserCart(_userId!);
-      await storeVM.initForUser(_userId!); 
+      await storeVM.initForUser(_userId!);
     }
-    
+
     notifyListeners();
   }
 
@@ -141,12 +144,10 @@ class AuthViewModel extends ChangeNotifier {
     _setLoading(true);
 
     try {
-
-final storeVM = Provider.of<StoreViewModel>(context, listen: false);
-storeVM.clearFavorites();
+      final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+      storeVM.clearFavorites();
       await _auth.signOut();
 
-    
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('userRole');
       await prefs.remove('userId');
@@ -166,7 +167,7 @@ storeVM.clearFavorites();
 
       notifyListeners();
 
-await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
+      await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
 
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => AuthScreen()),
@@ -180,8 +181,10 @@ await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
     }
   }
 
-  Future<void> login(BuildContext context, NotificationViewModel notificationVM,) async {
-   
+  Future<void> login(
+    BuildContext context,
+    NotificationViewModel notificationVM,
+  ) async {
     _setLoading(true);
 
     try {
@@ -195,7 +198,7 @@ await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
       _email = user.email;
 
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      
+
       if (!userDoc.exists) {
         throw Exception('User data not found');
       }
@@ -207,17 +210,15 @@ await FirebaseMessaging.instance.unsubscribeFromTopic('new_products');
       await openUserCart(_userId!);
 
       final storeVM = Provider.of<StoreViewModel>(context, listen: false);
-await storeVM.initForUser(_userId!);
+      await storeVM.initForUser(_userId!);
 
-      Utils.toastMessage('Welcome, ${_userRole == 'admin' ? 'Admin' : 'User'}!');
-  notificationVM.showNotification(
-    'Login Successful',
-    'Welcome back!',
-  );
+      Utils.toastMessage(
+        'Welcome, ${_userRole == 'admin' ? 'Admin' : 'User'}!',
+      );
+      notificationVM.showNotification('Login Successful', 'Welcome back!');
 
-  await context.read<NotificationViewModel>().init();
+      await context.read<NotificationViewModel>().init();
 
-      
       _emailController.clear();
       _passwordController.clear();
 
@@ -269,11 +270,13 @@ await storeVM.initForUser(_userId!);
         final user = result!.user!;
         _userId = user.uid;
         _email = user.email;
- await PushNotificationService.instance.saveTokenToFirestore();
-        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+        await PushNotificationService.instance.saveTokenToFirestore();
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
         if (!userDoc.exists) {
-         
           await _firestore.collection('users').doc(user.uid).set({
             'username': user.displayName ?? 'User',
             'email': user.email,
@@ -290,7 +293,7 @@ await storeVM.initForUser(_userId!);
 
         await openUserCart(_userId!);
         final storeVM = Provider.of<StoreViewModel>(context, listen: false);
-await storeVM.initForUser(_userId!);
+        await storeVM.initForUser(_userId!);
       }
 
       _setLoading(false);
@@ -301,23 +304,23 @@ await storeVM.initForUser(_userId!);
       return null;
     }
   }
-    
+
   Box<CartModel>? _cartBox;
 
   Future<void> openUserCart(String uid) async {
     try {
       final boxName = 'cart_$uid';
-      
+
       if (_cartBox != null && _cartBox!.isOpen) {
         await _cartBox!.close();
       }
-      
+
       if (!Hive.isBoxOpen(boxName)) {
         _cartBox = await Hive.openBox<CartModel>(boxName);
       } else {
         _cartBox = Hive.box<CartModel>(boxName);
       }
-      
+
       print('Opened cart for user: $uid (${_cartBox!.length} items)');
     } catch (e) {
       print('Error opening cart: $e');
@@ -343,7 +346,7 @@ await storeVM.initForUser(_userId!);
   int getTotalCartValue() {
     try {
       if (_cartBox == null || !_cartBox!.isOpen) return 0;
-      
+
       int total = 0;
       for (var i = 0; i < _cartBox!.length; i++) {
         final item = _cartBox!.getAt(i)!;
@@ -363,6 +366,66 @@ await storeVM.initForUser(_userId!);
       }
     } catch (e) {
       print('Error clearing cart: $e');
+    }
+  }
+
+  Future<User?> loginWithFacebook(BuildContext context) async {
+    try {
+      _setLoading(true);
+
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status != LoginStatus.success) {
+        Utils.toastMessage('Facebook login cancelled or failed.');
+        return null;
+      }
+
+      final OAuthCredential credential = FacebookAuthProvider.credential(
+        result.accessToken!.tokenString,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+      final user = userCredential.user!;
+
+      _userId = user.uid;
+      _email = user.email;
+
+      await PushNotificationService.instance.saveTokenToFirestore();
+
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+
+      if (!userDoc.exists) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'username': user.displayName ?? 'User',
+          'email': user.email ?? '',
+          'uid': user.uid,
+          'role': 'user',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        _userRole = 'user';
+      } else {
+        _userRole = userDoc.data()?['role'] ?? 'user';
+      }
+
+      await _saveToPrefs(_userRole!, _userId!, _email!);
+      await openUserCart(_userId!);
+
+      final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+      await storeVM.initForUser(_userId!);
+
+      _setLoading(false);
+      return user;
+    } on FirebaseAuthException catch (e) {
+      _setLoading(false);
+      Utils.toastMessage('Firebase error: ${e.message}');
+      return null;
+    } catch (e) {
+      _setLoading(false);
+      debugPrint('Facebook login error: $e');
+      Utils.toastMessage('Facebook login failed: $e');
+      return null;
     }
   }
 

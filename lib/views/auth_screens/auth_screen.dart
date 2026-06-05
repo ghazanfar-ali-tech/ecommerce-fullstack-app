@@ -31,7 +31,7 @@ class AuthScreen extends StatelessWidget {
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20),
                       ),
-                     gradient: AppColors.heroGradient, 
+                      gradient: AppColors.heroGradient,
                     ),
                     child: Center(
                       child: SizedBox(
@@ -73,7 +73,7 @@ class AuthScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 border: Border.all(
-                                  color: AppColors.primary, 
+                                  color: AppColors.primary,
                                   width: 0.5,
                                 ),
                                 color: AppColors.surfaceVariant(context),
@@ -92,7 +92,7 @@ class AuthScreen extends StatelessWidget {
                                           width: 150,
                                           height: 50,
                                           decoration: BoxDecoration(
-                                             gradient: AppColors.primaryGradient,
+                                            gradient: AppColors.primaryGradient,
                                             borderRadius: BorderRadius.circular(
                                               50,
                                             ),
@@ -117,8 +117,10 @@ class AuthScreen extends StatelessWidget {
                                                     fontSize: 15.3,
                                                     fontWeight: FontWeight.bold,
                                                     color: model.isLoginSelected
-                                                       ? Colors.white          
-                                                        : AppColors.primaryText(context),
+                                                        ? Colors.white
+                                                        : AppColors.primaryText(
+                                                            context,
+                                                          ),
                                                   ),
                                                 ),
                                               ),
@@ -134,7 +136,9 @@ class AuthScreen extends StatelessWidget {
                                                     fontSize: 15.3,
                                                     fontWeight: FontWeight.bold,
                                                     color: model.isLoginSelected
-                                                       ? AppColors.primaryText(context) 
+                                                        ? AppColors.primaryText(
+                                                            context,
+                                                          )
                                                         : Colors.white,
                                                   ),
                                                 ),
@@ -156,30 +160,34 @@ class AuthScreen extends StatelessWidget {
                                 return Form(
                                   key: _formkey,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                 
                                       AnimatedSize(
                                         duration: Duration(milliseconds: 400),
                                         curve: Curves.easeInOut,
                                         child: AnimatedSwitcher(
                                           duration: Duration(milliseconds: 400),
-                                          transitionBuilder: (child, animation) {
-                                            final offsetAnim = Tween<Offset>(
-                                              begin: Offset(0, -0.3),
-                                              end: Offset(0, 0),
-                                            ).animate(CurvedAnimation(
-                                              parent: animation,
-                                              curve: Curves.easeInOut,
-                                            ));
-                                            return SlideTransition(
-                                              position: offsetAnim,
-                                              child: FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              ),
-                                            );
-                                          },
+                                          transitionBuilder:
+                                              (child, animation) {
+                                                final offsetAnim =
+                                                    Tween<Offset>(
+                                                      begin: Offset(0, -0.3),
+                                                      end: Offset(0, 0),
+                                                    ).animate(
+                                                      CurvedAnimation(
+                                                        parent: animation,
+                                                        curve: Curves.easeInOut,
+                                                      ),
+                                                    );
+                                                return SlideTransition(
+                                                  position: offsetAnim,
+                                                  child: FadeTransition(
+                                                    opacity: animation,
+                                                    child: child,
+                                                  ),
+                                                );
+                                              },
                                           child: model.isLoginSelected
                                               ? SizedBox.shrink(
                                                   key: ValueKey('empty'),
@@ -188,24 +196,25 @@ class AuthScreen extends StatelessWidget {
                                                   children: [
                                                     customField(
                                                       context: context,
-                                                      controller: context.read<AuthViewModel>().usernameController,
+                                                      controller: context
+                                                          .read<AuthViewModel>()
+                                                          .usernameController,
                                                       hintName: "Name",
                                                       icon: Icons.person,
                                                       labelText: "Name",
-                                                      validator: (value){
-                                                        if(value!.isEmpty){
+                                                      validator: (value) {
+                                                        if (value!.isEmpty) {
                                                           return "Enter user name";
                                                         }
                                                         return null;
-                                                      }
+                                                      },
                                                     ),
                                                     SizedBox(height: 10),
                                                   ],
                                                 ),
                                         ),
                                       ),
-                                  
-                                   
+
                                       AnimatedSlide(
                                         duration: Duration(milliseconds: 400),
                                         curve: Curves.easeInOut,
@@ -216,35 +225,38 @@ class AuthScreen extends StatelessWidget {
                                           children: [
                                             customField(
                                               context: context,
-                                              controller: context.read<AuthViewModel>().emailController,
+                                              controller: context
+                                                  .read<AuthViewModel>()
+                                                  .emailController,
                                               hintName: "Email",
                                               icon: Icons.email_outlined,
                                               labelText: "Email",
-                                              validator: (value){
-                                                        if(value!.isEmpty){
-                                                          return "Enter email";
-                                                        }
-                                                        return null;
-                                                      }
+                                              validator: (value) {
+                                                if (value!.isEmpty) {
+                                                  return "Enter email";
+                                                }
+                                                return null;
+                                              },
                                             ),
                                             SizedBox(height: 10),
-                                             customField(
+                                            customField(
                                               context: context,
-                                          controller: context.read<AuthViewModel>().passwordController,
-                                          hintName: "Password",
-                                          labelText: "Password",
-                                          icon: Icons.lock_outline_rounded,
-                                          validator: (value){
-                                                        if(value!.isEmpty){
-                                                          return "Enter Password";
-                                                        }
-                                                        return null;
-                                                      }
-                                        )
+                                              controller: context
+                                                  .read<AuthViewModel>()
+                                                  .passwordController,
+                                              hintName: "Password",
+                                              labelText: "Password",
+                                              icon: Icons.lock_outline_rounded,
+                                              validator: (value) {
+                                                if (value!.isEmpty) {
+                                                  return "Enter Password";
+                                                }
+                                                return null;
+                                              },
+                                            ),
                                           ],
                                         ),
                                       ),
-                                  
                                     ],
                                   ),
                                 );
@@ -259,10 +271,16 @@ class AuthScreen extends StatelessWidget {
                                   onTap: () {
                                     if (model.isLoginSelected) {
                                       print("Login clicked");
-                                      model.login(context,context.read<NotificationViewModel>());
+                                      model.login(
+                                        context,
+                                        context.read<NotificationViewModel>(),
+                                      );
                                     } else {
                                       print("Sign Up clicked");
-                                      model.signUp(context,context.read<NotificationViewModel>());
+                                      model.signUp(
+                                        context,
+                                        context.read<NotificationViewModel>(),
+                                      );
                                     }
                                   },
                                   child: AnimatedContainer(
@@ -273,7 +291,7 @@ class AuthScreen extends StatelessWidget {
                                     height: 50,
                                     decoration: BoxDecoration(
                                       boxShadow: [BoxShadow()],
-                                      gradient:AppColors.primaryGradient,
+                                      gradient: AppColors.primaryGradient,
                                       borderRadius: BorderRadius.circular(30),
                                     ),
                                     child: Center(
@@ -316,7 +334,12 @@ class AuthScreen extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: InkWell(
                                 onTap: () {
-                                   Navigator.push(context, MaterialPageRoute(builder: (_)=>ForgotPasswordScreen()));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ForgotPasswordScreen(),
+                                    ),
+                                  );
                                 },
                                 child: Text(
                                   'Forgot password',
@@ -362,15 +385,26 @@ class AuthScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 IconButton(
-                                    onPressed: () async {
-                                   final user = await context.read<AuthViewModel>().loginWithGoogle(context);
-                                   if (user != null) {
-                                  
-                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNavigation()));
-                                   } else {
-                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AuthScreen()));
-                                   }
-                                 },
+                                  onPressed: () async {
+                                    final user = await context
+                                        .read<AuthViewModel>()
+                                        .loginWithGoogle(context);
+                                    if (user != null) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BottomNavigation(),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => AuthScreen(),
+                                        ),
+                                      );
+                                    }
+                                  },
                                   icon: Image(
                                     height: 35,
                                     width: 35,
@@ -378,7 +412,19 @@ class AuthScreen extends StatelessWidget {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final user = await context
+                                        .read<AuthViewModel>()
+                                        .loginWithFacebook(context);
+                                    if (user != null) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BottomNavigation(),
+                                        ),
+                                      );
+                                    }
+                                  },
                                   icon: Image(
                                     height: 35,
                                     width: 35,
