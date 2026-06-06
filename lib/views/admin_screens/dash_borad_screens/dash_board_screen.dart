@@ -20,11 +20,17 @@ class DashBoardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        // centerTitle: true,
+        backgroundColor: const Color(0xFF3B82F6),
         title: Text(
           'Dashboard',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
         ),
-        backgroundColor: Colors.orange,
+
         elevation: 0,
         actions: [
           IconButton(

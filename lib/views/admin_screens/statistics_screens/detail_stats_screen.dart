@@ -31,7 +31,7 @@ class DetailedSalesScreen extends StatelessWidget {
             color: AppColors.primaryLight,
           ),
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.blue,
         elevation: 0,
         actions: [
           IconButton(

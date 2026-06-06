@@ -1,19 +1,19 @@
+import 'package:ecommerceapp/resources/components/appColor.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
 class AnimatedDetailedSalesButton extends StatefulWidget {
   final VoidCallback onPressed;
-  
-  const AnimatedDetailedSalesButton({
-    super.key,
-    required this.onPressed,
-  });
+
+  const AnimatedDetailedSalesButton({super.key, required this.onPressed});
 
   @override
-  State<AnimatedDetailedSalesButton> createState() => _AnimatedDetailedSalesButtonState();
+  State<AnimatedDetailedSalesButton> createState() =>
+      _AnimatedDetailedSalesButtonState();
 }
 
-class _AnimatedDetailedSalesButtonState extends State<AnimatedDetailedSalesButton>
+class _AnimatedDetailedSalesButtonState
+    extends State<AnimatedDetailedSalesButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -28,13 +28,15 @@ class _AnimatedDetailedSalesButtonState extends State<AnimatedDetailedSalesButto
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.05).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.05,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -79,14 +81,7 @@ class _AnimatedDetailedSalesButtonState extends State<AnimatedDetailedSalesButto
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.orange[400]!,
-                        Colors.orange[600]!,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -172,7 +167,7 @@ class CompactAnimatedButton extends StatefulWidget {
   final VoidCallback onPressed;
   final String title;
   final IconData icon;
-  
+
   const CompactAnimatedButton({
     super.key,
     required this.onPressed,
@@ -219,11 +214,7 @@ class _CompactAnimatedButtonState extends State<CompactAnimatedButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              widget.icon,
-              color: Colors.white,
-              size: 20,
-            ),
+            Icon(widget.icon, color: Colors.white, size: 20),
             const SizedBox(width: 8),
             Text(
               widget.title,
@@ -242,17 +233,16 @@ class _CompactAnimatedButtonState extends State<CompactAnimatedButton> {
 
 class FloatingDetailedSalesButton extends StatefulWidget {
   final VoidCallback onPressed;
-  
-  const FloatingDetailedSalesButton({
-    super.key,
-    required this.onPressed,
-  });
+
+  const FloatingDetailedSalesButton({super.key, required this.onPressed});
 
   @override
-  State<FloatingDetailedSalesButton> createState() => _FloatingDetailedSalesButtonState();
+  State<FloatingDetailedSalesButton> createState() =>
+      _FloatingDetailedSalesButtonState();
 }
 
-class _FloatingDetailedSalesButtonState extends State<FloatingDetailedSalesButton>
+class _FloatingDetailedSalesButtonState
+    extends State<FloatingDetailedSalesButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -266,9 +256,10 @@ class _FloatingDetailedSalesButtonState extends State<FloatingDetailedSalesButto
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.9,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -306,10 +297,7 @@ class _FloatingDetailedSalesButtonState extends State<FloatingDetailedSalesButto
                 height: 70,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.orange[400]!,
-                      Colors.orange[600]!,
-                    ],
+                    colors: [Colors.orange[400]!, Colors.orange[600]!],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
