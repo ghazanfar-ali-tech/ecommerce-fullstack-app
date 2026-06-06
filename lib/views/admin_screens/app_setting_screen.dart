@@ -497,32 +497,32 @@ class AppSettingScreen extends StatelessWidget {
                       _buildTextField(
                         controller: storeNameController,
                         label: 'Store Name',
-                        icon: Icons.store,
+                        icon: Icon(Icons.store, color: Colors.blue),
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         controller: storeLogoController,
                         label: 'Store Logo URL',
-                        icon: Icons.image,
+                        icon: Icon(Icons.image, color: Colors.blue),
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         controller: supportEmailController,
                         label: 'Support Email',
-                        icon: Icons.email,
+                        icon: Icon(Icons.email, color: Colors.blue),
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         controller: storeInfoController,
                         label: 'Store Info',
-                        icon: Icons.info,
+                        icon: Icon(Icons.info, color: Colors.blue),
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         controller: currencySymbolController,
                         label: 'Currency Symbol',
-                        icon: Icons.attach_money,
+                        icon: Icon(Icons.attach_money, color: Colors.blue),
                       ),
                     ],
                   ),
@@ -613,7 +613,7 @@ class AppSettingScreen extends StatelessWidget {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
+    required Icon icon,
     int maxLines = 1,
   }) {
     return TextField(
@@ -621,7 +621,7 @@ class AppSettingScreen extends StatelessWidget {
       maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        prefixIcon: icon,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -15,6 +15,7 @@ class GoogleSignInService {
     }
     isInitialize = true;
   }
+
   static Future<UserCredential?> signInWithGoogle() async {
     try {
       await initSignIn();
@@ -25,9 +26,10 @@ class GoogleSignInService {
           .authorizationForScopes(['email', 'profile']);
       String? accessToken = authorization?.accessToken;
       if (accessToken == null) {
-        final authorization2 = await authorizationClient.authorizeScopes(
-          ['email', 'profile'],
-        );
+        final authorization2 = await authorizationClient.authorizeScopes([
+          'email',
+          'profile',
+        ]);
         accessToken = authorization2.accessToken;
         if (accessToken == null) {
           throw FirebaseAuthException(code: "error", message: "error");
@@ -62,7 +64,7 @@ class GoogleSignInService {
       rethrow;
     }
   }
-  // Sign out
+
   static Future<void> signOut() async {
     try {
       await _googleSignIn.signOut();
@@ -72,7 +74,7 @@ class GoogleSignInService {
       throw e;
     }
   }
-  // Get current user
+
   static User? getCurrentUser() {
     return _auth.currentUser;
   }

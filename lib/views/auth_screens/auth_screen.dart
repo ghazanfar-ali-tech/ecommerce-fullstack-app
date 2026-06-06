@@ -27,7 +27,7 @@ class AuthScreen extends StatelessWidget {
             width: size.width,
             height: size.height * (isSmall ? 0.38 : 0.42),
             decoration: BoxDecoration(
-              gradient: AppColors.heroGradient,
+              gradient: AppColors.cardGradient,
               borderRadius: const BorderRadius.only(
                 bottomRight: Radius.circular(40),
               ),
