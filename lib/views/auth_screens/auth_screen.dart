@@ -269,6 +269,9 @@ class AuthScreen extends StatelessWidget {
                                     SizedBox(height: size.height * 0.016),
 
                                     customField(
+                                      obscure: model.obscurePassword,
+                                      onToggleObscure:
+                                          model.togglePasswordVisibility,
                                       context: context,
                                       controller: context
                                           .read<AuthViewModel>()

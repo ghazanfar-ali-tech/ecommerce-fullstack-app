@@ -669,7 +669,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      'Rs $productPrice',
+                                      r'$' + productPrice,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontSize: 12,

@@ -343,12 +343,12 @@ class ProductManagementScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _SectionLabel(
-                        title: 'Price (Rs)',
+                        title: r'Price ($)',
                         icon: Icons.payments_outlined,
                       ),
                       const SizedBox(height: 12),
                       productFields(
-                        hintName: "e.g. 1500",
+                        hintName: r'e.g. $150',
                         icon: Icons.payments_outlined,
                         minLines: 1,
                         controller: productPriceController,

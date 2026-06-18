@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 Widget customField({
+  VoidCallback? onToggleObscure,
   required String hintName,
   required IconData icon,
   String? labelText,
@@ -29,6 +30,15 @@ Widget customField({
         fontSize: 14,
       ),
       prefixIcon: Icon(icon, color: Color.fromARGB(255, 94, 160, 235)),
+      suffixIcon: onToggleObscure != null
+          ? IconButton(
+              icon: Icon(
+                obscure ? Icons.visibility_off : Icons.visibility,
+                color: Color.fromARGB(255, 94, 160, 235),
+              ),
+              onPressed: onToggleObscure,
+            )
+          : null,
       filled: true,
       fillColor: AppColors.cardBackground(context),
 
