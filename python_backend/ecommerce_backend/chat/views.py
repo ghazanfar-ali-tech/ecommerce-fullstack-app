@@ -18,10 +18,9 @@ if os.path.exists(Path(__file__).resolve().parent.parent / '.env'):
     load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
 if not firebase_admin._apps:
-    firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
-    firebase_dict = json.loads(firebase_json)
-    firebase_dict['private_key'] = firebase_dict['private_key'].replace('\\n', '\n')
-    cred = credentials.Certificate(firebase_dict)
+    cred = credentials.Certificate(
+        os.path.join(settings.BASE_DIR, 'firebase_credentials.json')
+    )
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
