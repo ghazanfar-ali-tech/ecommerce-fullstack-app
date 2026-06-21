@@ -18,11 +18,9 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 if not firebase_admin._apps:
-    import json
-    cred_json = os.environ.get('FIREBASE_CREDENTIALS_JSON', '{}')
-    cred_dict = json.loads(cred_json)
-    cred_dict['private_key'] = cred_dict['private_key'].replace('\\n', '\n')
-    cred = credentials.Certificate(cred_dict)
+    cred = credentials.Certificate(
+        os.path.join(settings.BASE_DIR, 'firebase_credentials.json')
+    )
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
