@@ -1,4 +1,5 @@
 
+from rest_framework.utils import json
 import re
 import os
 from django.conf import settings
@@ -10,17 +11,19 @@ from .serializers import ChatMessageSerializer
 from groq import Groq
 from pathlib import Path
 from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
 
-import firebase_admin
-from firebase_admin import credentials, firestore
+
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate(
-        os.path.join(settings.BASE_DIR, 'firebase_credentials.json')
-    )
+    firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    firebase_dict = json.loads(firebase_json)
+    firebase_dict['private_key'] = firebase_dict['private_key'].replace('\\n', '\n')
+    cred = credentials.Certificate(firebase_dict)
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
