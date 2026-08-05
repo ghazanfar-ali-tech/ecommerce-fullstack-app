@@ -88,8 +88,8 @@ class AuthScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.cardBackground(context),
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -128,7 +128,7 @@ class AuthScreen extends StatelessWidget {
                           Consumer<AuthViewModel>(
                             builder: (context, model, _) {
                               return Container(
-                                height: 48,
+                                height: 49,
                                 decoration: BoxDecoration(
                                   color: AppColors.surfaceVariant(context),
                                   borderRadius: BorderRadius.circular(14),
@@ -141,7 +141,7 @@ class AuthScreen extends StatelessWidget {
                                   children: [
                                     AnimatedAlign(
                                       duration: const Duration(
-                                        milliseconds: 300,
+                                        milliseconds: 530,
                                       ),
                                       curve: Curves.easeInOut,
                                       alignment: model.isLoginSelected
@@ -511,21 +511,30 @@ class _SocialButton extends StatelessWidget {
       child: Container(
         width: size.width * 0.38,
         height: 50,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceVariant(context),
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: AppColors.border(context), width: 0.8),
-        ),
+       decoration: BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(13),
+  border: Border.all(color: AppColors.border(context), width: 0.8),
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.08),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+      spreadRadius: 0,
+    ),
+  ],
+),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            const SizedBox(width: 20),
             Image.asset(assetPath, width: 22, height: 22, fit: BoxFit.contain),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Text(
               label,
               style: TextStyle(
                 color: AppColors.textPrimary(context),
-                fontSize: size.width * 0.033,
+                fontSize: size.width * 0.035,
                 fontWeight: FontWeight.w600,
               ),
             ),
