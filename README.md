@@ -4,21 +4,59 @@ A full-stack Flutter e-commerce application where **AI can handle the shopping p
 
 Instead of manually searching, filtering, opening products, adding them to the cart, and navigating through checkout, users can simply tell the AI what they want and complete the shopping flow through chat.
 
+## 📱 Screenshots
+
+<p align="center">
+  <img src="project_images/home_1.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/home_2.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/chat_bot.jpeg" width="250">
+</p>
+
+<br>
+
+<p align="center">
+  <img src="project_images/admin_panel_1.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/admin_panel_2.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/category_screen.jpeg" width="250">
+</p>
+
+<br>
+
+<p align="center">
+  <img src="project_images/auth_image.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/favourite_screen.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/order_details.jpeg" width="250">
+</p>
+
+<br>
+
+<p align="center">
+  <img src="project_images/settings.jpeg" width="250">
+  &nbsp;&nbsp;&nbsp;
+  <img src="project_images/WhatsApp%20Image%202026-08-12%20at%206.38.23%20PM.jpeg" width="250">
+</p>
+
 ## ✨ Features
 
-###  AI Shopping Assistant
+### 🤖 AI Shopping Assistant
 
 * Powered by **Grok**
 * Search for products using natural language
 * Ask questions about products
 * Add products to the cart through conversation
 * Complete purchases through the chatbot
-* Users can still shop traditionally using search, filters, cart, and checkout
+* Traditional shopping with search, filters, cart, and checkout is also available
 
 ### 👨‍💼 Admin Panel
 
 * Manage categories, brands, and products
-* Create and manage product discounts with start/end dates
+* Create and manage discounts with start and end dates
 * Track product sales and units sold
 * Update shop name and logo
 * Chat directly with customers
@@ -31,14 +69,15 @@ Instead of manually searching, filtering, opening products, adding them to the c
 * Shopping cart
 * Order management
 * Delivery location management
-* Offline data storage
+* Customer chat
+* Offline data storage with Hive
 * Deep linking
 * Stripe and SafePay test-mode payments
 
 ## 🧰 Technologies
 
 * **Flutter** — Mobile application
-* **Django REST Framework** — Deep Linking
+* **Django REST Framework** — Backend API
 * **Firebase Auth & Firestore** — Authentication and data
 * **Grok** — AI shopping assistant
 * **Cloudinary** — Image storage
@@ -62,7 +101,7 @@ lib/
 ├── custom_obj.dart
 └── main.dart
 
-project images/
+project_images/
 ├── admin_panel_1.jpeg
 ├── admin_panel_2.jpeg
 ├── auth_image.jpeg
@@ -77,16 +116,6 @@ project images/
 
 python_backend/
 ```
-
-## 📱 Screenshots
-
-|                                                             |                                                                                                 |                                                               |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| <img src="project%20images/home_1.jpeg" width="250">        | <img src="project%20images/home_2.jpeg" width="250">                                            | <img src="project%20images/chat_bot.jpeg" width="250">        |
-| <img src="project%20images/admin_panel_1.jpeg" width="250"> | <img src="project%20images/admin_panel_2.jpeg" width="250">                                     | <img src="project%20images/category_screen.jpeg" width="250"> |
-| <img src="project%20images/auth_image.jpeg" width="250">    | <img src="project%20images/favourite_screen.jpeg" width="250">                                  | <img src="project%20images/order_details.jpeg" width="250">   |
-| <img src="project%20images/settings.jpeg" width="250">      | <img src="project%20images/WhatsApp%20Image%202026-08-12%20at%206.38.23%20PM.jpeg" width="250"> |                                                               |
-|                                                             |                                                                                                 |                                                               |
 
 ## 🔗 Project
 
