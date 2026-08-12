@@ -7,41 +7,40 @@ Instead of manually searching, filtering, opening products, adding them to the c
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="project_images/home_1.jpeg" width="250">
+  <img src="project%20images/home_1.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/home_2.jpeg" width="250">
+  <img src="project%20images/home_2.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/chat_bot.jpeg" width="250">
+  <img src="project%20images/chat_bot.jpeg" width="250">
 </p>
 
 <br>
 
 <p align="center">
-  <img src="project_images/admin_panel_1.jpeg" width="250">
+  <img src="project%20images/admin_panel_1.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/admin_panel_2.jpeg" width="250">
+  <img src="project%20images/admin_panel_2.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/category_screen.jpeg" width="250">
+  <img src="project%20images/category_screen.jpeg" width="250">
 </p>
 
 <br>
 
 <p align="center">
-  <img src="project_images/auth_image.jpeg" width="250">
+  <img src="project%20images/auth_image.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/favourite_screen.jpeg" width="250">
+  <img src="project%20images/favourite_screen.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/order_details.jpeg" width="250">
+  <img src="project%20images/order_details.jpeg" width="250">
 </p>
 
 <br>
 
 <p align="center">
-  <img src="project_images/settings.jpeg" width="250">
+  <img src="project%20images/settings.jpeg" width="250">
   &nbsp;&nbsp;&nbsp;
-  <img src="project_images/WhatsApp%20Image%202026-08-12%20at%206.38.23%20PM.jpeg" width="250">
+  <img src="project%20images/WhatsApp%20Image%202026-08-12%20at%206.38.23%20PM.jpeg" width="250">
 </p>
-
 ## ✨ Features
 
 ### 🤖 AI Shopping Assistant
