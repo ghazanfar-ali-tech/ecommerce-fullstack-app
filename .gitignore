@@ -56,4 +56,4 @@ assets/service_account.json
 service_account.json
 .env
  
- 
+python_backend/ecommerce_backend/firebase_credentials.json
