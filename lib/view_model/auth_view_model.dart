@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthViewModel extends ChangeNotifier {
   String? _userRole;
@@ -373,65 +373,65 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<User?> loginWithFacebook(BuildContext context) async {
-    try {
-      _setLoading(true);
+  // Future<User?> loginWithFacebook(BuildContext context) async {
+  //   try {
+  //     _setLoading(true);
 
-      final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['email', 'public_profile'],
-      );
+  //     final LoginResult result = await FacebookAuth.instance.login(
+  //       permissions: ['email', 'public_profile'],
+  //     );
 
-      if (result.status != LoginStatus.success) {
-        Utils.toastMessage('Facebook login cancelled or failed.');
-        return null;
-      }
+  //     if (result.status != LoginStatus.success) {
+  //       Utils.toastMessage('Facebook login cancelled or failed.');
+  //       return null;
+  //     }
 
-      final OAuthCredential credential = FacebookAuthProvider.credential(
-        result.accessToken!.tokenString,
-      );
+  //     final OAuthCredential credential = FacebookAuthProvider.credential(
+  //       result.accessToken!.tokenString,
+  //     );
 
-      final userCredential = await _auth.signInWithCredential(credential);
-      final user = userCredential.user!;
+  //     final userCredential = await _auth.signInWithCredential(credential);
+  //     final user = userCredential.user!;
 
-      _userId = user.uid;
-      _email = user.email;
+  //     _userId = user.uid;
+  //     _email = user.email;
 
-      await PushNotificationService.instance.saveTokenToFirestore();
+  //     await PushNotificationService.instance.saveTokenToFirestore();
 
-      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+  //     final userDoc = await _firestore.collection('users').doc(user.uid).get();
 
-      if (!userDoc.exists) {
-        await _firestore.collection('users').doc(user.uid).set({
-          'username': user.displayName ?? 'User',
-          'email': user.email ?? '',
-          'uid': user.uid,
-          'role': 'user',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        _userRole = 'user';
-      } else {
-        _userRole = userDoc.data()?['role'] ?? 'user';
-      }
+  //     if (!userDoc.exists) {
+  //       await _firestore.collection('users').doc(user.uid).set({
+  //         'username': user.displayName ?? 'User',
+  //         'email': user.email ?? '',
+  //         'uid': user.uid,
+  //         'role': 'user',
+  //         'createdAt': FieldValue.serverTimestamp(),
+  //       });
+  //       _userRole = 'user';
+  //     } else {
+  //       _userRole = userDoc.data()?['role'] ?? 'user';
+  //     }
 
-      await _saveToPrefs(_userRole!, _userId!, _email!);
-      await openUserCart(_userId!);
+  //     await _saveToPrefs(_userRole!, _userId!, _email!);
+  //     await openUserCart(_userId!);
 
-      final storeVM = Provider.of<StoreViewModel>(context, listen: false);
-      await storeVM.initForUser(_userId!);
+  //     final storeVM = Provider.of<StoreViewModel>(context, listen: false);
+  //     await storeVM.initForUser(_userId!);
 
-      _setLoading(false);
-      return user;
-    } on FirebaseAuthException catch (e) {
-      _setLoading(false);
-      Utils.toastMessage('Firebase error: ${e.message}');
-      return null;
-    } catch (e) {
-      _setLoading(false);
-      debugPrint('Facebook login error: $e');
-      Utils.toastMessage('Facebook login failed: $e');
-      return null;
-    }
-  }
+  //     _setLoading(false);
+  //     return user;
+  //   } on FirebaseAuthException catch (e) {
+  //     _setLoading(false);
+  //     Utils.toastMessage('Firebase error: ${e.message}');
+  //     return null;
+  //   } catch (e) {
+  //     _setLoading(false);
+  //     debugPrint('Facebook login error: $e');
+  //     Utils.toastMessage('Facebook login failed: $e');
+  //     return null;
+  //   }
+  // }
 
   @override
   void dispose() {

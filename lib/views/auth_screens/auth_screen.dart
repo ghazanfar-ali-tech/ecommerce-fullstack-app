@@ -458,17 +458,17 @@ class AuthScreen extends StatelessWidget {
                                 size: size,
                                 context: context,
                                 onTap: () async {
-                                  final user = await context
-                                      .read<AuthViewModel>()
-                                      .loginWithFacebook(context);
-                                  if (user != null) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => BottomNavigation(),
-                                      ),
-                                    );
-                                  }
+                                  // final user = await context
+                                  //     .read<AuthViewModel>()
+                                  //     .loginWithFacebook(context);
+                                  // if (user != null) {
+                                  //   Navigator.pushReplacement(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (_) => BottomNavigation(),
+                                  //     ),
+                                  //   );
+                                  // }
                                 },
                               ),
                             ],
